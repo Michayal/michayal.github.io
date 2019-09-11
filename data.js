@@ -112,35 +112,6 @@ var Elem =
      { elemName: 'Elem14', nodeA: 7, nodeB: 5 },
      { elemName: 'Elem15', nodeA: 2, nodeB: 5 } ];
 
-function plotAxis (scene, color) {
-    var axis = document.createElement('a-entity');
-    axis.setAttribute('line__x', {'start': {x: 0, y: 0, z: 0},
-                                  'end': {x: 10, y: 0, z: 0},
-                                  'color': color});
-    for (var tick = 1; tick < 10; tick++) {
-        axis.setAttribute('line__x' + tick, {'start': {x: tick, y: -0.2, z: 0},
-                                             'end': {x: tick, y: 0.2, z: 0},
-                                             'color': color});
-    };
-    axis.setAttribute('line__y', {'start': {x: 0, y: 0, z: 0},
-                                  'end': {x: 0, y: 10, z: 0},
-                                  'color': color});
-    for (var tick = 1; tick < 10; tick++) {
-        axis.setAttribute('line__y' + tick, {'start': {y: tick, z: -0.2, x: 0},
-                                             'end': {y: tick, z: 0.2, x: 0},
-                                             'color': color});
-    };
-    axis.setAttribute('line__z', {'start': {x: 0, y: 0, z: 0},
-                                  'end': {x: 0, y: 0, z: 10},
-                                  'color': color});
-    for (var tick = 1; tick < 10; tick++) {
-        axis.setAttribute('line__z' + tick, {'start': {z: tick, x: -0.2, y: 0},
-                                             'end': {z: tick, x: 0.2, y: 0},
-                                             'color': color});
-    };
-    scene.appendChild(axis);
-};
-
 function plotDot (scene, position, size, color, id, text) {
     var sphere = document.createElement('a-sphere');
     sphere.setAttribute('radius', size);

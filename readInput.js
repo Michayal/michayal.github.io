@@ -34,7 +34,7 @@ function processFile() {
     var num = 0;
     var Node = [];
     var Elem = [];
-    for (i = 1; i < content.length; i = i+8, num = num+1) { 
+    for (i = 1; i < content.length; i = i+9, num = num+1) { 
         if (content[i] != '\n*Element'){
             //Node Objects are created and characterized here
             Node[num] = { nodeName : 'Node'+ String(Number(content[i])), x : Number(content[i+1]),
