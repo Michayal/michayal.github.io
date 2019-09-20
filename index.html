@@ -8,18 +8,30 @@
         <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v6.0.0/dist/aframe-extras.min.js"></script>
         <script src="https://unpkg.com/aframe-teleport-controls@0.2.0/dist/aframe-teleport-controls.min.js"></script>
         <script src="https://unpkg.com/aframe-controller-cursor-component@0.2.2/dist/aframe-controller-cursor-component.min.js"></script>
-        <!script src="https://rawgit.com/dmarcos/aframe-motion-capture/master/dist/aframe-motion-capture.min.js"><!/script>
+        <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
         <script src="components/intersection-spawn.js"></script>
         <script src="components/random-color.js"></script>
         <script src="components/snap.js"></script>
         <script src="data.js"></script>
         <script src = "\node_modules\mathjs\dist\math.js"></script>
+        <script src = "\node_modules\super-hands\dist\super-hands.js"></script>
 
     </head>
 
     <body>
         <a-scene avatar-recorder>
             <a-assets>
+
+                <a-mixin id="node" geometry="primitive: sphere; radius: 0.1"
+                         hoverable grabbable stretchable draggable droppable
+                         shadow
+                         event-set__dragdrop=""
+                         event-set__hoveron="_event: hover-start; material.opacity: 0.7; transparent: true"
+                         event-set__hoveroff="_event: hover-end; material.opacity: 1; transparent: false"
+                         event-set__dragon="_event: dragover-start; material.wireframe: true"
+                         event-set__dragoff="_event: dragover-end; material.wireframe: false">
+                </a-mixin>
+
                 <img id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
                 <img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg">
                 <a-mixin id="voxel"
@@ -30,11 +42,18 @@
                          ></a-mixin>
             </a-assets>
 
-            <a-text id="detailText" value="Node value:" align="center" color="#FFF" visible="false" position="0 -0.55 0.55" rotation = "0 180 0"></a-text>
+            <a-entity progressive-controls="objects: .node">
+                <a-entity id="lhand" class="left-controller"></a-entity>
+                <a-entity id="rhand" class="right-controller"></a-entity>
+            </a-entity>
+
+            <a-text id="detailText" value="Node value:" look-at="#camera" align="center" color="#FFF" visible="false" position="2 3 5" rotation = "0 0 0"></a-text>
 
             <a-sky id="bg" radius="30" src="#skyTexture" theta-length="90"></a-sky>
 
             <a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1"></a-cylinder>
+
+            <a-entity getcomponents update-tube></a-entity>
 
             <!-- Hands. 
 <a-entity id="teleHand"
@@ -49,10 +68,25 @@ controller-cursor
 ></a-entity>-->
 
             <!-- Camera. -->
-            <a-camera rotation = "0 180 0">
-                <a-cursor>
-                </a-cursor>
-            </a-camera>
+            <!--
+<a-camera id="camera" position = "4 1.5 5">
+<a-entity cursor="downEvents: triggerdown; upEvents: triggerUp" 
+geometry="primitive: ring; radiusInner: 0.03; radiusOuter: 0.05"
+material="color: blue; shader: flat"
+position="0 0 -1">
+</a-entity>
+</a-camera>
+-->
+
+            <a-entity camera wasd-controls id="camera" position = "4 1.5 5"
+                      capture-mouse
+                      raycaster="objects: .node" cursor="rayOrigin:mouse"
+                      static-body="shape: sphere; sphereRadius: 0.001"
+                      super-hands="colliderEvent: raycaster-intersection;
+                                   colliderEventProperty: els;
+                                   colliderEndEvent:raycaster-intersection-cleared;
+                                   colliderEndEventProperty: clearedEls;">
+            </a-entity> 
 
 
         </a-scene>

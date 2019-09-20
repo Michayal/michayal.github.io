@@ -112,6 +112,8 @@ var Node =
       forceY: 0,
       fdist: 0 } ];
 
+console.log(Node);
+
 var Elem =
     [ { elemName: 'Elem0', nodeA: 0, nodeB: 1 },
      { elemName: 'Elem1', nodeA: 1, nodeB: 2 },
@@ -132,21 +134,71 @@ var Elem =
      { elemName: 'Elem16', nodeA: 10, nodeB: 6 },
      { elemName: 'Elem17', nodeA: 6, nodeB: 9 } ];
 
+var DefNode = [];
+
 function plotDot (scene, position, size, color, id, text) {
-    var sphere = document.createElement('a-sphere');
-    sphere.setAttribute('click-drag');
+    var sphere = document.createElement('a-entity');
+    sphere.setAttribute('class', 'node');
+    sphere.setAttribute('mixin', 'node');
     sphere.setAttribute('radius', size);
     sphere.setAttribute('position', position);
     sphere.setAttribute('color', color);
     sphere.setAttribute('id', id);
     sphere.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
-        var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z - 0.25}
+        var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
         //console.log(newTextPos);
         text.setAttribute('position',newTextPos);
         text.setAttribute('value',id);
         text.setAttribute('visible',true);
         sphere.setAttribute('scale', {x: 1.3, y: 1.3, z: 1.3});
+    });
+    sphere.addEventListener('grab-end', function (evt) {
+        console.log(sphere.getAttribute('id'));
+        console.log(sphere.getAttribute('position').x);
+        var i = sphere.getAttribute('id').substr(4);
+        console.log(i);
+        console.log(Node[i].x);
+        Node[i].x = sphere.getAttribute('position').x;
+        Node[i].y = sphere.getAttribute('position').y;
+        Node[i].z = sphere.getAttribute('position').z;
+        console.log(Node[i].x);
+        updateStruct();
+    });
+    sphere.addEventListener('mouseleave', function () {
+        sphere.setAttribute('scale', {x: 1, y: 1, z: 1});
+        text.setAttribute('visible',false);
+    });
+    //console.log(sphere);
+    scene.appendChild(sphere);
+};
+
+function plotDefDot (scene, position, size, color, id, text) {
+    var sphere = document.createElement('a-sphere');
+    sphere.setAttribute('radius', size);
+    sphere.setAttribute('position', position);
+    sphere.setAttribute('color', color);
+    sphere.setAttribute('id', id);
+    sphere.addEventListener('mouseenter', function (evt) {
+        var oldTextPos = evt.detail.intersection.point;
+        var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
+        //console.log(newTextPos);
+        text.setAttribute('position',newTextPos);
+        text.setAttribute('value',id);
+        text.setAttribute('visible',true);
+        sphere.setAttribute('scale', {x: 1.3, y: 1.3, z: 1.3});
+    });
+    sphere.addEventListener('grab-end', function (evt) {
+        console.log(sphere.getAttribute('id'));
+        console.log(sphere.getAttribute('position').x);
+        var i = sphere.getAttribute('id').substr(4);
+        console.log(i);
+        console.log(Node[i].x);
+        Node[i].x = sphere.getAttribute('position').x;
+        Node[i].y = sphere.getAttribute('position').y;
+        Node[i].z = sphere.getAttribute('position').z;
+        console.log(Node[i].x);
+        updateStruct();
     });
     sphere.addEventListener('mouseleave', function () {
         sphere.setAttribute('scale', {x: 1, y: 1, z: 1});
@@ -167,7 +219,7 @@ function plotTube (scene, position, size, color, id, text) {
     tube.setAttribute('id', id);
     tube.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
-        var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z - 0.25}
+        var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
         //console.log(newTextPos);
         text.setAttribute('position',newTextPos);
         text.setAttribute('value',id);
@@ -184,10 +236,66 @@ function plotTube (scene, position, size, color, id, text) {
 
 
 function myPrint(){
-    console.log("SOmething random")
+    console.log('Look what I can do!');
 };
 
-function InitAnalysis(){
+function updateStruct(){
+    console.log('Moved sphere, time to redraw tube');
+
+    for (var j = 0; j < Elem.length; j = j+1) {
+
+        var nodeStart = Elem[j].nodeA;
+        var nodeEnd = Elem[j].nodeB;
+        var tubePos = '';
+        var nodex1 = Node[nodeStart].x; 
+        var nodey1 = Node[nodeStart].y; 
+        var nodez1 = Node[nodeStart].z;
+        var nodex2 = Node[nodeEnd].x; 
+        var nodey2 = Node[nodeEnd].y; 
+        var nodez2 = Node[nodeEnd].z;
+        tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
+
+        var tube = document.getElementById(Elem[j].elemName);
+        tube.setAttribute('path', tubePos);
+    }
+    console.log(Node);
+    DoAnalysis();
+};
+
+/*
+AFRAME.registerComponent('getcomponents', {
+    init: function () {
+        //InitAnalysis();
+        var allObjects = this.el.sceneEl.object3D.children;
+        var NodeList = [];
+        var ElemList = [];
+        for (var i = 0; i < allObjects.length; i = i+1) {
+            console.log(allObjects[i].el);
+            if (allObjects[i].el.localName == 'a-sphere'){
+                console.log('sphere');
+                NodeList.push(allObjects[i].el.id);
+                console.log(allObjects[i].el);
+            }
+            else if (allObjects[i].el.localName == 'a-tube'){
+                console.log('tube');
+                ElemList.push(allObjects[i].el.id);
+            }
+        }
+
+        for (var i = 0; i < NodeList.length; i = i+1) {
+            var VRnode = document.getElementById(NodeList[i]);
+            console.log(VRnode);
+            VRnode.setAttribute('position', {x: Node[i].x, y: Node[i].y, z: Node[i].z});
+        }
+
+        myPrint();
+    },
+    update: function(){
+
+    }
+}); */
+
+function DoAnalysis(){
     // Node[0].DOF = 2; //Adding a value-pair to a JSON object
 
     var numElem = Elem.length;
@@ -235,8 +343,8 @@ function InitAnalysis(){
         Qglobal.subset(math.index(i,0),Node[num].forceX);
         Qglobal.subset(math.index(i+1,0),Node[num].forceY);
     }
-    console.log(dispBCs);
-    console.log(Qglobal);
+    //console.log(dispBCs);
+    //console.log(Qglobal);
 
 
     //Encodes f_dist from Nodal data
@@ -268,7 +376,7 @@ function InitAnalysis(){
                                  [-c*EA*s/L + 12*s*c*EI/Lcubed, -ssquared*EA/L - 12*csquared*EI/Lcubed, -6*c*EI/Lsquared, c*EA*s/L - 12*s*c*EI/Lcubed, ssquared*EA/L + 12*csquared*EI/Lcubed, -6*c*EI/Lsquared],
                                  [-6*s*EI/Lsquared, 6*c*EI/Lsquared, 2*EI/L, 6*s*EI/Lsquared, -6*c*EI/Lsquared, 4*EI/L]]);
 
-        
+
         // Create and assemble Distributed Force Vector
         var Qdist = math.zeros(6,1);
         Qdist.subset(math.index(0,0),L*fx/2);
@@ -308,8 +416,8 @@ function InitAnalysis(){
     //Solve for qGlobal
     var Kinv = math.inv(Kglobal)
     var qGlobal = math.multiply(Kinv,Qglobal); 
-    console.log(qGlobal);
-    
+    //console.log(qGlobal);
+
     var stress = math.zeros(numElem,6);
     for (var i = 0; i < numElem; i = i+1) {
         var node1 = Elem[i].nodeA;
@@ -340,8 +448,8 @@ function InitAnalysis(){
         qelem.subset(math.index(3,0),math.subset(qGlobal,math.index(math.subset(elemDOFs,math.index(i,3)),0)));
         qelem.subset(math.index(4,0),math.subset(qGlobal,math.index(math.subset(elemDOFs,math.index(i,4)),0)));
         qelem.subset(math.index(5,0),math.subset(qGlobal,math.index(math.subset(elemDOFs,math.index(i,5)),0)));
-        
-        
+
+
         var Qdist = math.zeros(6,1);
         Qdist.subset(math.index(0,0),L*fx/2);
         Qdist.subset(math.index(1,0),L*fy/2);
@@ -369,7 +477,7 @@ function InitAnalysis(){
     }
 
 
-    console.log(stress);
+    //console.log(stress);
     //console.log(stress._size[0]);
 
     //Solve for buckling
@@ -384,9 +492,9 @@ function InitAnalysis(){
         deformedNodes.subset(math.index(i,0), Node[i].x + math.subset(qGlobal,math.index(3*i,0)));
         deformedNodes.subset(math.index(i,1), Node[i].y + math.subset(qGlobal,math.index((3*i)+1,0)));
     }
-    console.log(deformedNodes);
+    //console.log(deformedNodes);
 
-    var DefNode = [];
+
 
     for (i = 0; i < numNodes; i = i+1) { 
         //Node Objects are created and characterized here
@@ -401,7 +509,13 @@ function InitAnalysis(){
     var i = 0;
     for (let item of DefNode) {
         //console.log(Node[i].x);
-        plotDot(scene, {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z}, 0.1, "#ff0000", DefNode[i].DefnodeName, detailText);
+        newNode = document.getElementById(DefNode[i].DefnodeName);
+        if (newNode != null){
+            newNode.setAttribute('position', {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z});
+        }
+        else{
+            plotDefDot(scene, {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z}, 0.1, "#ff0000", DefNode[i].DefnodeName, detailText);
+        }
         i = i+1;
     };
     for (var j = 0; j < Elem.length; j = j+1) {
@@ -418,14 +532,15 @@ function InitAnalysis(){
         tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
 
         //console.log(tubePos);
-        plotTube(scene, tubePos, 0.05, "color:red", Elem[j].elemName, detailText);
-
-
+        tube = document.getElementById('Def'+Elem[j].elemName);
+        if (tube != null){
+            tube.setAttribute('path', tubePos);
+        }
+        else{
+            plotTube(scene, tubePos, 0.05, "color:red", 'Def'+Elem[j].elemName, detailText);
+        }
     }
 };
-
-
-
 
 //window.onload = myPrint();
 
@@ -459,6 +574,5 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
     }
-    //plotAxis (scene, 'black')
-    InitAnalysis();
+    DoAnalysis();
 });
