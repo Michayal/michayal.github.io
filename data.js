@@ -134,6 +134,7 @@ var Elem =
 
 function plotDot (scene, position, size, color, id, text) {
     var sphere = document.createElement('a-sphere');
+    sphere.setAttribute('click-drag');
     sphere.setAttribute('radius', size);
     sphere.setAttribute('position', position);
     sphere.setAttribute('color', color);
