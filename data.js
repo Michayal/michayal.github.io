@@ -460,7 +460,7 @@ function DoAnalysis(){
     for (var i = 0; i < numElem; i = i+1) {
         buckling.subset(math.index(i,0),-math.square(math.pi)*EA*0.0833/math.square(elemLengths[i]));
     }
-    console.log(maxStress);
+    //console.log(maxStress);
 
     var deformedNodes = math.zeros(numNodes,2);
     for (var i = 0; i < numNodes; i = i+1) {
