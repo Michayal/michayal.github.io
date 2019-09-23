@@ -23,6 +23,7 @@
             <a-assets>
 
                 <a-mixin id="node" geometry="primitive: sphere; radius: 0.1"
+                         material="shader: standard; color: #ffffff"
                          hoverable grabbable stretchable draggable droppable
                          shadow
                          event-set__dragdrop=""
@@ -34,12 +35,12 @@
 
                 <img id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
                 <img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg">
-                <a-mixin id="voxel"
+                <!a-mixin id="voxel"
                          geometry="primitive: box; height: 0.5; width: 0.5; depth: 0.5"
                          material="shader: standard"
                          random-color
                          snap="offset: 0.25 0.25 0.25; snap: 0.5 0.5 0.5"
-                         ></a-mixin>
+                         ><!/a-mixin>
             </a-assets>
 
             <a-entity progressive-controls="objects: .node">
@@ -52,8 +53,6 @@
             <a-sky id="bg" radius="30" src="#skyTexture" theta-length="90"></a-sky>
 
             <a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1"></a-cylinder>
-
-            <a-entity getcomponents update-tube></a-entity>
 
             <!-- Hands. 
 <a-entity id="teleHand"

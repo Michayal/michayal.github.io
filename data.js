@@ -1,5 +1,7 @@
 //This is the 2D Truss script extended out to 2D Frame calculations
 
+//Gradient generator credit: https://www.strangeplanet.fr/work/gradient-generator/index.php
+
 var Node =
     [ { nodeName: 'Node0',
        x: 2,
@@ -112,8 +114,6 @@ var Node =
       forceY: 0,
       fdist: 0 } ];
 
-console.log(Node);
-
 var Elem =
     [ { elemName: 'Elem0', nodeA: 0, nodeB: 1 },
      { elemName: 'Elem1', nodeA: 1, nodeB: 2 },
@@ -135,6 +135,7 @@ var Elem =
      { elemName: 'Elem17', nodeA: 6, nodeB: 9 } ];
 
 var DefNode = [];
+var gradient = [ "#001EFF", "#3CFF00", "#FFEE00", "#FFAE00", "#FF7300", "#FF0000", "#FFFFFF"];
 
 function plotDot (scene, position, size, color, id, text) {
     var sphere = document.createElement('a-entity');
@@ -142,7 +143,7 @@ function plotDot (scene, position, size, color, id, text) {
     sphere.setAttribute('mixin', 'node');
     sphere.setAttribute('radius', size);
     sphere.setAttribute('position', position);
-    sphere.setAttribute('color', color);
+    sphere.setAttribute('color', "#ffffff");
     sphere.setAttribute('id', id);
     sphere.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
@@ -154,15 +155,13 @@ function plotDot (scene, position, size, color, id, text) {
         sphere.setAttribute('scale', {x: 1.3, y: 1.3, z: 1.3});
     });
     sphere.addEventListener('grab-end', function (evt) {
-        console.log(sphere.getAttribute('id'));
-        console.log(sphere.getAttribute('position').x);
+        //console.log(sphere.getAttribute('id'));
+        //console.log(sphere.getAttribute('position').x);
         var i = sphere.getAttribute('id').substr(4);
-        console.log(i);
-        console.log(Node[i].x);
+        //console.log(i);
         Node[i].x = sphere.getAttribute('position').x;
         Node[i].y = sphere.getAttribute('position').y;
         Node[i].z = sphere.getAttribute('position').z;
-        console.log(Node[i].x);
         updateStruct();
     });
     sphere.addEventListener('mouseleave', function () {
@@ -216,6 +215,7 @@ function plotTube (scene, position, size, color, id, text) {
     tube.setAttribute('path', position);
     //tube.setAttribute('position', location);
     tube.setAttribute('material', color);
+    tube.setAttribute('shader', 'standard');
     tube.setAttribute('id', id);
     tube.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
@@ -240,7 +240,7 @@ function myPrint(){
 };
 
 function updateStruct(){
-    console.log('Moved sphere, time to redraw tube');
+    //console.log('Moved sphere, time to redraw tube');
 
     for (var j = 0; j < Elem.length; j = j+1) {
 
@@ -258,42 +258,8 @@ function updateStruct(){
         var tube = document.getElementById(Elem[j].elemName);
         tube.setAttribute('path', tubePos);
     }
-    console.log(Node);
     DoAnalysis();
 };
-
-/*
-AFRAME.registerComponent('getcomponents', {
-    init: function () {
-        //InitAnalysis();
-        var allObjects = this.el.sceneEl.object3D.children;
-        var NodeList = [];
-        var ElemList = [];
-        for (var i = 0; i < allObjects.length; i = i+1) {
-            console.log(allObjects[i].el);
-            if (allObjects[i].el.localName == 'a-sphere'){
-                console.log('sphere');
-                NodeList.push(allObjects[i].el.id);
-                console.log(allObjects[i].el);
-            }
-            else if (allObjects[i].el.localName == 'a-tube'){
-                console.log('tube');
-                ElemList.push(allObjects[i].el.id);
-            }
-        }
-
-        for (var i = 0; i < NodeList.length; i = i+1) {
-            var VRnode = document.getElementById(NodeList[i]);
-            console.log(VRnode);
-            VRnode.setAttribute('position', {x: Node[i].x, y: Node[i].y, z: Node[i].z});
-        }
-
-        myPrint();
-    },
-    update: function(){
-
-    }
-}); */
 
 function DoAnalysis(){
     // Node[0].DOF = 2; //Adding a value-pair to a JSON object
@@ -331,6 +297,7 @@ function DoAnalysis(){
     var I = 1/12*w*math.pow(t,3);
     var EI = E*I;
     var EA = E*A;
+    var maxAllowableStress = 0.18;
 
     var dispBCs = math.zeros(numNodes*2, 1);
     for (var i = 0, num = 0; i < numNodes*3; i = i+3, num = num+1) {
@@ -458,6 +425,14 @@ function DoAnalysis(){
         Qdist.subset(math.index(4,0),L*fy/2);
         Qdist.subset(math.index(5,0),-(c*fy-s*fx)*Lsquared/12);
 
+        //Old Force Method
+        Qelem = math.multiply(T,Kelem,qelem)
+        //console.log(Qelem);
+        stress.subset(math.index(i,0),math.multiply(-A,math.subset(Qelem,math.index(0,0))));
+
+
+        //New Force Method, figure out why this is this way...
+        /* 
         var val1 = math.multiply(Kelem,qelem);
         var GlobalForce = math.subtract(val1,Qdist);
         var force = math.multiply(T,GlobalForce);
@@ -472,20 +447,20 @@ function DoAnalysis(){
         stress.subset(math.index(i,2),force.subset(math.index(1,0))/A);
         stress.subset(math.index(i,3),force.subset(math.index(3,0))/A - force.subset(math.index(5,0))*0.5*t/I);
         stress.subset(math.index(i,4),force.subset(math.index(0,0))/A - force.subset(math.index(5,0))*-0.5*t/I);
-        stress.subset(math.index(i,5),force.subset(math.index(4,0))/A);
+        stress.subset(math.index(i,5),force.subset(math.index(4,0))/A); */
 
     }
 
-
-    //console.log(stress);
-    //console.log(stress._size[0]);
+    var maxStress = math.max(math.abs(stress));
+    var minStress = math.min(math.abs(stress));
+    var stressRange = maxStress - minStress;
 
     //Solve for buckling
     var buckling = math.zeros(numElem,1);
     for (var i = 0; i < numElem; i = i+1) {
         buckling.subset(math.index(i,0),-math.square(math.pi)*EA*0.0833/math.square(elemLengths[i]));
     }
-    //console.log(buckling);
+    console.log(maxStress);
 
     var deformedNodes = math.zeros(numNodes,2);
     for (var i = 0; i < numNodes; i = i+1) {
@@ -514,10 +489,14 @@ function DoAnalysis(){
             newNode.setAttribute('position', {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z});
         }
         else{
-            plotDefDot(scene, {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z}, 0.1, "#ff0000", DefNode[i].DefnodeName, detailText);
+            plotDefDot(scene, {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z}, 0.1, "#000000", DefNode[i].DefnodeName, detailText);
         }
         i = i+1;
     };
+
+
+
+
     for (var j = 0; j < Elem.length; j = j+1) {
 
         var nodeStart = Elem[j].nodeA;
@@ -531,16 +510,53 @@ function DoAnalysis(){
         var nodez2 = DefNode[nodeEnd].z;
         tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
 
-        //console.log(tubePos);
+        color = stressColor(math.abs(stress.subset(math.index(j,0))),stressRange,maxAllowableStress);
+
         tube = document.getElementById('Def'+Elem[j].elemName);
         if (tube != null){
             tube.setAttribute('path', tubePos);
+            tube.setAttribute('material', color);
         }
         else{
-            plotTube(scene, tubePos, 0.05, "color:red", 'Def'+Elem[j].elemName, detailText);
+            plotTube(scene, tubePos, 0.05, color, 'Def'+Elem[j].elemName, detailText);
         }
     }
 };
+
+function stressColor(elemStress, stressRange, maxAllowableStress){
+    var stressDiv = stressRange/6;
+    var segment = math.round(elemStress/stressDiv);
+
+    if (elemStress >= maxAllowableStress){
+        color = gradient[6];
+    }
+    else{
+        switch (segment){
+            case 1:
+                color = gradient[0];
+                break;
+            case 2:
+                color = gradient[1];
+                break;
+            case 3:
+                color = gradient[2];
+                break;
+            case 4:
+                color = gradient[3];
+                break;
+            case 5:
+                color = gradient[4];
+                break;
+            case 6:
+                color = gradient[5];
+                break;
+
+        }
+    }
+    color = 'color: '.concat(color);
+    return color;
+};
+
 
 //window.onload = myPrint();
 
