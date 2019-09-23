@@ -1,2 +1,6 @@
 # WebTruss
- Realtime 2D Truss in WebVR
+ Realtime 2D Frame FEA in WebVR
+
+Michayal Mathew
+MAESTRO VR Research Lab
+Texas A&M University
