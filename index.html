@@ -21,7 +21,7 @@
     </head>
 
     <body>
-        <a-scene avatar-recorder>
+        <a-scene avatar-recorder touch-to-click-converter>
             <a-assets>
 
                 <a-mixin id="node" geometry="primitive: sphere; radius: 0.1"
@@ -35,6 +35,22 @@
                          event-set__dragoff="_event: dragover-end; material.wireframe: false">
                 </a-mixin>
 
+                <a-mixin id="pointer" raycaster="showLine: true; objects: .cube, a-link"
+                         super-hands="colliderEvent: raycaster-intersection;
+                                      colliderEventProperty: els;
+                                      colliderEndEvent:raycaster-intersection-cleared;
+                                      colliderEndEventProperty: clearedEls;">
+                </a-mixin>
+                <a-mixin id="controller-right" mixin="pointer"
+                         vive-controls="hand: right" oculus-touch-controls="hand: right"
+                         windows-motion-controls="hand: right"
+                         gearvr-controls daydream-controls oculus-go-controls>
+                </a-mixin>
+                <a-mixin id="controller-left" mixin="pointer"
+                         vive-controls="hand: left" oculus-touch-controls="hand: left"
+                         windows-motion-controls="hand: left">
+                </a-mixin>
+
                 <img id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
                 <img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg">
                 <!a-mixin id="voxel"
@@ -45,9 +61,9 @@
                 ><!/a-mixin>
             </a-assets>
 
-            <a-entity progressive-controls="objects: .node">
-                <a-entity id="lhand" class="left-controller"></a-entity>
-                <a-entity id="rhand" class="right-controller"></a-entity>
+            <a-entity>
+                <a-entity id="rhand" mixin="controller-right"></a-entity>
+          <a-entity id="lhand" mixin="controller-left"></a-entity>
             </a-entity>
 
             <a-text id="detailText" value="Node value:" look-at="#camera" align="center" color="#FFF" visible="false" position="2 3 5" rotation = "0 0 0"></a-text>
