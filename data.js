@@ -543,7 +543,7 @@ function DoAnalysis(){
     var i = 0;
     for (let item of DefNode) {
         //console.log(Node[i].x);
-        newNode = document.getElementById(DefNode[i].DefnodeName);
+        newNode = document.getElementById(Node[i].nodeName);
         if (newNode != null){
             newNode.setAttribute('position', {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z});
         }
