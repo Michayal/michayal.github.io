@@ -135,7 +135,47 @@ var Elem =
      { elemName: 'Elem17', nodeA: 6, nodeB: 9 } ];
 
 var DefNode = [];
+var ForceAdd = false;
+var SupportAdd = false;
 var gradient = [ "#001EFF", "#3CFF00", "#FFEE00", "#FFAE00", "#FF7300", "#FF0000", "#FFFFFF"];
+
+document.addEventListener('keydown', (event) => {
+    const keyName = event.key;
+
+    if (keyName === 'Control') {
+        ForceAdd = true;
+        // do not alert when only Control key is pressed.
+        return;
+    }
+    if (keyName === 'Shift') {
+        SupportAdd = true;
+        // do not alert when only Control key is pressed.
+        return;
+    }
+
+    if (event.ctrlKey) {
+        // Even though event.key is not 'Control' (e.g., 'a' is pressed),
+        // event.ctrlKey may be true if Ctrl key is pressed at the same time.
+        //alert(`Combination of ctrlKey + ${keyName}`);
+    } else {
+        //alert(`Key pressed ${keyName}`);
+    }
+}, false);
+
+document.addEventListener('keyup', (event) => {
+    const keyName = event.key;
+
+    // As the user releases the Ctrl key, the key is no longer active,
+    // so event.ctrlKey is false.
+    if (keyName === 'Control') {
+        ForceAdd = false;
+        //alert('Control key was released');
+    }
+    if (keyName === 'Shift') {
+        SupportAdd = false;
+        //alert('Control key was released');
+    }
+}, false);
 
 function plotDot (scene, position, size, color, id, text) {
     var sphere = document.createElement('a-entity');
@@ -145,28 +185,43 @@ function plotDot (scene, position, size, color, id, text) {
     sphere.setAttribute('position', position);
     sphere.setAttribute('color', "#ffffff");
     sphere.setAttribute('id', id);
+
     sphere.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
         var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
         //console.log(newTextPos);
+        var i = sphere.getAttribute('id').substr(4);
         text.setAttribute('position',newTextPos);
-        text.setAttribute('value',id);
+        var textToShow = id.concat(' , ForceY = ', String(Node[i].forceY));
+        text.setAttribute('value',textToShow);
         text.setAttribute('visible',true);
         sphere.setAttribute('scale', {x: 1.3, y: 1.3, z: 1.3});
+    });
+    sphere.addEventListener('mouseleave', function () {
+        sphere.setAttribute('scale', {x: 1, y: 1, z: 1});
+        text.setAttribute('visible',false);
     });
     sphere.addEventListener('grab-end', function (evt) {
         //console.log(sphere.getAttribute('id'));
         //console.log(sphere.getAttribute('position').x);
         var i = sphere.getAttribute('id').substr(4);
-        //console.log(i);
+        console.log('grabbed');
         Node[i].x = sphere.getAttribute('position').x;
         Node[i].y = sphere.getAttribute('position').y;
         Node[i].z = sphere.getAttribute('position').z;
+        if(ForceAdd == true){
+            Node[i].forceY = Node[i].forceY - 1000;
+            console.log(Node[i].forceY)
+            var textToShow = id.concat(' , ForceY = ', String(Node[i].forceY));
+            text.setAttribute('value',textToShow);;
+        }
+        if(SupportAdd == true){
+            Node[i].forceY = Node[i].forceY + 1000;
+            console.log(Node[i].forceY)
+            var textToShow = id.concat(' , ForceY = ', String(Node[i].forceY));
+            text.setAttribute('value',textToShow);;
+        }
         updateStruct();
-    });
-    sphere.addEventListener('mouseleave', function () {
-        sphere.setAttribute('scale', {x: 1, y: 1, z: 1});
-        text.setAttribute('visible',false);
     });
     //console.log(sphere);
     scene.appendChild(sphere);
@@ -178,6 +233,7 @@ function plotDefDot (scene, position, size, color, id, text) {
     sphere.setAttribute('position', position);
     sphere.setAttribute('color', color);
     sphere.setAttribute('id', id);
+    /*
     sphere.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
         var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
@@ -186,6 +242,13 @@ function plotDefDot (scene, position, size, color, id, text) {
         text.setAttribute('value',id);
         text.setAttribute('visible',true);
         sphere.setAttribute('scale', {x: 1.3, y: 1.3, z: 1.3});
+    });
+    sphere.addEventListener('mouseleave', function () {
+        sphere.setAttribute('scale', {x: 1, y: 1, z: 1});
+        text.setAttribute('visible',false);
+    }); */
+    sphere.addEventListener('mousedown', function (evt) {
+        console.log('click');
     });
     sphere.addEventListener('grab-end', function (evt) {
         console.log(sphere.getAttribute('id'));
@@ -198,10 +261,6 @@ function plotDefDot (scene, position, size, color, id, text) {
         Node[i].z = sphere.getAttribute('position').z;
         console.log(Node[i].x);
         updateStruct();
-    });
-    sphere.addEventListener('mouseleave', function () {
-        sphere.setAttribute('scale', {x: 1, y: 1, z: 1});
-        text.setAttribute('visible',false);
     });
     //console.log(sphere);
     scene.appendChild(sphere);
@@ -512,10 +571,13 @@ function DoAnalysis(){
 
         color = stressColor(math.abs(stress.subset(math.index(j,0))),stressRange,maxAllowableStress);
 
-        tube = document.getElementById('Def'+Elem[j].elemName);
+        tube = document.getElementById(Elem[j].elemName);
         if (tube != null){
             tube.setAttribute('path', tubePos);
             tube.setAttribute('material', color);
+            //var tubeMat = tube.getAttribute('material')
+            //tubeMat.opacity = 0.7;
+            //console.log(tubeMat.opacity);
         }
         else{
             plotTube(scene, tubePos, 0.05, color, 'Def'+Elem[j].elemName, detailText);
