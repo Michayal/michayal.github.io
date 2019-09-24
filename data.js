@@ -137,6 +137,47 @@ var Elem =
 var DefNode = [];
 var gradient = [ "#001EFF", "#3CFF00", "#FFEE00", "#FFAE00", "#FF7300", "#FF0000", "#FFFFFF"];
 
+var ForceAdd = false;
+var SupportAdd = false;
+
+document.addEventListener('keydown', (event) => {
+    const keyName = event.key;
+
+    if (keyName === 'Control') {
+        ForceAdd = true;
+        // do not alert when only Control key is pressed.
+        return;
+    }
+    if (keyName === 'Shift') {
+        SupportAdd = true;
+        // do not alert when only Control key is pressed.
+        return;
+    }
+
+    if (event.ctrlKey) {
+        // Even though event.key is not 'Control' (e.g., 'a' is pressed),
+        // event.ctrlKey may be true if Ctrl key is pressed at the same time.
+        //alert(`Combination of ctrlKey + ${keyName}`);
+    } else {
+        //alert(`Key pressed ${keyName}`);
+    }
+}, false);
+
+document.addEventListener('keyup', (event) => {
+    const keyName = event.key;
+
+    // As the user releases the Ctrl key, the key is no longer active,
+    // so event.ctrlKey is false.
+    if (keyName === 'Control') {
+        ForceAdd = false;
+        //alert('Control key was released');
+    }
+    if (keyName === 'Shift') {
+        SupportAdd = false;
+        //alert('Control key was released');
+    }
+}, false);
+
 function plotDot (scene, position, size, color, id, text) {
     var sphere = document.createElement('a-entity');
     sphere.setAttribute('class', 'node');
@@ -145,28 +186,43 @@ function plotDot (scene, position, size, color, id, text) {
     sphere.setAttribute('position', position);
     sphere.setAttribute('color', "#ffffff");
     sphere.setAttribute('id', id);
+
     sphere.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
         var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
         //console.log(newTextPos);
+        var i = sphere.getAttribute('id').substr(4);
         text.setAttribute('position',newTextPos);
-        text.setAttribute('value',id);
+        var textToShow = id.concat(' , ForceY = ', String(Node[i].forceY));
+        text.setAttribute('value',textToShow);
         text.setAttribute('visible',true);
         sphere.setAttribute('scale', {x: 1.3, y: 1.3, z: 1.3});
+    });
+    sphere.addEventListener('mouseleave', function () {
+        sphere.setAttribute('scale', {x: 1, y: 1, z: 1});
+        text.setAttribute('visible',false);
     });
     sphere.addEventListener('grab-end', function (evt) {
         //console.log(sphere.getAttribute('id'));
         //console.log(sphere.getAttribute('position').x);
         var i = sphere.getAttribute('id').substr(4);
-        //console.log(i);
+        console.log('grabbed');
         Node[i].x = sphere.getAttribute('position').x;
         Node[i].y = sphere.getAttribute('position').y;
         Node[i].z = sphere.getAttribute('position').z;
+        if(ForceAdd == true){
+            Node[i].forceY = Node[i].forceY - 1000;
+            console.log(Node[i].forceY)
+            var textToShow = id.concat(' , ForceY = ', String(Node[i].forceY));
+            text.setAttribute('value',textToShow);;
+        }
+        if(SupportAdd == true){
+            Node[i].forceY = Node[i].forceY + 1000;
+            console.log(Node[i].forceY)
+            var textToShow = id.concat(' , ForceY = ', String(Node[i].forceY));
+            text.setAttribute('value',textToShow);;
+        }
         updateStruct();
-    });
-    sphere.addEventListener('mouseleave', function () {
-        sphere.setAttribute('scale', {x: 1, y: 1, z: 1});
-        text.setAttribute('visible',false);
     });
     //console.log(sphere);
     scene.appendChild(sphere);
@@ -247,11 +303,11 @@ function updateStruct(){
         var nodeStart = Elem[j].nodeA;
         var nodeEnd = Elem[j].nodeB;
         var tubePos = '';
-        var nodex1 = Node[nodeStart].x; 
-        var nodey1 = Node[nodeStart].y; 
+        var nodex1 = Node[nodeStart].x;
+        var nodey1 = Node[nodeStart].y;
         var nodez1 = Node[nodeStart].z;
-        var nodex2 = Node[nodeEnd].x; 
-        var nodey2 = Node[nodeEnd].y; 
+        var nodex2 = Node[nodeEnd].x;
+        var nodey2 = Node[nodeEnd].y;
         var nodez2 = Node[nodeEnd].z;
         tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
 
@@ -382,7 +438,7 @@ function DoAnalysis(){
 
     //Solve for qGlobal
     var Kinv = math.inv(Kglobal)
-    var qGlobal = math.multiply(Kinv,Qglobal); 
+    var qGlobal = math.multiply(Kinv,Qglobal);
     //console.log(qGlobal);
 
     var stress = math.zeros(numElem,6);
@@ -432,7 +488,7 @@ function DoAnalysis(){
 
 
         //New Force Method, figure out why this is this way...
-        /* 
+        /*
         var val1 = math.multiply(Kelem,qelem);
         var GlobalForce = math.subtract(val1,Qdist);
         var force = math.multiply(T,GlobalForce);
@@ -471,7 +527,7 @@ function DoAnalysis(){
 
 
 
-    for (i = 0; i < numNodes; i = i+1) { 
+    for (i = 0; i < numNodes; i = i+1) {
         //Node Objects are created and characterized here
         DefNode[i] = { DefnodeName : 'DefNode'+ String(i), x : math.subset(deformedNodes,math.index(i,0)),
                       y : math.subset(deformedNodes,math.index(i,1)), z : Node[i].z};
@@ -502,11 +558,11 @@ function DoAnalysis(){
         var nodeStart = Elem[j].nodeA;
         var nodeEnd = Elem[j].nodeB;
         var tubePos = '';
-        var nodex1 = DefNode[nodeStart].x; 
-        var nodey1 = DefNode[nodeStart].y; 
+        var nodex1 = DefNode[nodeStart].x;
+        var nodey1 = DefNode[nodeStart].y;
         var nodez1 = DefNode[nodeStart].z;
-        var nodex2 = DefNode[nodeEnd].x; 
-        var nodey2 = DefNode[nodeEnd].y; 
+        var nodex2 = DefNode[nodeEnd].x;
+        var nodey2 = DefNode[nodeEnd].y;
         var nodez2 = DefNode[nodeEnd].z;
         tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
 
@@ -577,11 +633,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
         var nodeStart = Elem[j].nodeA;
         var nodeEnd = Elem[j].nodeB;
         var tubePos = '';
-        var nodex1 = Node[nodeStart].x; 
-        var nodey1 = Node[nodeStart].y; 
+        var nodex1 = Node[nodeStart].x;
+        var nodey1 = Node[nodeStart].y;
         var nodez1 = Node[nodeStart].z;
-        var nodex2 = Node[nodeEnd].x; 
-        var nodey2 = Node[nodeEnd].y; 
+        var nodex2 = Node[nodeEnd].x;
+        var nodey2 = Node[nodeEnd].y;
         var nodez2 = Node[nodeEnd].z;
         tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
 

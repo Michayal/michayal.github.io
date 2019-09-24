@@ -35,7 +35,7 @@
                          event-set__dragoff="_event: dragover-end; material.wireframe: false">
                 </a-mixin>
 
-                <a-mixin id="pointer" raycaster="showLine: true; objects: .cube, a-link"
+                <a-mixin id="pointer" raycaster="showLine: true; objects: .node, a-link"
                          super-hands="colliderEvent: raycaster-intersection;
                                       colliderEventProperty: els;
                                       colliderEndEvent:raycaster-intersection-cleared;
@@ -53,12 +53,6 @@
 
                 <img id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
                 <img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg">
-                <!a-mixin id="voxel"
-                geometry="primitive: box; height: 0.5; width: 0.5; depth: 0.5"
-                material="shader: standard"
-                random-color
-                snap="offset: 0.25 0.25 0.25; snap: 0.5 0.5 0.5"
-                ><!/a-mixin>
             </a-assets>
 
             <a-entity>
@@ -72,7 +66,7 @@
 
             <a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1"></a-cylinder>
 
-            <!-- Hands. 
+            <!-- Hands.
 <a-entity id="teleHand"
 hand-controls="left"
 teleport-controls="type: parabolic; collisionEntities: [mixin='voxel'], #ground"
@@ -87,7 +81,7 @@ controller-cursor
             <!-- Camera. -->
             <!--
 <a-camera id="camera" position = "4 1.5 5">
-<a-entity cursor="downEvents: triggerdown; upEvents: triggerUp" 
+<a-entity cursor="downEvents: triggerdown; upEvents: triggerUp"
 geometry="primitive: ring; radiusInner: 0.03; radiusOuter: 0.05"
 material="color: blue; shader: flat"
 position="0 0 -1">
@@ -104,23 +98,10 @@ position="0 0 -1">
                                        colliderEventProperty: els;
                                        colliderEndEvent:raycaster-intersection-cleared;
                                        colliderEndEventProperty: clearedEls;">
-                </a-entity> 
+                </a-entity>
             </a-entity>
 
 
         </a-scene>
     </body>
-
-    <!script>
-    //document.addEventListener("DOMContentLoaded", function(){
-    //console.log("Printsomething")                                                      
-    //var sphere = document.createElement('a-sphere');
-    //var scene = document.querySelector('a-scene');
-    //scene.appendChild(sphere)
-    //});  
-    <!/script>
-
-
-
 </html>
-
