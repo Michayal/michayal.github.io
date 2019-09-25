@@ -482,28 +482,29 @@ function DoAnalysis(){
         Qdist.subset(math.index(5,0),-(c*fy-s*fx)*Lsquared/12);
 
         //Old Force Method
-        Qelem = math.multiply(T,Kelem,qelem)
+        //Qelem = math.multiply(T,Kelem,qelem)
         //console.log(Qelem);
-        stress.subset(math.index(i,0),math.multiply(-A,math.subset(Qelem,math.index(0,0))));
+        //stress.subset(math.index(i,0),math.multiply(-A,math.subset(Qelem,math.index(0,0))));
 
-
+        
         //New Force Method, figure out why this is this way...
-        /*
+        
         var val1 = math.multiply(Kelem,qelem);
-        var GlobalForce = math.subtract(val1,Qdist);
+        var GlobalForce = math.subtract(val1,Qdist); //ElemForce
         var force = math.multiply(T,GlobalForce);
         //Supposedly need to switch signs of first element?
         force.subset(math.index(0,0),-1*force.subset(math.index(0,0)));
         force.subset(math.index(1,0),-1*force.subset(math.index(1,0)));
         force.subset(math.index(2,0),-1*force.subset(math.index(2,0)));
 
+        console.log(force);
         //Calculate Element Stresses
-        stress.subset(math.index(i,0),force.subset(math.index(0,0))/A - force.subset(math.index(2,0))*0.5*t/I);
-        stress.subset(math.index(i,1),force.subset(math.index(0,0))/A - force.subset(math.index(2,0))*-0.5*t/I);
-        stress.subset(math.index(i,2),force.subset(math.index(1,0))/A);
-        stress.subset(math.index(i,3),force.subset(math.index(3,0))/A - force.subset(math.index(5,0))*0.5*t/I);
+        stress.subset(math.index(i,0),force.subset(math.index(0,0))/A - force.subset(math.index(2,0))*0.5*t/I); //X Node1
+        stress.subset(math.index(i,1),force.subset(math.index(0,0))/A - force.subset(math.index(2,0))*-0.5*t/I); //Y
+        stress.subset(math.index(i,2),force.subset(math.index(1,0))/A); //Moment 
+        stress.subset(math.index(i,3),force.subset(math.index(3,0))/A - force.subset(math.index(5,0))*0.5*t/I); //X Node2
         stress.subset(math.index(i,4),force.subset(math.index(0,0))/A - force.subset(math.index(5,0))*-0.5*t/I);
-        stress.subset(math.index(i,5),force.subset(math.index(4,0))/A); */
+        stress.subset(math.index(i,5),force.subset(math.index(4,0))/A);
 
     }
 
