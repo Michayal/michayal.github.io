@@ -38,7 +38,7 @@ function processFile() {
         if (content[i] != '\r\n\r\n*Element'){
             //Node Objects are created and characterized here
             Node[num] = { nodeName : 'Node'+ String(Number(content[i])), x : Number(content[i+1]),
-                         y : Number(content[i+2]), z : Number(content[i+3]),
+                         y : Number(content[i+2])-1, z : Number(content[i+3]),
                          fixedX : Number(content[i+4]), fixedY : Number(content[i+5]),
                          fixedM : Number(content[i+6]), forceX : Number(content[i+7]), 
                          forceY : Number(content[i+8]), fdist : Number(content[i+9])};
