@@ -135,8 +135,9 @@ var Elem =
      { elemName: 'Elem17', nodeA: 6, nodeB: 9 } ];
 
 var DefNode = [];
-//var gradient = [ "#001EFF", "#3CFF00", "#FFEE00", "#FFAE00", "#FF7300", "#FF0000", "#FFFFFF"];
-var gradient = ['0 30 255','60 255 0','255 238 0','255 174 0','255 155 0','255 255 255'];
+var gradient = [ "#001EFF", "#3CFF00", "#FFEE00", "#FFAE00", "#FF7300", "#FF0000", "#FFFFFF"];
+//var gradient = ['0 30 255','60 255 0','255 238 0','255 174 0','255 155 0','255 255 255'];
+//var gradient = ["#001EFF", "#1469AA", "#28B455", "#3CFF00", "#9DF600", "#FFEE00", "#FFCE00", "#FFAE00", "#FF9000", "#FF7300", "#FF3900", "#FF0000", "#FF7F7F", "#FFFFFF"];
 
 var ForceAdd = false;
 var SupportAdd = false;
@@ -274,6 +275,7 @@ function plotTube (scene, position, size, color, id, text) {
     tube.setAttribute('material', color);
     tube.setAttribute('shader', 'standard');
     tube.setAttribute('id', id);
+    AFRAME.utils.entity.setComponentProperty(tube,'material.side','back');
     /*
     tube.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
@@ -299,10 +301,13 @@ function plotDefTube (scene, position, size, color, id, text) {
     tube.setAttribute('radius', size);
     tube.setAttribute('path', position);
     //tube.setAttribute('position', location);
-    tube.setAttribute('shader', 'gradient');
-    tube.setAttribute('topColor', tcolor);
-    tube.setAttribute('bottomColor', bcolor);
+    tube.setAttribute('shader', 'standard');
+
     tube.setAttribute('id', id);
+    AFRAME.utils.entity.setComponentProperty(tube,'material.src',color);
+    //AFRAME.utils.entity.setComponentProperty(tube,'material.side','back');
+
+    //tube.setAttribute('material.side', 'back');
     /*
     tube.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
@@ -603,17 +608,15 @@ function DoAnalysis(){
         var nodez2 = DefNode[nodeEnd].z;
         tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
 
-        tcolor = stressColor(math.abs(stress.subset(math.index(j,0))),stressRange,maxAllowableStress);
-        bcolor = stressColor(math.abs(stress.subset(math.index(j,0))),stressRange,maxAllowableStress);
+        color = stressColor(math.abs(stress.subset(math.index(j,0))),stressRange,maxAllowableStress);
 
         tube = document.getElementById('Def'+Elem[j].elemName);
         if (tube != null){
             tube.setAttribute('path', tubePos);
-            tube.setAttribute('topColor', tcolor);
-            tube.setAttribute('bottomColor', bcolor);
+            tube.setAttribute('material.src', color);
         }
         else{
-            plotDefTube(scene, tubePos, 0.05, tcolor, bcolor, 'Def'+Elem[j].elemName, detailText);
+            plotDefTube(scene, tubePos, 0.05, color, 'Def'+Elem[j].elemName, detailText);
         }
     }
 };
@@ -623,32 +626,32 @@ function stressColor(elemStress, stressRange, maxAllowableStress){
     var segment = math.round(elemStress/stressDiv);
 
     if (elemStress >= maxAllowableStress){
-        color = gradient[6];
+        color = 'color: #FFFFFF';
     }
     else{
         switch (segment){
             case 1:
-                color = gradient[0];
+                color = '#texture1';
                 break;
             case 2:
-                color = gradient[1];
+                color = '#texture2';
                 break;
             case 3:
-                color = gradient[2];
+                color = '#texture3';
                 break;
             case 4:
-                color = gradient[3];
+                color = '#texture4';
                 break;
             case 5:
-                color = gradient[4];
+                color = '#texture5';
                 break;
             case 6:
-                color = gradient[5];
+                color = '#texture6';
                 break;
 
         }
     }
-    color = 'color: '.concat(color);
+    //color = 'color: '.concat(color);
     return color;
 };
 
