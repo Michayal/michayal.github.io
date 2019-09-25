@@ -135,7 +135,8 @@ var Elem =
      { elemName: 'Elem17', nodeA: 6, nodeB: 9 } ];
 
 var DefNode = [];
-var gradient = [ "#001EFF", "#3CFF00", "#FFEE00", "#FFAE00", "#FF7300", "#FF0000", "#FFFFFF"];
+//var gradient = [ "#001EFF", "#3CFF00", "#FFEE00", "#FFAE00", "#FF7300", "#FF0000", "#FFFFFF"];
+var gradient = ['0 30 255','60 255 0','255 238 0','255 174 0','255 155 0','255 255 255'];
 
 var ForceAdd = false;
 var SupportAdd = false;
@@ -273,6 +274,7 @@ function plotTube (scene, position, size, color, id, text) {
     tube.setAttribute('material', color);
     tube.setAttribute('shader', 'standard');
     tube.setAttribute('id', id);
+    /*
     tube.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
         var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
@@ -285,7 +287,36 @@ function plotTube (scene, position, size, color, id, text) {
     tube.addEventListener('mouseleave', function () {
         tube.setAttribute('material', color);
         text.setAttribute('visible',false);
+    });*/
+    //console.log(tube);
+    scene.appendChild(tube);
+};
+
+function plotDefTube (scene, position, size, color, id, text) {
+    var tube = document.createElement('a-tube');
+    //var location = new THREE.Vector3(0,0,0);
+    //console.log(location);
+    tube.setAttribute('radius', size);
+    tube.setAttribute('path', position);
+    //tube.setAttribute('position', location);
+    tube.setAttribute('shader', 'gradient');
+    tube.setAttribute('topColor', tcolor);
+    tube.setAttribute('bottomColor', bcolor);
+    tube.setAttribute('id', id);
+    /*
+    tube.addEventListener('mouseenter', function (evt) {
+        var oldTextPos = evt.detail.intersection.point;
+        var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
+        //console.log(newTextPos);
+        text.setAttribute('position',newTextPos);
+        text.setAttribute('value',id);
+        text.setAttribute('visible',true);
+        tube.setAttribute('material', "color:white");
     });
+    tube.addEventListener('mouseleave', function () {
+        tube.setAttribute('material', color);
+        text.setAttribute('visible',false);
+    });*/
     //console.log(tube);
     scene.appendChild(tube);
 };
@@ -353,7 +384,7 @@ function DoAnalysis(){
     var I = 1/12*w*math.pow(t,3);
     var EI = E*I;
     var EA = E*A;
-    var maxAllowableStress = 0.18;
+    var maxAllowableStress = 1E25;
 
     var dispBCs = math.zeros(numNodes*2, 1);
     for (var i = 0, num = 0; i < numNodes*3; i = i+3, num = num+1) {
@@ -442,6 +473,8 @@ function DoAnalysis(){
     //console.log(qGlobal);
 
     var stress = math.zeros(numElem,6);
+    var tstress = math.zeros(numElem,1);
+    var bstress = math.zeros(numElem,1);
     for (var i = 0; i < numElem; i = i+1) {
         var node1 = Elem[i].nodeA;
         var node2 = Elem[i].nodeB;
@@ -482,13 +515,12 @@ function DoAnalysis(){
         Qdist.subset(math.index(5,0),-(c*fy-s*fx)*Lsquared/12);
 
         //Old Force Method
-        Qelem = math.multiply(T,Kelem,qelem)
+        //Qelem = math.multiply(T,Kelem,qelem)
         //console.log(Qelem);
-        stress.subset(math.index(i,0),math.multiply(-A,math.subset(Qelem,math.index(0,0))));
+        //stress.subset(math.index(i,0),math.multiply(-A,math.subset(Qelem,math.index(0,0))));
 
 
         //New Force Method, figure out why this is this way...
-        /*
         var val1 = math.multiply(Kelem,qelem);
         var GlobalForce = math.subtract(val1,Qdist);
         var force = math.multiply(T,GlobalForce);
@@ -503,9 +535,14 @@ function DoAnalysis(){
         stress.subset(math.index(i,2),force.subset(math.index(1,0))/A);
         stress.subset(math.index(i,3),force.subset(math.index(3,0))/A - force.subset(math.index(5,0))*0.5*t/I);
         stress.subset(math.index(i,4),force.subset(math.index(0,0))/A - force.subset(math.index(5,0))*-0.5*t/I);
-        stress.subset(math.index(i,5),force.subset(math.index(4,0))/A); */
+        stress.subset(math.index(i,5),force.subset(math.index(4,0))/A);
+
+        tstress.subset(math.index(i,0),math.max(stress.subset(math.index(i,0)),stress.subset(math.index(i,3))));
+        bstress.subset(math.index(i,0),math.max(stress.subset(math.index(i,1)),stress.subset(math.index(i,4))));
 
     }
+    console.log(tstress);
+    console.log(bstress);
 
     var maxStress = math.max(math.abs(stress));
     var minStress = math.min(math.abs(stress));
@@ -566,15 +603,17 @@ function DoAnalysis(){
         var nodez2 = DefNode[nodeEnd].z;
         tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
 
-        color = stressColor(math.abs(stress.subset(math.index(j,0))),stressRange,maxAllowableStress);
+        tcolor = stressColor(math.abs(stress.subset(math.index(j,0))),stressRange,maxAllowableStress);
+        bcolor = stressColor(math.abs(stress.subset(math.index(j,0))),stressRange,maxAllowableStress);
 
         tube = document.getElementById('Def'+Elem[j].elemName);
         if (tube != null){
             tube.setAttribute('path', tubePos);
-            tube.setAttribute('material', color);
+            tube.setAttribute('topColor', tcolor);
+            tube.setAttribute('bottomColor', bcolor);
         }
         else{
-            plotTube(scene, tubePos, 0.05, color, 'Def'+Elem[j].elemName, detailText);
+            plotDefTube(scene, tubePos, 0.05, tcolor, bcolor, 'Def'+Elem[j].elemName, detailText);
         }
     }
 };
