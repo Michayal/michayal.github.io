@@ -41,7 +41,7 @@ var Node =
     fixedY: 0,
     fixedM: 0,
     forceX: 0,
-    forceY: 0,
+    forceY: -3500,
     fdist: 0 },
   { nodeName: 'Node4',
     x: 2.774363,
@@ -111,7 +111,7 @@ var Node =
     fixedY: 0,
     fixedM: 0,
     forceX: 0,
-    forceY: -15,
+    forceY: 0,
     fdist: 0 } ]
 
 var Elem =
