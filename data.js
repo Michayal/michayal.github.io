@@ -136,6 +136,8 @@ var Elem =
 
 var DefNode = [];
 var gradient = [ "#001EFF", "#3CFF00", "#FFEE00", "#FFAE00", "#FF7300", "#FF0000", "#FFFFFF"];
+//var gradient = ['0 30 255','60 255 0','255 238 0','255 174 0','255 155 0','255 255 255'];
+//var gradient = ["#001EFF", "#1469AA", "#28B455", "#3CFF00", "#9DF600", "#FFEE00", "#FFCE00", "#FFAE00", "#FF9000", "#FF7300", "#FF3900", "#FF0000", "#FF7F7F", "#FFFFFF"];
 
 var ForceAdd = false;
 var SupportAdd = false;
@@ -273,6 +275,8 @@ function plotTube (scene, position, size, color, id, text) {
     tube.setAttribute('material', color);
     tube.setAttribute('shader', 'standard');
     tube.setAttribute('id', id);
+    AFRAME.utils.entity.setComponentProperty(tube,'material.side','back');
+    /*
     tube.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
         var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
@@ -285,7 +289,39 @@ function plotTube (scene, position, size, color, id, text) {
     tube.addEventListener('mouseleave', function () {
         tube.setAttribute('material', color);
         text.setAttribute('visible',false);
+    });*/
+    //console.log(tube);
+    scene.appendChild(tube);
+};
+
+function plotDefTube (scene, position, size, color, id, text) {
+    var tube = document.createElement('a-tube');
+    //var location = new THREE.Vector3(0,0,0);
+    //console.log(location);
+    tube.setAttribute('radius', size);
+    tube.setAttribute('path', position);
+    //tube.setAttribute('position', location);
+    tube.setAttribute('shader', 'standard');
+
+    tube.setAttribute('id', id);
+    AFRAME.utils.entity.setComponentProperty(tube,'material.src',color);
+    //AFRAME.utils.entity.setComponentProperty(tube,'material.side','back');
+
+    //tube.setAttribute('material.side', 'back');
+    /*
+    tube.addEventListener('mouseenter', function (evt) {
+        var oldTextPos = evt.detail.intersection.point;
+        var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
+        //console.log(newTextPos);
+        text.setAttribute('position',newTextPos);
+        text.setAttribute('value',id);
+        text.setAttribute('visible',true);
+        tube.setAttribute('material', "color:white");
     });
+    tube.addEventListener('mouseleave', function () {
+        tube.setAttribute('material', color);
+        text.setAttribute('visible',false);
+    });*/
     //console.log(tube);
     scene.appendChild(tube);
 };
@@ -353,7 +389,7 @@ function DoAnalysis(){
     var I = 1/12*w*math.pow(t,3);
     var EI = E*I;
     var EA = E*A;
-    var maxAllowableStress = 0.18;
+    var maxAllowableStress = 1E25;
 
     var dispBCs = math.zeros(numNodes*2, 1);
     for (var i = 0, num = 0; i < numNodes*3; i = i+3, num = num+1) {
@@ -442,6 +478,8 @@ function DoAnalysis(){
     //console.log(qGlobal);
 
     var stress = math.zeros(numElem,6);
+    var tstress = math.zeros(numElem,1);
+    var bstress = math.zeros(numElem,1);
     for (var i = 0; i < numElem; i = i+1) {
         var node1 = Elem[i].nodeA;
         var node2 = Elem[i].nodeB;
@@ -486,9 +524,9 @@ function DoAnalysis(){
         //console.log(Qelem);
         //stress.subset(math.index(i,0),math.multiply(-A,math.subset(Qelem,math.index(0,0))));
 
-        
+
+
         //New Force Method, figure out why this is this way...
-        
         var val1 = math.multiply(Kelem,qelem);
         var GlobalForce = math.subtract(val1,Qdist); //ElemForce
         var force = math.multiply(T,GlobalForce);
@@ -501,12 +539,17 @@ function DoAnalysis(){
         //Calculate Element Stresses
         stress.subset(math.index(i,0),force.subset(math.index(0,0))/A - force.subset(math.index(2,0))*0.5*t/I); //X Node1
         stress.subset(math.index(i,1),force.subset(math.index(0,0))/A - force.subset(math.index(2,0))*-0.5*t/I); //Y
-        stress.subset(math.index(i,2),force.subset(math.index(1,0))/A); //Moment 
+        stress.subset(math.index(i,2),force.subset(math.index(1,0))/A); //Moment
         stress.subset(math.index(i,3),force.subset(math.index(3,0))/A - force.subset(math.index(5,0))*0.5*t/I); //X Node2
         stress.subset(math.index(i,4),force.subset(math.index(0,0))/A - force.subset(math.index(5,0))*-0.5*t/I);
         stress.subset(math.index(i,5),force.subset(math.index(4,0))/A);
 
+        tstress.subset(math.index(i,0),math.max(stress.subset(math.index(i,0)),stress.subset(math.index(i,3))));
+        bstress.subset(math.index(i,0),math.max(stress.subset(math.index(i,1)),stress.subset(math.index(i,4))));
+
     }
+    console.log(tstress);
+    console.log(bstress);
 
     var maxStress = math.max(math.abs(stress));
     var minStress = math.min(math.abs(stress));
@@ -572,10 +615,10 @@ function DoAnalysis(){
         tube = document.getElementById('Def'+Elem[j].elemName);
         if (tube != null){
             tube.setAttribute('path', tubePos);
-            tube.setAttribute('material', color);
+            tube.setAttribute('material.src', color);
         }
         else{
-            plotTube(scene, tubePos, 0.05, color, 'Def'+Elem[j].elemName, detailText);
+            plotDefTube(scene, tubePos, 0.05, color, 'Def'+Elem[j].elemName, detailText);
         }
     }
 };
@@ -585,32 +628,32 @@ function stressColor(elemStress, stressRange, maxAllowableStress){
     var segment = math.round(elemStress/stressDiv);
 
     if (elemStress >= maxAllowableStress){
-        color = gradient[6];
+        color = 'color: #FFFFFF';
     }
     else{
         switch (segment){
             case 1:
-                color = gradient[0];
+                color = '#texture1';
                 break;
             case 2:
-                color = gradient[1];
+                color = '#texture2';
                 break;
             case 3:
-                color = gradient[2];
+                color = '#texture3';
                 break;
             case 4:
-                color = gradient[3];
+                color = '#texture4';
                 break;
             case 5:
-                color = gradient[4];
+                color = '#texture5';
                 break;
             case 6:
-                color = gradient[5];
+                color = '#texture6';
                 break;
 
         }
     }
-    color = 'color: '.concat(color);
+    //color = 'color: '.concat(color);
     return color;
 };
 
