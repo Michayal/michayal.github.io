@@ -148,7 +148,7 @@ document.addEventListener('keydown', (event) => {
         // do not alert when only Control key is pressed.
         return;
     }
-    if (keyName === 'Shift') {
+    if (keyName === 'Tab') {
         SupportAdd = true;
         // do not alert when only Control key is pressed.
         return;
@@ -172,7 +172,7 @@ document.addEventListener('keyup', (event) => {
         ForceAdd = false;
         //alert('Control key was released');
     }
-    if (keyName === 'Shift') {
+    if (keyName === 'Tab') {
         SupportAdd = false;
         //alert('Control key was released');
     }
