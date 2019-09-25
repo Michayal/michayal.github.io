@@ -21,11 +21,14 @@
         <script src = "super-hands.js"></script>
         <script src ="mappings.js"></script>
         <script src ="input-listen.js"></script>
+        <script src="https://rawgit.com/google-ar/three.ar.js/f9603ee/dist/three.ar.js"></script>
+        <!-- Last, include aframe-ar. -->
+        <script src="https://rawgit.com/chenzlabs/aframe-ar/master/dist/aframe-ar.min.js"></script>
 
     </head>
 
     <body>
-        <a-scene avatar-recorder touch-to-click-converter physics="gravity:-9.8">
+        <a-scene avatar-recorder touch-to-click-converter physics="gravity:-9.8" ar>
             <a-assets>
 
                 <a-mixin id="node" geometry="primitive: sphere; radius: 0.1"
