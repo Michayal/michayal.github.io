@@ -21,14 +21,114 @@
         <script src = "super-hands.js"></script>
         <script src ="mappings.js"></script>
         <script src ="input-listen.js"></script>
-        <script src="https://rawgit.com/google-ar/three.ar.js/f9603ee/dist/three.ar.js"></script>
-        <!-- Last, include aframe-ar. -->
-        <script src="https://rawgit.com/chenzlabs/aframe-ar/master/dist/aframe-ar.min.js"></script>
+        <script src="https://vr.cwervo.com/js/vr/datguivr.min.js"></script>
+        <script src="https://unpkg.com/aframe-event-set-component@^3.0.0/dist/aframe-event-set-component.min.js"></script>
 
+        <script>
+            var scene, camera, renderer, gui;
+
+            AFRAME.registerComponent("vr-dat-gui", {
+                init: function() {
+                    scene = document.querySelector("a-scene").object3D;
+                    camera = this.el.camera;
+                    renderer = this.el.renderer;
+                    console.log({ scene, camera, renderer });
+                    addGuiElements(scene, camera, renderer);
+                }
+            });
+
+            var guiData = {
+                testControllerEvents: function() {
+                    eventList.forEach(function(e) {
+                        var event = new Event(e);
+                        console.log(e + " : ");
+                        document.getElementById("leftControl").dispatchEvent(event);
+                    });
+                }
+            };
+
+            let sphereMaterial = new THREE.MeshStandardMaterial({color:0xff6699});
+            sphereMaterial.roughness = 0.60;
+            sphereMaterial.metalness = 0.5;
+            sphereMaterial.options = ['#ff6699', '#000000', '#ffffff'];
+
+            function addGuiElements(scene, camera, renderer) {
+                gui = dat.GUIVR.create("Your text here");
+                gui.position.x = 2;
+                gui.position.y = 1.5;
+                gui.position.z = 4;
+
+                gui.rotation.y = 0.6;
+                //gui.rotation.set({x : 0.17, y : 0.6, z : -0.08});
+
+                var sphere = document.querySelector("#sphere").object3D;
+                sphere.shading = THREE.FlatShading;
+                ["x", "y", "z"].forEach(function(axis) {
+                    gui.add(sphere.scale, axis, 0, 10);
+                });
+
+                gui.add(guiData, "testControllerEvents");
+                gui.add(sphere,'shading', { 'THREE.SmoothShading': THREE.SmoothShading, 'THREE.FlatShading': THREE.FlatShading });
+                gui.add(sphereMaterial, 'wireframe' );
+                //gui.add(sphere.color, 'color', ['#ff6699', '#000000', '#ffffff']);
+                //gui.add(dropdown,["1","2","3"]);
+
+                scene.add(gui);
+
+                // Mouse input
+                //  you can use the mouse to interact with the GUI on-screen!
+                dat.GUIVR.enableMouse( camera, renderer );
+                //  or turn it off when going into VR
+                window.addEventListener( 'vrdisplaypresentchange', function( e ){
+                    if( e.display.isPresenting ){
+                        dat.GUIVR.disableMouse();
+                    }
+                    else{
+                        dat.GUIVR.enableMouse( camera, renderer );
+                    }
+                }, false );
+
+                // Gaze input?
+                var gazeInput = dat.GUIVR.addInputObject( camera );
+                scene.add( gazeInput.cursor ); //  only add the cursor, not the laser
+            }
+
+            AFRAME.registerComponent('dat-gui-controller', {
+                schema : {
+                    query : {default : ""}
+                },
+                init : function() {
+                    if (this.data.query === "") {
+                        console.warn("Dat-gui-controller: no query, please add one");
+                        return;
+                    }
+                    scene = this.el.sceneEl.object3D;
+
+                    var controls = document.querySelectorAll(this.data.query);
+
+                    controls.forEach(function (controllerEl) {
+                        var object3D = controllerEl.object3D;
+                        // https://github.com/dataarts/dat.guiVR/wiki/Input-Support-(Vive-Controllers,-Mouse,-etc)
+                        var vrInput = dat.GUIVR.addInputObject( object3D );
+
+                        ['trigger', 'trackpad', 'grip'].forEach(function (baseEvent) {
+                            ['up', 'down'].forEach(function (e) { controllerEl.addEventListener(baseEvent + e, function(){
+                                var gripEvent = baseEvent === 'grip';
+                                console.log((gripEvent ? 'gripped' : 'pressed') + " " + controllerEl + " " + e);
+                                var value = (e === "down");
+                                (gripEvent ? vrInput.gripped(value) : vrInput.pressed(value));
+                            })})
+                        });
+                        scene.add(vrInput);
+                    });
+                }
+            });
+
+        </script>
     </head>
 
     <body>
-        <a-scene avatar-recorder touch-to-click-converter physics="gravity:-9.8" ar>
+        <a-scene avatar-recorder touch-to-click-converter physics="gravity:-9.8" vr-dat-gui="vr-dat-gui" dat-gui-controller="query: [hand-controls]">
             <a-assets>
 
                 <a-mixin id="node" geometry="primitive: sphere; radius: 0.1"
@@ -70,8 +170,8 @@
                          raycaster="objects: .node; far:50;" laser-controls="hand: left">
                 </a-mixin>
 
-                <!img id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
-                <!img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg">
+                <img id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
+                <img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg">
                 <img id="texture1" src=texture1.png>
                 <img id="texture2" src=texture2.png>
                 <img id="texture3" src=texture3.png>
@@ -79,12 +179,7 @@
                 <img id="texture5" src=texture5.png>
                 <img id="texture6" src=texture6.png>
             </a-assets>
-            <!--
-<a-entity progressive-controls="objects: .node">
-<a-entity id="lhand" class="left-controller"></a-entity>
-<a-entity id="rhand" class="right-controller"></a-entity>
-</a-entity>
--->
+
             <a-entity id ="cameraRig" position = "4 0 5">
                 <a-entity wasd-controls look-controls>
                     <a-entity camera id="camera" position = "0 1.6 0"
@@ -97,16 +192,19 @@
                                            colliderEndEventProperty: clearedEls;">
                     </a-entity>
                 </a-entity>
-                <a-entity id="rhand" mixin="controller-right" input-listen></a-entity>
-                <a-entity id="lhand" mixin="controller-left" input-listen></a-entity>
+                <a-entity id="leftControl" hand-controls="left" teleport-controls="type: parabolic; cameraRig: #cameraRig;"></a-entity>
+                <a-entity id="rightControl" hand-controls="right" teleport-controls="type: parabolic; cameraRig: #cameraRig;"></a-entity>
             </a-entity>
 
+            <a-entity datgui="foo: bar" position = "3 0 4"></a-entity>
+
+            <a-sphere id="sphere" color="#EF2D5E" position="0 1.25 -5" radius="1.25"></a-sphere>
 
             <a-text id="detailText" value="Node value:" look-at="#camera" align="center" color="#FFF" visible="false" position="2 3 5" rotation = "0 0 0"></a-text>
 
-            <!a-sky id="bg" radius="30" src="#skyTexture" theta-length="90"><!/a-sky>
+            <a-sky id="bg" radius="30" src="#skyTexture" theta-length="90" position="0 0 0"></a-sky>
 
-            <!a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1"><!/a-cylinder>
+            <a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1" position="0 0 0"></a-cylinder>
 
             <!-- Hands.
 <a-entity id="teleHand"
