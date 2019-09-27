@@ -32,7 +32,7 @@
                     scene = document.querySelector("a-scene").object3D;
                     camera = this.el.camera;
                     renderer = this.el.renderer;
-                    console.log({ scene, camera, renderer });
+                    //console.log({ scene, camera, renderer });
                     addGuiElements(scene, camera, renderer);
                 }
             });
@@ -52,28 +52,89 @@
             sphereMaterial.metalness = 0.5;
             sphereMaterial.options = ['#ff6699', '#000000', '#ffffff'];
 
+            function updateMaterial(){
+                material = mesh.material = new THREE.MeshStandardMaterial({
+                    shading: state.shading,
+                    color: state.color
+                });
+                material.roughness = state.roughness;
+                material.metalness = 1;
+                material.envMap = textureCube;
+                material.wireframe = state.wireframe;
+            }
+
+
             function addGuiElements(scene, camera, renderer) {
-                gui = dat.GUIVR.create("Your text here");
+                gui = dat.GUIVR.create("Settings");
+                //console.log(NodeList);
+                //gui.add(Node[0],'nodeName',NodeList);
+                
+                gui1 = dat.GUIVR.create("ForceY");
+                
+                gui.addFolder(gui1);
+                //var InitNodes = document.querySelector("#InitNodes").object3D;
+                
+                for (var i = 0; i<Node.length; i++){
+                    gui1.add(Node[i], 'forceY', -5000, 5000).name(String(Node[i].nodeName).concat('.forceY')).onChange(DoAnalysis);
+                }
+
+                gui2 = dat.GUIVR.create("ForceX");
+
+                gui.addFolder(gui2);
+                
+                for (var i = 0; i<Node.length; i++){
+                    gui2.add(Node[i], 'forceX', -5000, 5000).name(String(Node[i].nodeName).concat('.forceX')).onChange(DoAnalysis);
+                }
+                
+                gui3 = dat.GUIVR.create("F dist");
+
+                gui.addFolder(gui3);
+                
+                for (var i = 0; i<Node.length; i++){
+                    gui3.add(Node[i], 'fdist', -100, 100).name(String(Node[i].nodeName).concat('.fdist')).onChange(DoAnalysis);
+                }
+
+                scene.add(gui);
+                
                 gui.position.x = 2;
                 gui.position.y = 1.5;
                 gui.position.z = 4;
 
                 gui.rotation.y = 0.6;
+
+
+                //gui.add(gui2);
+
+
+
+                /* (InitNodes.children.length).forEach(function(node) {
+                  gui.add(InitNodes.children.scale.x, node, 0, 10);
+                });*/
+
+
+                //gui.add(Node,'nodeName',{'Node0':Node.Node0, 'Node1':Node.Node1})
+
                 //gui.rotation.set({x : 0.17, y : 0.6, z : -0.08});
 
+                /*
                 var sphere = document.querySelector("#sphere").object3D;
+                console.log(sphere.el.attributes.color);
+                //sphere.el.attributes.color = '#EF2D5E'
                 sphere.shading = THREE.FlatShading;
                 ["x", "y", "z"].forEach(function(axis) {
                     gui.add(sphere.scale, axis, 0, 10);
                 });
 
                 gui.add(guiData, "testControllerEvents");
-                gui.add(sphere,'shading', { 'THREE.SmoothShading': THREE.SmoothShading, 'THREE.FlatShading': THREE.FlatShading });
+                gui.add(sphere,'shading', { 'THREE.SmoothShading': THREE.SmoothShading, 'THREE.FlatShading': THREE.FlatShading }).listen().onChange( updateMaterial );
+                gui.add(sphere.el.attributes,'color', { 'default':'#EF2D5E','red': '#FF0000', 'green': '#00FF00','blue': '#0000FF'});
                 gui.add(sphereMaterial, 'wireframe' );
                 //gui.add(sphere.color, 'color', ['#ff6699', '#000000', '#ffffff']);
                 //gui.add(dropdown,["1","2","3"]);
+                */
 
-                scene.add(gui);
+                //scene.add(gui);
+                //scene.add(gui2);
 
                 // Mouse input
                 //  you can use the mouse to interact with the GUI on-screen!
@@ -196,9 +257,9 @@
                 <a-entity id="rightControl" hand-controls="right" teleport-controls="type: parabolic; cameraRig: #cameraRig;"></a-entity>
             </a-entity>
 
-            <a-entity datgui="foo: bar" position = "3 0 4"></a-entity>
+            <a-entity id='InitNodes'></a-entity>
 
-            <a-sphere id="sphere" color="#EF2D5E" position="0 1.25 -5" radius="1.25"></a-sphere>
+            <!a-sphere id="sphere" color="#EF2D5E" position="0 1.25 -5" radius="1.25"><!/a-sphere>
 
             <a-text id="detailText" value="Node value:" look-at="#camera" align="center" color="#FFF" visible="false" position="2 3 5" rotation = "0 0 0"></a-text>
 

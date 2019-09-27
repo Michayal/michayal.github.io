@@ -135,6 +135,7 @@ var Elem =
      { elemName: 'Elem17', nodeA: 6, nodeB: 9 } ];
 
 var DefNode = [];
+var NodeList = [];
 //var gradient = [ "#001EFF", "#3CFF00", "#FFEE00", "#FFAE00", "#FF7300", "#FF0000", "#FFFFFF"];
 //var gradient = ['0 30 255','60 255 0','255 238 0','255 174 0','255 155 0','255 255 255'];
 //var gradient = ["#001EFF", "#1469AA", "#28B455", "#3CFF00", "#9DF600", "#FFEE00", "#FFCE00", "#FFAE00", "#FF9000", "#FF7300", "#FF3900", "#FF0000", "#FF7F7F", "#FFFFFF"];
@@ -227,7 +228,9 @@ function plotDot (scene, position, size, color, id, text) {
         updateStruct();
     });
     //console.log(sphere);
-    scene.appendChild(sphere);
+    var NodeArray = document.getElementById("InitNodes")
+    NodeArray.appendChild(sphere);
+    //scene.appendChild(NodeArray);
 };
 
 function plotDefDot (scene, position, size, color, id, text) {
@@ -548,8 +551,8 @@ function DoAnalysis(){
         bstress.subset(math.index(i,0),math.max(stress.subset(math.index(i,1)),stress.subset(math.index(i,4))));
 
     }
-    console.log(tstress);
-    console.log(bstress);
+    //console.log(tstress);
+    //console.log(bstress);
 
     var maxStress = math.max(math.abs(stress));
     var minStress = math.min(math.abs(stress));
@@ -669,6 +672,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var i = 0;
     for (let item of Node) {
         //console.log(Node[i].x);
+        NodeList.push({'nodeName': Node[i].nodeName});
         plotDot(scene, {x: Node[i].x, y: Node[i].y, z: Node[i].z}, 0.1, "#ffffff", Node[i].nodeName, detailText);
         i = i+1;
     };
