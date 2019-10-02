@@ -68,39 +68,56 @@
                 gui = dat.GUIVR.create("Settings");
                 //console.log(NodeList);
                 //gui.add(Node[0],'nodeName',NodeList);
-                
+
                 gui1 = dat.GUIVR.create("ForceY");
-                
+
                 gui.addFolder(gui1);
                 //var InitNodes = document.querySelector("#InitNodes").object3D;
-                
+
                 for (var i = 0; i<Node.length; i++){
-                    gui1.add(Node[i], 'forceY', -5000, 5000).name(String(Node[i].nodeName).concat('.forceY')).onChange(DoAnalysis);
+                    gui1.add(Node[i], 'forceY', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceY')).onChange(DoAnalysis);
                 }
 
                 gui2 = dat.GUIVR.create("ForceX");
 
                 gui.addFolder(gui2);
-                
+
                 for (var i = 0; i<Node.length; i++){
-                    gui2.add(Node[i], 'forceX', -5000, 5000).name(String(Node[i].nodeName).concat('.forceX')).onChange(DoAnalysis);
+                    gui2.add(Node[i], 'forceX', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceX')).onChange(DoAnalysis);
                 }
-                
+
                 gui3 = dat.GUIVR.create("F dist");
 
                 gui.addFolder(gui3);
-                
+
                 for (var i = 0; i<Node.length; i++){
-                    gui3.add(Node[i], 'fdist', -100, 100).name(String(Node[i].nodeName).concat('.fdist')).onChange(DoAnalysis);
+                    gui3.add(Node[i], 'fdist', -100, 100).step(10).name(String(Node[i].nodeName).concat('.fdist')).onChange(DoAnalysis);
                 }
+                
+                gui4 = dat.GUIVR.create("Material Properties");
+
+                gui.addFolder(gui4);
+                gui4.add(matProps[0], 'youngsModulus', {'Polypropylene (1.5 GPa)':1.5E9,'Aluminium (69 GPa)':69E9,'Titanium (105 GPa)':105E9,'Steel (200 GPa)':200E9}).onChange(DoAnalysis);
+                gui4.add(matProps[1], 'thickness', 0.001, 0.1).name('Thickness [m]').onChange(DoAnalysis);
+                gui4.add(matProps[2], 'width', 0.001, 0.1).name('Width [m]').onChange(DoAnalysis);
+                gui4.add(matProps[3], 'maxAllowableStress', {1E6:1E6,1E7:1E7,1E8:1E8,1E9:1E9,1E10:1E10,1E11:1E11}).onChange(DoAnalysis);
+
+                /*
+                gui.addFolder(gui4);
+                gui4.add(matProps[0], 'youngsModulus', {'Polypropylene (1.5 GPa)':1.5E9,'Aluminium (69 GPa)':69E9,'Titanium (105 GPa)':105E9,'Steel (200 GPa)':200E9}).name('Youngs Modulus [Pa]').onChange(DoAnalysis);
+                gui4.add(matProps[1], 'thickness', 0.001, 0.1).name('Thickness [m]').onChange(DoAnalysis);
+                gui4.add(matProps[2], 'width', 0.001, 0.1).name('Width [m]').onChange(DoAnalysis);
+                gui4.add(matProps[3], 'maxAllowableStress', {1E6:1E6,1E7:1E7,1E8:1E8,1E9:1E9,1E10:1E10,1E11:1E11}).name('Max Stress Allowable [Pa]').onChange(DoAnalysis);
+                */
 
                 scene.add(gui);
-                
+
                 gui.position.x = 2;
                 gui.position.y = 1.5;
                 gui.position.z = 4;
 
                 gui.rotation.y = 0.6;
+                
 
 
                 //gui.add(gui2);
@@ -203,6 +220,13 @@
                          event-set__hoveroff="_event: hover-end; material.opacity: 1; transparent: false"
                          event-set__dragdrop="">
                 </a-mixin>
+                <a-mixin id="elem" geometry="primitive: sphere; radius: 0.1"
+                         hoverable
+                         shadow
+                         event-set__hoveron="_event: hover-start; material.opacity: 0.7; transparent: true"
+                         event-set__hoveroff="_event: hover-end; material.opacity: 1; transparent: false"
+                         event-set__dragdrop="">
+                </a-mixin>
 
                 <a-mixin id="pointer" raycaster="showLine: true; objects: .node, a-link"
                          super-hands="colliderEvent: raycaster-intersection;
@@ -231,21 +255,23 @@
                          raycaster="objects: .node; far:50;" laser-controls="hand: left">
                 </a-mixin>
 
-                <img id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
-                <img id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg">
+                <img crossorigin="anonymous" id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
+                <img crossorigin="anonymous" id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg">
+                <img id="texture0" src=texture0.png>
                 <img id="texture1" src=texture1.png>
                 <img id="texture2" src=texture2.png>
                 <img id="texture3" src=texture3.png>
                 <img id="texture4" src=texture4.png>
                 <img id="texture5" src=texture5.png>
                 <img id="texture6" src=texture6.png>
+                <img id="texture7" src=texture7.png>
             </a-assets>
 
             <a-entity id ="cameraRig" position = "4 0 5">
                 <a-entity wasd-controls look-controls>
                     <a-entity camera id="camera" position = "0 1.6 0"
                               capture-mouse
-                              raycaster="objects: .node" cursor="rayOrigin:mouse"
+                              raycaster="objects: .node, .elem" cursor="rayOrigin:mouse"
                               static-body="shape: sphere; sphereRadius: 0.001"
                               super-hands="colliderEvent: raycaster-intersection;
                                            colliderEventProperty: els;
@@ -253,8 +279,8 @@
                                            colliderEndEventProperty: clearedEls;">
                     </a-entity>
                 </a-entity>
-                <a-entity id="leftControl" hand-controls="left" teleport-controls="type: parabolic; cameraRig: #cameraRig;"></a-entity>
-                <a-entity id="rightControl" hand-controls="right" teleport-controls="type: parabolic; cameraRig: #cameraRig;"></a-entity>
+                <a-entity id="leftControl" hand-controls="left" teleport-controls="type: parabolic; cameraRig: #cameraRig;" super-hands hand-controls="left"></a-entity>
+                <a-entity id="rightControl" hand-controls="right" teleport-controls="type: parabolic; cameraRig: #cameraRig;" super-hands hand-controls="right"></a-entity>
             </a-entity>
 
             <a-entity id='InitNodes'></a-entity>

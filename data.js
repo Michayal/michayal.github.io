@@ -41,7 +41,7 @@ var Node =
       fixedY: 0,
       fixedM: 0,
       forceX: 0,
-      forceY: -3500,
+      forceY: 0,
       fdist: 0 },
      { nodeName: 'Node4',
       x: 2.774363,
@@ -136,50 +136,20 @@ var Elem =
 
 var DefNode = [];
 var NodeList = [];
+var matProps = 
+    [
+        {youngsModulus: 1.5E9},
+        {thickness: 0.002},
+        {width: 0.02},
+        {maxAllowableStress: 1E8}
+    ];
+
+var stress;
+var color = '#texture0';
+// Textures generated at:https://angrytools.com/gradient/image/
 //var gradient = [ "#001EFF", "#3CFF00", "#FFEE00", "#FFAE00", "#FF7300", "#FF0000", "#FFFFFF"];
 //var gradient = ['0 30 255','60 255 0','255 238 0','255 174 0','255 155 0','255 255 255'];
 //var gradient = ["#001EFF", "#1469AA", "#28B455", "#3CFF00", "#9DF600", "#FFEE00", "#FFCE00", "#FFAE00", "#FF9000", "#FF7300", "#FF3900", "#FF0000", "#FF7F7F", "#FFFFFF"];
-
-var ForceAdd = false;
-var SupportAdd = false;
-
-document.addEventListener('keydown', (event) => {
-    const keyName = event.key;
-
-    if (keyName === 'Control') {
-        ForceAdd = true;
-        // do not alert when only Control key is pressed.
-        return;
-    }
-    if (keyName === 'Tab') {
-        SupportAdd = true;
-        // do not alert when only Control key is pressed.
-        return;
-    }
-
-    if (event.ctrlKey) {
-        // Even though event.key is not 'Control' (e.g., 'a' is pressed),
-        // event.ctrlKey may be true if Ctrl key is pressed at the same time.
-        //alert(`Combination of ctrlKey + ${keyName}`);
-    } else {
-        //alert(`Key pressed ${keyName}`);
-    }
-}, false);
-
-document.addEventListener('keyup', (event) => {
-    const keyName = event.key;
-
-    // As the user releases the Ctrl key, the key is no longer active,
-    // so event.ctrlKey is false.
-    if (keyName === 'Control') {
-        ForceAdd = false;
-        //alert('Control key was released');
-    }
-    if (keyName === 'Tab') {
-        SupportAdd = false;
-        //alert('Control key was released');
-    }
-}, false);
 
 function plotDot (scene, position, size, color, id, text) {
     var sphere = document.createElement('a-entity');
@@ -213,19 +183,8 @@ function plotDot (scene, position, size, color, id, text) {
         Node[i].x = sphere.getAttribute('position').x;
         Node[i].y = sphere.getAttribute('position').y;
         Node[i].z = sphere.getAttribute('position').z;
-        if(ForceAdd == true){
-            Node[i].forceY = Node[i].forceY - 1000;
-            console.log(Node[i].forceY)
-            var textToShow = id.concat(' , ForceY = ', String(Node[i].forceY));
-            text.setAttribute('value',textToShow);;
-        }
-        if(SupportAdd == true){
-            Node[i].forceY = Node[i].forceY + 1000;
-            console.log(Node[i].forceY)
-            var textToShow = id.concat(' , ForceY = ', String(Node[i].forceY));
-            text.setAttribute('value',textToShow);;
-        }
         updateStruct();
+        //sphere.setAttribute('position', {x: sphere.getAttribute('position').x, y: sphere.getAttribute('position').y, z: sphere.getAttribute('position').z});
     });
     //console.log(sphere);
     var NodeArray = document.getElementById("InitNodes")
@@ -299,8 +258,8 @@ function plotTube (scene, position, size, color, id, text) {
 
 function plotDefTube (scene, position, size, color, id, text) {
     var tube = document.createElement('a-tube');
-    //var location = new THREE.Vector3(0,0,0);
-    //console.log(location);
+    tube.setAttribute('class', 'elem');
+    tube.setAttribute('mixin', 'elem');
     tube.setAttribute('radius', size);
     tube.setAttribute('path', position);
     //tube.setAttribute('position', location);
@@ -311,20 +270,18 @@ function plotDefTube (scene, position, size, color, id, text) {
     //AFRAME.utils.entity.setComponentProperty(tube,'material.side','back');
 
     //tube.setAttribute('material.side', 'back');
-    /*
     tube.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
         var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
-        //console.log(newTextPos);
+        var i = tube.getAttribute('id').substr(4);
         text.setAttribute('position',newTextPos);
-        text.setAttribute('value',id);
+        var textToShow = id.concat(' , Stress = ', String(math.subset(stress,math.index(Number(i),0))));
+        text.setAttribute('value',textToShow);
         text.setAttribute('visible',true);
-        tube.setAttribute('material', "color:white");
     });
     tube.addEventListener('mouseleave', function () {
-        tube.setAttribute('material', color);
         text.setAttribute('visible',false);
-    });*/
+    });
     //console.log(tube);
     scene.appendChild(tube);
 };
@@ -336,7 +293,7 @@ function myPrint(){
 
 function updateStruct(){
     //console.log('Moved sphere, time to redraw tube');
-
+    /*
     for (var j = 0; j < Elem.length; j = j+1) {
 
         var nodeStart = Elem[j].nodeA;
@@ -352,11 +309,11 @@ function updateStruct(){
 
         var tube = document.getElementById(Elem[j].elemName);
         tube.setAttribute('path', tubePos);
-    }
+    } */
     DoAnalysis();
 };
 
-function DoAnalysis(){
+var DoAnalysis = function(){
     // Node[0].DOF = 2; //Adding a value-pair to a JSON object
 
     var numElem = Elem.length;
@@ -383,16 +340,21 @@ function DoAnalysis(){
     }
 
     //Problem Parameters defined here
-    var E = 1.5E9;
-    var t = 0.002;
-    var w = 0.02;
+    var E = matProps[0].youngsModulus;
+    var t = matProps[1].thickness;
+    var w = matProps[2].width;
     var fx = 0;
     var fy = 0;
     var A = t*w;
     var I = 1/12*w*math.pow(t,3);
     var EI = E*I;
     var EA = E*A;
-    var maxAllowableStress = 1E25;
+    var maxAllowableStress = matProps[3].maxAllowableStress;
+    console.log(maxAllowableStress);
+    //this.maxAllowableStress = 1E8;
+    //var maxAllowableStress = 0.18;
+
+
 
     var dispBCs = math.zeros(numNodes*2, 1);
     for (var i = 0, num = 0; i < numNodes*3; i = i+3, num = num+1) {
@@ -480,7 +442,7 @@ function DoAnalysis(){
     var qGlobal = math.multiply(Kinv,Qglobal);
     //console.log(qGlobal);
 
-    var stress = math.zeros(numElem,6);
+    stress = math.zeros(numElem,6);
     var tstress = math.zeros(numElem,1);
     var bstress = math.zeros(numElem,1);
     for (var i = 0; i < numElem; i = i+1) {
@@ -523,10 +485,11 @@ function DoAnalysis(){
         Qdist.subset(math.index(5,0),-(c*fy-s*fx)*Lsquared/12);
 
         //Old Force Method
-        //Qelem = math.multiply(T,Kelem,qelem)
+        /*
+        Qelem = math.multiply(T,Kelem,qelem)
         //console.log(Qelem);
-        //stress.subset(math.index(i,0),math.multiply(-A,math.subset(Qelem,math.index(0,0))));
-
+        stress.subset(math.index(i,0),math.multiply(-A,math.subset(Qelem,math.index(0,0))));
+        */
 
 
         //New Force Method, figure out why this is this way...
@@ -549,8 +512,10 @@ function DoAnalysis(){
 
         tstress.subset(math.index(i,0),math.max(stress.subset(math.index(i,0)),stress.subset(math.index(i,3))));
         bstress.subset(math.index(i,0),math.max(stress.subset(math.index(i,1)),stress.subset(math.index(i,4))));
+        //Elem[i].stress = stress.subset(math.index(i,0));
 
     }
+    //console.log(Elem);
     //console.log(tstress);
     //console.log(bstress);
 
@@ -576,8 +541,11 @@ function DoAnalysis(){
 
     for (i = 0; i < numNodes; i = i+1) {
         //Node Objects are created and characterized here
+
         DefNode[i] = { DefnodeName : 'DefNode'+ String(i), x : math.subset(deformedNodes,math.index(i,0)),
                       y : math.subset(deformedNodes,math.index(i,1)), z : Node[i].z};
+        //Node[i].x = math.subset(deformedNodes,math.index(i,0));
+        //Node[i].y = math.subset(deformedNodes,math.index(i,1));
     }
 
     //console.log(DefNode);
@@ -585,20 +553,21 @@ function DoAnalysis(){
     var detailText = document.getElementById('detailText');
 
     var i = 0;
-    for (let item of DefNode) {
+    for (let item of Node) {
         //console.log(Node[i].x);
-        newNode = document.getElementById(DefNode[i].DefnodeName);
+        newNode = document.getElementById(Node[i].nodeName);
         if (newNode != null){
             newNode.setAttribute('position', {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z});
         }
         else{
-            plotDefDot(scene, {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z}, 0.1, "#000000", DefNode[i].DefnodeName, detailText);
+            plotDot(scene, {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z}, 0.1, "#000000", Node[i].nodeName, detailText);
         }
         i = i+1;
     };
 
+    //console.log(Node);
 
-
+    //console.log(stress);
 
     for (var j = 0; j < Elem.length; j = j+1) {
 
@@ -613,49 +582,63 @@ function DoAnalysis(){
         var nodez2 = DefNode[nodeEnd].z;
         tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
 
-        color = stressColor(math.abs(stress.subset(math.index(j,0))),stressRange,maxAllowableStress);
 
-        tube = document.getElementById('Def'+Elem[j].elemName);
+        var color = stressColor(math.abs(stress.subset(math.index(j,0))),stressRange,maxAllowableStress);
+        //console.log(color);
+
+        tube = document.getElementById(Elem[j].elemName);
         if (tube != null){
             tube.setAttribute('path', tubePos);
-            tube.setAttribute('material.src', color);
+            AFRAME.utils.entity.setComponentProperty(tube,'material.src',color);
         }
         else{
-            plotDefTube(scene, tubePos, 0.05, color, 'Def'+Elem[j].elemName, detailText);
+            plotDefTube(scene, tubePos, 0.05, color, Elem[j].elemName, detailText);
         }
     }
 };
 
 function stressColor(elemStress, stressRange, maxAllowableStress){
-    var stressDiv = stressRange/6;
+    var stressDiv = maxAllowableStress/7;
     var segment = math.round(elemStress/stressDiv);
+    //console.log(elemStress);
+    //console.log(segment);
 
-    if (elemStress >= maxAllowableStress){
-        color = 'color: #FFFFFF';
-    }
-    else{
-        switch (segment){
-            case 1:
-                color = '#texture1';
-                break;
-            case 2:
-                color = '#texture2';
-                break;
-            case 3:
-                color = '#texture3';
-                break;
-            case 4:
-                color = '#texture4';
-                break;
-            case 5:
-                color = '#texture5';
-                break;
-            case 6:
-                color = '#texture6';
-                break;
-
-        }
-    }
+    if (segment==1){color = '#texture0';} 
+    else if (segment==2){color = '#texture1';}
+    else if (segment==3){color = '#texture2';}
+    else if (segment==4){color = '#texture3';}
+    else if (segment==5){color = '#texture4';}
+    else if (segment==6){color = '#texture5';}
+    else if (segment==7){color = '#texture6';}
+    else if (segment>7){color = '#texture7';}
+        
+    /*
+    switch (segment){
+        case 1:
+            color = '#texture0';
+            break;
+        case 2:
+            color = '#texture1';
+            break;
+        case 3:
+            color = '#texture2';
+            break;
+        case 4:
+            color = '#texture3';
+            break;
+        case 5:
+            color = '#texture4';
+            break;
+        case 6:
+            color = '#texture5';
+            break;
+        case 7:
+            color = '#texture6';
+            break;
+        case (segment >7):
+            color = '#texture7';
+            break;
+    }*/
     //color = 'color: '.concat(color);
     return color;
 };
@@ -676,6 +659,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         plotDot(scene, {x: Node[i].x, y: Node[i].y, z: Node[i].z}, 0.1, "#ffffff", Node[i].nodeName, detailText);
         i = i+1;
     };
+    /*
     for (var j = 0; j < Elem.length; j = j+1) {
 
         var nodeStart = Elem[j].nodeA;
@@ -693,6 +677,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
         plotTube(scene, tubePos, 0.05, "color:green", Elem[j].elemName, detailText);
 
 
-    }
+    }*/
     DoAnalysis();
 });
