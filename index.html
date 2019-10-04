@@ -100,7 +100,8 @@
                 gui4.add(matProps[0], 'youngsModulus', {'Polypropylene (1.5 GPa)':1.5E9,'Aluminium (69 GPa)':69E9,'Titanium (105 GPa)':105E9,'Steel (200 GPa)':200E9}).onChange(DoAnalysis);
                 gui4.add(matProps[1], 'thickness', 0.001, 0.1).name('Thickness [m]').onChange(DoAnalysis);
                 gui4.add(matProps[2], 'width', 0.001, 0.1).name('Width [m]').onChange(DoAnalysis);
-                gui4.add(matProps[3], 'maxAllowableStress', {1E6:1E6,1E7:1E7,1E8:1E8,1E9:1E9,1E10:1E10,1E11:1E11}).onChange(DoAnalysis);
+                gui4.add(matProps[3], 'maxAllowableStress', {'1E6':1E6,'1E7':1E7,'1E8':1E8,'1E9':1E9,'1E10':1E10,'1E11':1E11}).onChange(DoAnalysis);
+                gui4.add(matProps[4], 'scaleFactor',0.1,1.5).step(0.1).onChange(DoAnalysis);
 
                 /*
                 gui.addFolder(gui4);
@@ -212,7 +213,7 @@
                 <a-mixin id="node" geometry="primitive: sphere; radius: 0.1"
                          material="shader: standard; color: #ffffff"
                          hoverable
-                         grabbable="startButtons: triggerdown, mousedown; endButtons: triggerdown, mouseup"
+                         grabbable="startButtons: triggerdown, mousedown; endButtons: triggerup, mouseup"
                          draggable
                          droppable
                          shadow
@@ -254,6 +255,12 @@
                          super-hands
                          raycaster="objects: .node; far:50;" laser-controls="hand: left">
                 </a-mixin>
+                
+                <a-mixin id="controller"
+                 super-hands
+                 static-body="shape: sphere; sphereRadius: 0.02;"
+                 sphere-collider="objects: .node, .elem;">
+                </a-mixin>
 
                 <img crossorigin="anonymous" id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
                 <img crossorigin="anonymous" id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg">
@@ -269,7 +276,8 @@
 
             <a-entity id ="cameraRig" position = "4 0 5">
                 <a-entity wasd-controls look-controls>
-                    <a-entity camera id="camera" position = "0 1.6 0"
+                    <a-entity camera id="camera" position = "0 1.6 0">
+                              <a-entity
                               capture-mouse
                               raycaster="objects: .node, .elem" cursor="rayOrigin:mouse"
                               static-body="shape: sphere; sphereRadius: 0.001"
@@ -277,10 +285,11 @@
                                            colliderEventProperty: els;
                                            colliderEndEvent:raycaster-intersection-cleared;
                                            colliderEndEventProperty: clearedEls;">
+                            </a-entity>
                     </a-entity>
                 </a-entity>
-                <a-entity id="leftControl" hand-controls="left" teleport-controls="type: parabolic; cameraRig: #cameraRig;" super-hands hand-controls="left"></a-entity>
-                <a-entity id="rightControl" hand-controls="right" teleport-controls="type: parabolic; cameraRig: #cameraRig;" super-hands hand-controls="right"></a-entity>
+                <a-entity id="leftControl" hand-controls="left" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig;"></a-entity>
+                <a-entity id="rightControl"hand-controls="right" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig;"></a-entity>
             </a-entity>
 
             <a-entity id='InitNodes'></a-entity>

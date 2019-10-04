@@ -141,7 +141,8 @@ var matProps =
         {youngsModulus: 1.5E9},
         {thickness: 0.002},
         {width: 0.02},
-        {maxAllowableStress: 1E8}
+        {maxAllowableStress: 1E8},
+        {scaleFactor: 0.75}
     ];
 
 var stress;
@@ -187,9 +188,9 @@ function plotDot (scene, position, size, color, id, text) {
         //sphere.setAttribute('position', {x: sphere.getAttribute('position').x, y: sphere.getAttribute('position').y, z: sphere.getAttribute('position').z});
     });
     //console.log(sphere);
-    var NodeArray = document.getElementById("InitNodes")
-    NodeArray.appendChild(sphere);
-    //scene.appendChild(NodeArray);
+    //var NodeArray = document.getElementById("InitNodes")
+    //NodeArray.appendChild(sphere);
+    scene.appendChild(sphere);
 };
 
 function plotDefDot (scene, position, size, color, id, text) {
@@ -350,6 +351,7 @@ var DoAnalysis = function(){
     var EI = E*I;
     var EA = E*A;
     var maxAllowableStress = matProps[3].maxAllowableStress;
+    var scaleFactor = matProps[4].scaleFactor;
     console.log(maxAllowableStress);
     //this.maxAllowableStress = 1E8;
     //var maxAllowableStress = 0.18;
@@ -653,9 +655,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
     var detailText = document.getElementById('detailText');
     //console.log(detailText);
     var i = 0;
+    var scaleFactor = matProps[4].scaling;
     for (let item of Node) {
         //console.log(Node[i].x);
         NodeList.push({'nodeName': Node[i].nodeName});
+        //Node[i].x = Node[i].x*scaleFactor;
+        //Node[i].y = Node[i].y*scaleFactor;
+        //Node[i].z = Node[i].z*scaleFactor;
         plotDot(scene, {x: Node[i].x, y: Node[i].y, z: Node[i].z}, 0.1, "#ffffff", Node[i].nodeName, detailText);
         i = i+1;
     };
