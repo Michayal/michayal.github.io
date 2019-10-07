@@ -11,8 +11,7 @@
         <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
         <script src="https://unpkg.com/aframe-teleport-controls/dist/aframe-teleport-controls.min.js"></script>
         <script src="https://unpkg.com/aframe-input-mapping-component/dist/aframe-input-mapping-component.min.js"></script>
-        <!script src="https://cdn.rawgit.com/zcanter/aframe-gradient-sky/master/dist/gradientsky.min.js"><!/script>
-        <script src="https://unpkg.com/@tlaukkan/aframe-three-color-gradient-shader@0.0.1/index.js"></script>
+        <script src="https://unpkg.com/aframe-event-set-component@^3.0.0/dist/aframe-event-set-component.min.js"></script>
         <script src="components/intersection-spawn.js"></script>
         <script src="components/random-color.js"></script>
         <script src="components/snap.js"></script>
@@ -22,7 +21,7 @@
         <script src ="mappings.js"></script>
         <script src ="input-listen.js"></script>
         <script src="https://vr.cwervo.com/js/vr/datguivr.min.js"></script>
-        <script src="https://unpkg.com/aframe-event-set-component@^3.0.0/dist/aframe-event-set-component.min.js"></script>
+
 
         <script>
             var scene, camera, renderer, gui;
@@ -93,7 +92,7 @@
                 for (var i = 0; i<Node.length; i++){
                     gui3.add(Node[i], 'fdist', -100, 100).step(10).name(String(Node[i].nodeName).concat('.fdist')).onChange(DoAnalysis);
                 }
-                
+
                 gui4 = dat.GUIVR.create("Material Properties");
 
                 gui.addFolder(gui4);
@@ -118,7 +117,7 @@
                 gui.position.z = 4;
 
                 gui.rotation.y = 0.6;
-                
+
 
 
                 //gui.add(gui2);
@@ -254,11 +253,11 @@
                          super-hands
                          raycaster="objects: .node; far:50;" laser-controls="hand: left">
                 </a-mixin>
-                
+
                 <a-mixin id="controller"
-                 super-hands
-                 static-body="shape: sphere; sphereRadius: 0.02;"
-                 sphere-collider="objects: .node, .elem;">
+                         super-hands
+                         static-body="shape: sphere; sphereRadius: 0.02;"
+                         sphere-collider="objects: .node, .elem;">
                 </a-mixin>
 
                 <img crossorigin="anonymous" id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
@@ -276,19 +275,19 @@
             <a-entity id ="cameraRig" position = "4 0 5">
                 <a-entity wasd-controls look-controls>
                     <a-entity camera id="camera" position = "0 1.6 0">
-                              <a-entity
-                              capture-mouse
-                              raycaster="objects: .node, .elem" cursor="rayOrigin:mouse"
-                              static-body="shape: sphere; sphereRadius: 0.001"
-                              super-hands="colliderEvent: raycaster-intersection;
-                                           colliderEventProperty: els;
-                                           colliderEndEvent:raycaster-intersection-cleared;
-                                           colliderEndEventProperty: clearedEls;">
-                            </a-entity>
+                        <a-entity
+                                  capture-mouse
+                                  raycaster="objects: .node, .elem" cursor="rayOrigin:mouse"
+                                  static-body="shape: sphere; sphereRadius: 0.001"
+                                  super-hands="colliderEvent: raycaster-intersection;
+                                               colliderEventProperty: els;
+                                               colliderEndEvent:raycaster-intersection-cleared;
+                                               colliderEndEventProperty: clearedEls;">
+                        </a-entity>
                     </a-entity>
                 </a-entity>
-                <a-entity id="leftControl" hand-controls="left" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig;"></a-entity>
-                <a-entity id="rightControl"hand-controls="right" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig;"></a-entity>
+                <a-entity id="leftControl" hand-controls="left" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; button: grip;"></a-entity>
+                <a-entity id="rightControl"hand-controls="right" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; button: grip;"></a-entity>
             </a-entity>
 
             <a-entity id='InitNodes'></a-entity>
