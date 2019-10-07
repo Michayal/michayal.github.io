@@ -191,6 +191,7 @@ function plotDot (scene, position, size, color, id, text) {
     //var NodeArray = document.getElementById("InitNodes")
     //NodeArray.appendChild(sphere);
     scene.appendChild(sphere);
+    //document.querySelector('a-scene').insertAdjacentHTML('beforeEnd', '<a-sphere position='+String(position.x)+' '+String(position.y)+' '+String(position.z)+'></a-sphere>');
 };
 
 function plotDefDot (scene, position, size, color, id, text) {
@@ -285,6 +286,8 @@ function plotDefTube (scene, position, size, color, id, text) {
     });
     //console.log(tube);
     scene.appendChild(tube);
+    //ascene = document.getElementById('scene');
+    //ascene.appendChild(tube);
 };
 
 
@@ -352,7 +355,7 @@ var DoAnalysis = function(){
     var EA = E*A;
     var maxAllowableStress = matProps[3].maxAllowableStress;
     var scaleFactor = matProps[4].scaleFactor;
-    console.log(maxAllowableStress);
+    //console.log(maxAllowableStress);
     //this.maxAllowableStress = 1E8;
     //var maxAllowableStress = 0.18;
 
@@ -553,6 +556,8 @@ var DoAnalysis = function(){
     //console.log(DefNode);
     var scene = document.querySelector('a-scene');
     var detailText = document.getElementById('detailText');
+    
+    console.log('FEA Calculations complete');
 
     var i = 0;
     for (let item of Node) {
@@ -613,7 +618,7 @@ function stressColor(elemStress, stressRange, maxAllowableStress){
     else if (segment==6){color = '#texture5';}
     else if (segment==7){color = '#texture6';}
     else if (segment>7){color = '#texture7';}
-        
+
     /*
     switch (segment){
         case 1:
@@ -645,27 +650,25 @@ function stressColor(elemStress, stressRange, maxAllowableStress){
     return color;
 };
 
-
-//window.onload = myPrint();
-
-document.addEventListener("DOMContentLoaded", function(event) {
-    //spawnnodes();
-    console.log("DOM fully loaded and parsed");
-    var scene = document.querySelector('a-scene');
-    var detailText = document.getElementById('detailText');
-    //console.log(detailText);
-    var i = 0;
-    var scaleFactor = matProps[4].scaling;
-    for (let item of Node) {
-        //console.log(Node[i].x);
-        NodeList.push({'nodeName': Node[i].nodeName});
-        //Node[i].x = Node[i].x*scaleFactor;
-        //Node[i].y = Node[i].y*scaleFactor;
-        //Node[i].z = Node[i].z*scaleFactor;
-        plotDot(scene, {x: Node[i].x, y: Node[i].y, z: Node[i].z}, 0.1, "#ffffff", Node[i].nodeName, detailText);
-        i = i+1;
-    };
-    /*
+AFRAME.registerComponent('web-fea', {
+    init: function () {
+        console.log("DOM fully loaded and parsed");
+        var scene = this.el;
+        //console.log(scene);
+        var detailText = document.getElementById('detailText');
+        //console.log(detailText);
+        var i = 0;
+        var scaleFactor = matProps[4].scaling;
+        for (let item of Node) {
+            //console.log(Node[i].x);
+            NodeList.push({'nodeName': Node[i].nodeName});
+            //Node[i].x = Node[i].x*scaleFactor;
+            //Node[i].y = Node[i].y*scaleFactor;
+            //Node[i].z = Node[i].z*scaleFactor;
+            plotDot(scene, {x: Node[i].x, y: Node[i].y, z: Node[i].z}, 0.1, "#ffffff", Node[i].nodeName, detailText);
+            i = i+1;
+        };
+        /*
     for (var j = 0; j < Elem.length; j = j+1) {
 
         var nodeStart = Elem[j].nodeA;
@@ -684,5 +687,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 
     }*/
-    DoAnalysis();
+        DoAnalysis();
+    }
 });
+
+//window.onload = startScene();
