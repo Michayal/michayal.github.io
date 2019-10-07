@@ -556,7 +556,7 @@ var DoAnalysis = function(){
     //console.log(DefNode);
     var scene = document.querySelector('a-scene');
     var detailText = document.getElementById('detailText');
-    
+
     console.log('FEA Calculations complete');
 
     var i = 0;
@@ -571,6 +571,24 @@ var DoAnalysis = function(){
         }
         i = i+1;
     };
+
+    var stressDiv = maxAllowableStress/7;
+    var lg0 = document.getElementById('lg0');
+    lg0.setAttribute('value','<'+ String(round(stressDiv*1/1E6, 2)) +' MPa');
+    var lg1 = document.getElementById('lg1');
+    lg1.setAttribute('value','<'+ String(round(stressDiv*2/1E6, 2)) +' MPa');
+    var lg2 = document.getElementById('lg2');
+    lg2.setAttribute('value','<'+ String(round(stressDiv*3/1E6, 2)) +' MPa');
+    var lg3 = document.getElementById('lg3');
+    lg3.setAttribute('value','<'+ String(round(stressDiv*4/1E6, 2)) +' MPa');
+    var lg4 = document.getElementById('lg4');
+    lg4.setAttribute('value','<'+ String(round(stressDiv*5/1E6, 2)) +' MPa');
+    var lg5 = document.getElementById('lg5');
+    lg5.setAttribute('value','<'+ String(round(stressDiv*6/1E6, 2)) +' MPa');
+    var lg6 = document.getElementById('lg6');
+    lg6.setAttribute('value','<'+ String(round(stressDiv*7/1E6, 2)) +' MPa');
+    var lg7 = document.getElementById('lg7');
+    lg7.setAttribute('value','>='+ String(round(maxAllowableStress/1E6, 2)) +' MPa');
 
     //console.log(Node);
 
@@ -590,7 +608,7 @@ var DoAnalysis = function(){
         tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
 
 
-        var color = stressColor(math.abs(stress.subset(math.index(j,0))),stressRange,maxAllowableStress);
+        var color = stressColor(math.abs(stress.subset(math.index(j,0))),stressDiv);
         //console.log(color);
 
         tube = document.getElementById(Elem[j].elemName);
@@ -604,8 +622,7 @@ var DoAnalysis = function(){
     }
 };
 
-function stressColor(elemStress, stressRange, maxAllowableStress){
-    var stressDiv = maxAllowableStress/7;
+function stressColor(elemStress, stressDiv){
     var segment = math.round(elemStress/stressDiv);
     //console.log(elemStress);
     //console.log(segment);
@@ -649,6 +666,11 @@ function stressColor(elemStress, stressRange, maxAllowableStress){
     //color = 'color: '.concat(color);
     return color;
 };
+
+function round(value, precision) {
+    var multiplier = Math.pow(10, precision || 0);
+    return Math.round(value * multiplier) / multiplier;
+}
 
 AFRAME.registerComponent('web-fea', {
     init: function () {

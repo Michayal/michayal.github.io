@@ -166,6 +166,14 @@
                     }
                 }, false );
 
+                // On mobile remove elements that are resource heavy
+                var isMobile = AFRAME.utils.device.isMobile();
+
+                if (isMobile) {
+                    var cardboardCursor = document.getElementById('cardboardCursor');
+                    cardboardCursor.setAttribute('visible',true);
+                }
+
                 // Gaze input?
                 var gazeInput = dat.GUIVR.addInputObject( camera );
                 scene.add( gazeInput.cursor ); //  only add the cursor, not the laser
@@ -220,11 +228,15 @@
                          event-set__hoveroff="_event: hover-end; material.opacity: 1; transparent: false"
                          event-set__dragdrop="">
                 </a-mixin>
+
                 <a-mixin id="elem" geometry="primitive: sphere; radius: 0.1"
                          hoverable
                          event-set__hoveron="_event: hover-start; material.opacity: 0.7; transparent: true"
                          event-set__hoveroff="_event: hover-end; material.opacity: 1; transparent: false"
                          event-set__dragdrop="">
+                </a-mixin>
+
+                <a-mixin id="legend" geometry="primitive:box; height:0.5; depth:0.2; width:0.5;">
                 </a-mixin>
 
                 <a-mixin id="pointer" raycaster="showLine: true; objects: .node, a-link"
@@ -283,6 +295,9 @@
                                                colliderEventProperty: els;
                                                colliderEndEvent:raycaster-intersection-cleared;
                                                colliderEndEventProperty: clearedEls;">
+                            <!a-entity id="cardboardCursor" visible = "false" cursor="fuse: true; fuseTimeout: 500"
+                                      geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                                      material="color: black; shader: flat"><!/a-entity>
                         </a-entity>
                     </a-entity>
                 </a-entity>
@@ -299,6 +314,16 @@
             <a-sky id="bg" radius="30" src="#skyTexture" theta-length="90" position="0 0 0"></a-sky>
 
             <a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1" position="0 0 0"></a-cylinder>
+            
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture0" position="6 1 2.5" rotation= "180 0 0"><a-text id="lg0" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture1" position="6 1.5 2.5" rotation= "180 0 0"><a-text id="lg1" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture2" position="6 2 2.5" rotation= "180 0 0"><a-text id="lg2" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture3" position="6 2.5 2.5" rotation= "180 0 0"><a-text id="lg3" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture4" position="6 3 2.5" rotation= "180 0 0"><a-text id="lg4" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture5" position="6 3.5 2.5" rotation= "180 0 0"><a-text id="lg5" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture6" position="6 4 2.5" rotation= "180 0 0"><a-text id="lg6" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture7" position="6 4.5 2.5" rotation= "180 0 0"><a-text id="lg7" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#F00"></a-text></a-box>
+            
 
             <!-- Hands.
 <a-entity id="teleHand"
