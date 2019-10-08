@@ -74,7 +74,7 @@
                 //var InitNodes = document.querySelector("#InitNodes").object3D;
 
                 for (var i = 0; i<Node.length; i++){
-                    gui1.add(Node[i], 'forceY', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChange);
+                    gui1.add(Node[i], 'forceY', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChangeY);
                 }
 
                 gui2 = dat.GUIVR.create("ForceX");
@@ -82,7 +82,7 @@
                 gui.addFolder(gui2);
 
                 for (var i = 0; i<Node.length; i++){
-                    gui2.add(Node[i], 'forceX', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceX'));
+                    gui2.add(Node[i], 'forceX', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceX')).onChange(vizChangeX);
                 }
                 /*
                 gui3 = dat.GUIVR.create("F dist");
@@ -244,9 +244,6 @@
                          event-set__dragdrop="">
                 </a-mixin>
 
-                <a-mixin id="legend" geometry="primitive:box; height:0.5; depth:0.2; width:0.5;">
-                </a-mixin>
-
                 <a-mixin id="pointer" raycaster="showLine: true; objects: .node, a-link"
                          super-hands="colliderEvent: raycaster-intersection;
                                       colliderEventProperty: els;
@@ -290,6 +287,7 @@
                 <img id="texture5" src=texture5.png>
                 <img id="texture6" src=texture6.png>
                 <img id="texture7" src=texture7.png>
+                <img id="legend" src=legend.png>
             </a-assets>
 
             <a-entity id ="cameraRig" position = "4 0 5">
@@ -323,29 +321,30 @@
 
             <a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1" position="0 0 0"></a-cylinder>
 
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture0" position="6 0.5 2.5" rotation= "180 0 0"><a-text id="lg0" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture1" position="6 1 2.5" rotation= "180 0 0"><a-text id="lg1" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture2" position="6 1.5 2.5" rotation= "180 0 0"><a-text id="lg2" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture3" position="6 2 2.5" rotation= "180 0 0"><a-text id="lg3" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture4" position="6 2.5 2.5" rotation= "180 0 0"><a-text id="lg4" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture5" position="6 3 2.5" rotation= "180 0 0"><a-text id="lg5" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture6" position="6 3.5 2.5" rotation= "180 0 0"><a-text id="lg6" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture7" position="6 4 2.5" rotation= "180 0 0"><a-text id="lg7" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#F00"></a-text></a-box>
-
-            <a-entity   id = "F1" position="1 1 1" mixin = "down Cyl" mixin = "Cone">
-              <a-entity  mixin = "Cone"></a-entity>
-            </a-entity>
+            <a-box id="legend" depth="0.2" height="4" width="2" src="#legend" position="7 2 1.5" rotation= "0 -45 0" look-at="#camera">
+                <a-text id="lg0" position="0.125 -1.75 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg1" position="0.125 -1.25 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg2" position="0.125 -0.75 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg3" position="0.125 -0.25 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg4" position="0.125 0.25 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg5" position="0.125 0.75 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg6" position="0.125 1.25 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg7" position="0.125 1.75 0.25" value="<= XX Pa" align="center" color="#F00"></a-text>
+            </a-box>
 
             <!--
+<a-box depth="0.2" height="0.5" width="0.5" src="#texture0" position="6 0.5 2.5" rotation= "180 0 0"><a-text id="lg0" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+<a-box depth="0.2" height="0.5" width="0.5" src="#texture1" position="6 1 2.5" rotation= "180 0 0"><a-text id="lg1" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+<a-box depth="0.2" height="0.5" width="0.5" src="#texture2" position="6 1.5 2.5" rotation= "180 0 0"><a-text id="lg2" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+<a-box depth="0.2" height="0.5" width="0.5" src="#texture3" position="6 2 2.5" rotation= "180 0 0"><a-text id="lg3" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+<a-box depth="0.2" height="0.5" width="0.5" src="#texture4" position="6 2.5 2.5" rotation= "180 0 0"><a-text id="lg4" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+<a-box depth="0.2" height="0.5" width="0.5" src="#texture5" position="6 3 2.5" rotation= "180 0 0"><a-text id="lg5" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+<a-box depth="0.2" height="0.5" width="0.5" src="#texture6" position="6 3.5 2.5" rotation= "180 0 0"><a-text id="lg6" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+<a-box depth="0.2" height="0.5" width="0.5" src="#texture7" position="6 4 2.5" rotation= "180 0 0"><a-text id="lg7" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#F00"></a-text></a-box>
+
+
 <a-entity id="legend" rotation= "0 0 0" look-at="#cameraRig">
-<a-text id="lg0" position="6 0.5 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
-<a-text id="lg1" position="6 1 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
-<a-text id="lg2" position="6 1.5 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
-<a-text id="lg3" position="6 2 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
-<a-text id="lg4" position="6 2.5 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
-<a-text id="lg5" position="6 3 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
-<a-text id="lg6" position="6 3.5 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
-<a-text id="lg7" position="6 4 2.1" value="<= XX Pa" align="center" color="#F00"></a-text>
+
 </a-entity> -->
 
 
