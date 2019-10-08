@@ -41,7 +41,7 @@ var Node =
       fixedY: 0,
       fixedM: 0,
       forceX: 0,
-      forceY: 0,
+      forceY: -3500,
       fdist: 0 },
      { nodeName: 'Node4',
       x: 2.774363,
@@ -134,6 +134,8 @@ var Elem =
      { elemName: 'Elem16', nodeA: 10, nodeB: 6 },
      { elemName: 'Elem17', nodeA: 6, nodeB: 9 } ];
 
+var recompute = [{Recalculate: function(){DoAnalysis()}}];
+var scene = document.querySelector('a-scene');
 var DefNode = [];
 var NodeList = [];
 var matProps = 
@@ -152,6 +154,77 @@ var color = '#texture0';
 //var gradient = ['0 30 255','60 255 0','255 238 0','255 174 0','255 155 0','255 255 255'];
 //var gradient = ["#001EFF", "#1469AA", "#28B455", "#3CFF00", "#9DF600", "#FFEE00", "#FFCE00", "#FFAE00", "#FF9000", "#FF7300", "#FF3900", "#FF0000", "#FF7F7F", "#FFFFFF"];
 
+function vizChange(){
+    console.log('Add Arrow');
+    for (var i = 0; i < Node.length; i = i+1) {
+        var idCheck = 'Node'+String(i)+'.fy';
+        var arr = document.getElementById(idCheck);
+        var forceY = Node[i].forceY;
+        var offset = 0.215;
+        
+        if(forceY==0){
+            arr.setAttribute('visible', 'false');
+        }
+        else if(forceY>0){
+            var rotation = '0 0 0'
+            arr.setAttribute('visible', 'true');
+            arr.setAttribute('rotation', rotation);
+            var pos = {x: 0, y: offset, z: 0};
+            arr.setAttribute('position', pos);
+        }
+        else if(forceY<0){
+            offset = -offset;
+            var rotation = '0 0 180'
+            arr.setAttribute('visible', 'true');
+            arr.setAttribute('rotation', rotation);
+            var pos = {x: 0, y: offset, z: 0};
+            arr.setAttribute('position', pos);
+        } 
+    };
+}
+
+function addForceArrow (nodeID, force, dir) {
+    var scene = document.querySelector('a-scene');
+    var nodeUsed = document.getElementById(nodeID);
+    console.log(force);
+
+    var cyl = document.createElement('a-entity');
+    cyl.setAttribute('mixin', 'down Cyl');
+    var cylID = 'Node'+String(nodeID.substr(4))+'.fy';
+    cyl.setAttribute('id', cylID);
+    nodeUsed.appendChild(cyl);
+    var cone = document.createElement('a-entity');
+    var offset = 0.215;
+    cone.setAttribute('mixin', 'Cone');
+    cyl.appendChild(cone);
+    if(dir == 'y'){
+        if(force==0){
+            cyl.setAttribute('visible', 'false');
+        }
+        else if(force>0){
+            var rotation = '0 0 0'
+            cyl.setAttribute('visible', 'true');
+            cyl.setAttribute('rotation', rotation);
+        }
+        else if(force<0){
+            var rotation = '0 0 180'
+            cyl.setAttribute('visible', 'true');
+            cyl.setAttribute('rotation', rotation);
+            offset = -offset;
+        } 
+    }
+    else if(dire =='x'){
+        if(force>0){
+            cyl.setAttribute('mixin', 'right Cyl');
+        }
+        else if(force<0){
+            cyl.setAttribute('mixin', 'left Cyl');
+        } 
+    }
+    var pos = {x: 0, y: offset, z: 0};
+    cyl.setAttribute('position', pos);
+}
+
 function plotDot (scene, position, size, color, id, text) {
     var sphere = document.createElement('a-entity');
     sphere.setAttribute('class', 'node');
@@ -160,7 +233,11 @@ function plotDot (scene, position, size, color, id, text) {
     sphere.setAttribute('position', position);
     sphere.setAttribute('color', "#ffffff");
     sphere.setAttribute('id', id);
+    scene.appendChild(sphere);
 
+    addForceArrow(id,Node[Number(id.substr(4))].forceY,'y');
+
+    // Functions after this //
     sphere.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
         var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
@@ -185,13 +262,8 @@ function plotDot (scene, position, size, color, id, text) {
         Node[i].y = sphere.getAttribute('position').y;
         Node[i].z = sphere.getAttribute('position').z;
         updateStruct();
-        //sphere.setAttribute('position', {x: sphere.getAttribute('position').x, y: sphere.getAttribute('position').y, z: sphere.getAttribute('position').z});
     });
-    //console.log(sphere);
-    //var NodeArray = document.getElementById("InitNodes")
-    //NodeArray.appendChild(sphere);
-    scene.appendChild(sphere);
-    //document.querySelector('a-scene').insertAdjacentHTML('beforeEnd', '<a-sphere position='+String(position.x)+' '+String(position.y)+' '+String(position.z)+'></a-sphere>');
+
 };
 
 function plotDefDot (scene, position, size, color, id, text) {
@@ -277,7 +349,7 @@ function plotDefTube (scene, position, size, color, id, text) {
         var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
         var i = tube.getAttribute('id').substr(4);
         text.setAttribute('position',newTextPos);
-        var textToShow = id.concat(' , Stress = ', String(math.subset(stress,math.index(Number(i),0))));
+        var textToShow = id.concat(' , Stress = ', String(round(math.subset(stress,math.index(Number(i),0))/1E6))+ ' Mpa');
         text.setAttribute('value',textToShow);
         text.setAttribute('visible',true);
     });
@@ -712,5 +784,3 @@ AFRAME.registerComponent('web-fea', {
         DoAnalysis();
     }
 });
-
-//window.onload = startScene();

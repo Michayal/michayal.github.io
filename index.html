@@ -10,7 +10,7 @@
         <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.0.1/dist/aframe-extras.min.js"></script>
         <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
         <script src="https://unpkg.com/aframe-teleport-controls/dist/aframe-teleport-controls.min.js"></script>
-        <script src="https://unpkg.com/aframe-input-mapping-component/dist/aframe-input-mapping-component.min.js"></script>
+        <!script src="https://unpkg.com/aframe-input-mapping-component/dist/aframe-input-mapping-component.min.js"><!/script>
         <script src="https://unpkg.com/aframe-event-set-component@^3.0.0/dist/aframe-event-set-component.min.js"></script>
         <script src="components/intersection-spawn.js"></script>
         <script src="components/random-color.js"></script>
@@ -18,7 +18,7 @@
         <script src="data.js"></script>
         <script src = "https://unpkg.com/mathjs@6.2.1"></script>
         <script src = "super-hands.js"></script>
-        <script src ="mappings.js"></script>
+        <!script src ="mappings.js"><!/script>
         <script src ="input-listen.js"></script>
         <script src="https://vr.cwervo.com/js/vr/datguivr.min.js"></script>
 
@@ -74,7 +74,7 @@
                 //var InitNodes = document.querySelector("#InitNodes").object3D;
 
                 for (var i = 0; i<Node.length; i++){
-                    gui1.add(Node[i], 'forceY', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceY')).onChange(DoAnalysis);
+                    gui1.add(Node[i], 'forceY', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChange);
                 }
 
                 gui2 = dat.GUIVR.create("ForceX");
@@ -82,25 +82,25 @@
                 gui.addFolder(gui2);
 
                 for (var i = 0; i<Node.length; i++){
-                    gui2.add(Node[i], 'forceX', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceX')).onChange(DoAnalysis);
+                    gui2.add(Node[i], 'forceX', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceX'));
                 }
-
+                /*
                 gui3 = dat.GUIVR.create("F dist");
 
                 gui.addFolder(gui3);
 
                 for (var i = 0; i<Node.length; i++){
-                    gui3.add(Node[i], 'fdist', -100, 100).step(10).name(String(Node[i].nodeName).concat('.fdist')).onChange(DoAnalysis);
-                }
+                    gui3.add(Node[i], 'fdist', -100, 100).step(10).name(String(Node[i].nodeName).concat('.fdist'));
+                }*/
 
                 gui4 = dat.GUIVR.create("Material Properties");
 
                 gui.addFolder(gui4);
-                gui4.add(matProps[0], 'youngsModulus', {'Polypropylene (1.5 GPa)':1.5E9,'Aluminium (69 GPa)':69E9,'Titanium (105 GPa)':105E9,'Steel (200 GPa)':200E9}).onChange(DoAnalysis);
-                gui4.add(matProps[1], 'thickness', 0.001, 0.1).name('Thickness [m]').onChange(DoAnalysis);
-                gui4.add(matProps[2], 'width', 0.001, 0.1).name('Width [m]').onChange(DoAnalysis);
-                gui4.add(matProps[3], 'maxAllowableStress', {'1E6':1E6,'1E7':1E7,'1E8':1E8,'1E9':1E9,'1E10':1E10,'1E11':1E11}).onChange(DoAnalysis);
-                gui4.add(matProps[4], 'scaleFactor',0.1,1.5).step(0.1).onChange(DoAnalysis);
+                gui4.add(matProps[0], 'youngsModulus', {'Polypropylene (1.5 GPa)':1.5E9,'Aluminium (69 GPa)':69E9,'Titanium (105 GPa)':105E9,'Steel (200 GPa)':200E9});
+                gui4.add(matProps[1], 'thickness', 0.001, 0.1).name('Thickness [m]');
+                gui4.add(matProps[2], 'width', 0.001, 0.1).name('Width [m]');
+                gui4.add(matProps[3], 'maxAllowableStress', {'1E6':1E6,'1E7':1E7,'1E8':1E8,'1E9':1E9,'1E10':1E10,'1E11':1E11});
+                gui4.add(matProps[4], 'scaleFactor',0.1,1.5).step(0.1);
 
                 /*
                 gui.addFolder(gui4);
@@ -110,6 +110,7 @@
                 gui4.add(matProps[3], 'maxAllowableStress', {1E6:1E6,1E7:1E7,1E8:1E8,1E9:1E9,1E10:1E10,1E11:1E11}).name('Max Stress Allowable [Pa]').onChange(DoAnalysis);
                 */
 
+                gui.add(recompute[0], 'Recalculate').name('WebFEA');
                 scene.add(gui);
 
                 gui.position.x = 2;
@@ -217,10 +218,17 @@
         <a-scene web-fea avatar-recorder touch-to-click-converter physics="gravity:-9.8" vr-dat-gui="vr-dat-gui" dat-gui-controller="query: [hand-controls]">
             <a-assets>
 
+                <a-mixin id="Cyl" geometry="primitive: cylinder;height: .35; radius: 0.05" material="color: red"></a-mixin>
+                <a-mixin id="Cone" position="0 .25 0" geometry="primitive: cone;height:.15;radius-bottom:.1" material="color: red"></a-mixin>
+                <a-mixin id="right" rotation="0 0 -90"></a-mixin>
+                <a-mixin id="left" rotation="0 0 90"></a-mixin>      
+                <a-mixin id="up" rotation="0 0 0"></a-mixin>
+                <a-mixin id="down" rotation="0 0 180"></a-mixin>
+
                 <a-mixin id="node" geometry="primitive: sphere; radius: 0.1"
                          material="shader: standard; color: #ffffff"
                          hoverable
-                         grabbable="startButtons: triggerdown, mousedown; endButtons: triggerup, mouseup"
+                         grabbable="startButtons: triggerdown, mousedown, pointup; endButtons: triggerup, mouseup, pointdown"
                          draggable
                          droppable
                          shadow
@@ -296,8 +304,8 @@
                                                colliderEndEvent:raycaster-intersection-cleared;
                                                colliderEndEventProperty: clearedEls;">
                             <!a-entity id="cardboardCursor" visible = "false" cursor="fuse: true; fuseTimeout: 500"
-                                      geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-                                      material="color: black; shader: flat"><!/a-entity>
+                            geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                            material="color: black; shader: flat"><!/a-entity>
                         </a-entity>
                     </a-entity>
                 </a-entity>
@@ -314,16 +322,32 @@
             <a-sky id="bg" radius="30" src="#skyTexture" theta-length="90" position="0 0 0"></a-sky>
 
             <a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1" position="0 0 0"></a-cylinder>
-            
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture0" position="6 0.5 2.5" rotation= "180 0 0"><a-text id="lg0" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture1" position="6 1 2.5" rotation= "180 0 0"><a-text id="lg1" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture2" position="6 1.5 2.5" rotation= "180 0 0"><a-text id="lg2" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture3" position="6 2 2.5" rotation= "180 0 0"><a-text id="lg3" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture4" position="6 2.5 2.5" rotation= "180 0 0"><a-text id="lg4" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture5" position="6 3 2.5" rotation= "180 0 0"><a-text id="lg5" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture6" position="6 3.5 2.5" rotation= "180 0 0"><a-text id="lg6" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-            <a-box depth="0.2" height="0.5" width="0.5" src="#texture7" position="6 4 2.5" rotation= "180 0 0"><a-text id="lg7" position = "0 0 -0.363" value="<= XX Pa" look-at="#camera" align="center" color="#F00"></a-text></a-box>
-            
+
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture0" position="6 0.5 2.5" rotation= "180 0 0"><a-text id="lg0" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture1" position="6 1 2.5" rotation= "180 0 0"><a-text id="lg1" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture2" position="6 1.5 2.5" rotation= "180 0 0"><a-text id="lg2" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture3" position="6 2 2.5" rotation= "180 0 0"><a-text id="lg3" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture4" position="6 2.5 2.5" rotation= "180 0 0"><a-text id="lg4" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture5" position="6 3 2.5" rotation= "180 0 0"><a-text id="lg5" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture6" position="6 3.5 2.5" rotation= "180 0 0"><a-text id="lg6" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
+            <a-box depth="0.2" height="0.5" width="0.5" src="#texture7" position="6 4 2.5" rotation= "180 0 0"><a-text id="lg7" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#F00"></a-text></a-box>
+
+            <a-entity   id = "F1" position="1 1 1" mixin = "down Cyl" mixin = "Cone">
+              <a-entity  mixin = "Cone"></a-entity>
+            </a-entity>
+
+            <!--
+<a-entity id="legend" rotation= "0 0 0" look-at="#cameraRig">
+<a-text id="lg0" position="6 0.5 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
+<a-text id="lg1" position="6 1 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
+<a-text id="lg2" position="6 1.5 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
+<a-text id="lg3" position="6 2 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
+<a-text id="lg4" position="6 2.5 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
+<a-text id="lg5" position="6 3 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
+<a-text id="lg6" position="6 3.5 2.1" value="<= XX Pa" align="center" color="#FFF"></a-text>
+<a-text id="lg7" position="6 4 2.1" value="<= XX Pa" align="center" color="#F00"></a-text>
+</a-entity> -->
+
 
             <!-- Hands.
 <a-entity id="teleHand"
