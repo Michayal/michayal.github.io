@@ -729,7 +729,7 @@ var DoAnalysis = function(){
 };
 
 function stressColor(elemStress, stressDiv){
-    var segment = math.round(elemStress/stressDiv);
+    var segment = round(elemStress/(stressDiv+1));
     //console.log(elemStress);
     //console.log(segment);
 
