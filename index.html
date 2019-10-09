@@ -18,7 +18,7 @@
         <script src="data.js"></script>
         <script src = "https://unpkg.com/mathjs@6.2.1"></script>
         <script src = "super-hands.js"></script>
-        <!script src ="mappings.js"><!/script>
+        <script src ="mappings.js"></script>
         <script src ="input-listen.js"></script>
         <script src="https://vr.cwervo.com/js/vr/datguivr.min.js"></script>
 
@@ -307,8 +307,8 @@
                         </a-entity>
                     </a-entity>
                 </a-entity>
-                <a-entity id="leftControl" hand-controls="left" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; button: grip;"></a-entity>
-                <a-entity id="rightControl"hand-controls="right" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; button: grip;"></a-entity>
+                <a-entity id="leftControl" hand-controls="left" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera;"></a-entity>
+                <a-entity id="rightControl"hand-controls="right" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera;"></a-entity>
             </a-entity>
 
             <a-entity id='InitNodes'></a-entity>
