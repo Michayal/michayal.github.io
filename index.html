@@ -10,8 +10,9 @@
         <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.0.1/dist/aframe-extras.min.js"></script>
         <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
-        <script src="aframe-teleport-controls.min.js"></script>
+        <script src="aframe-teleport-controls.js"></script>
         <script src="aframe-input-mapping-component.js"></script>
+        <script src="aframe-tooltip-component.min.js"></script>
         <script src="https://unpkg.com/aframe-event-set-component@^3.0.0/dist/aframe-event-set-component.min.js"></script>
         <script src="components/intersection-spawn.js"></script>
         <script src="components/random-color.js"></script>
@@ -307,8 +308,8 @@
                         </a-entity>
                     </a-entity>
                 </a-entity>
-                <a-entity id="leftControl" hand-controls="left" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; button: grip;"></a-entity>
-                <a-entity id="rightControl"hand-controls="right" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; button: grip;"></a-entity>
+                <a-entity id="leftControl" hand-controls="left" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; button: thumbstick;"></a-entity>
+                <a-entity id="rightControl"hand-controls="right" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; button: thumbstick;"></a-entity>
             </a-entity>
 
             <a-entity id='InitNodes'></a-entity>
