@@ -10,7 +10,7 @@ if (scene.hasLoaded) {
 function run () {
   var t=
   {behaviours:{},
-   
+
    mappings:
    {
      painting:
@@ -19,7 +19,7 @@ function run () {
           "grip.down":"undo",
           "trigger.changed":"paint"
         },
-        
+
         "vive-controls":
         {
           "axis.move":"changeBrushSizeInc",
@@ -28,7 +28,7 @@ function run () {
           "trackpad.down":"aim",
           "trackpad.up":"teleport"
         },
-        
+
         "oculus-touch-controls":
         {
           "axis.move":"changeBrushSizeAbs",
@@ -39,7 +39,7 @@ function run () {
           "bbutton.down":"aim",
           "bbutton.up":"teleport"
         },
-        
+
         "windows-motion-controls":
         {
           "axis.move":"changeBrushSizeAbs",

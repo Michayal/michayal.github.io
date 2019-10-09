@@ -221,7 +221,7 @@
                 <a-mixin id="Cyl" geometry="primitive: cylinder;height: .35; radius: 0.05" material="color: red"></a-mixin>
                 <a-mixin id="Cone" position="0 .25 0" geometry="primitive: cone;height:.15;radius-bottom:.1" material="color: red"></a-mixin>
                 <a-mixin id="right" rotation="0 0 -90"></a-mixin>
-                <a-mixin id="left" rotation="0 0 90"></a-mixin>      
+                <a-mixin id="left" rotation="0 0 90"></a-mixin>
                 <a-mixin id="up" rotation="0 0 0"></a-mixin>
                 <a-mixin id="down" rotation="0 0 180"></a-mixin>
 
@@ -307,8 +307,8 @@
                         </a-entity>
                     </a-entity>
                 </a-entity>
-                <a-entity id="leftControl" hand-controls="left" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera;"></a-entity>
-                <a-entity id="rightControl"hand-controls="right" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera;"></a-entity>
+                <a-entity id="leftControl" hand-controls="left" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; button: grip;"></a-entity>
+                <a-entity id="rightControl"hand-controls="right" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; button: grip;"></a-entity>
             </a-entity>
 
             <a-entity id='InitNodes'></a-entity>
