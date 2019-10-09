@@ -1,57 +1,33 @@
-{
 var scene = document.querySelector('a-scene');
 
 if (scene.hasLoaded) {
-  run();
+    run();
 } else {
-  scene.addEventListener('loaded', run);
+    scene.addEventListener('loaded', run);
 }
 
 function run () {
-  var t=
-  {behaviours:{},
-
-   mappings:
-   {
-     painting:
-       {common:
+    var mappings =
         {
-          "grip.down":"undo",
-          "trigger.changed":"paint"
-        },
+            default: {
 
-        "vive-controls":
-        {
-          "axis.move":"changeBrushSizeInc",
-          "trackpad.touchstart":"startChangeBrushSize",
-          "menu.down":"toggleMenu",
-          "trackpad.down":"aim",
-          "trackpad.up":"teleport"
-        },
+                "vive-controls":
+                {
+                    "trackpaddown":"aim",
+                    "trackpadup":"teleport"
+                },
 
-        "oculus-touch-controls":
-        {
-          "axis.move":"changeBrushSizeAbs",
-          "abutton.down":"toggleMenu",
-          "xbutton.down":"toggleMenu",
-          "ybutton.down":"aim",
-          "ybutton.up":"teleport",
-          "bbutton.down":"aim",
-          "bbutton.up":"teleport"
-        },
+                "oculus-touch-controls":
+                {
+                    "thumbstickdown":"aim",
+                    "thumbstickup":"teleport",
+                    "ybuttondown":"aim",
+                    "ybuttonup":"teleport",
+                    "xbuttondown":"aim",
+                    "xbuttonup":"teleport"
+                }
+            };
 
-        "windows-motion-controls":
-        {
-          "axis.move":"changeBrushSizeAbs",
-          "menu.down":"toggleMenu",
-          "trackpad.down":"aim",
-          "trackpad.up":"teleport"
+            AFRAME.registerInputMappings(mappings);
         }
-       }
-   }
-  };
-
-
-  AFRAME.registerInputMappings(t),AFRAME.currentInputMapping="painting";
-}
-}
+    }
