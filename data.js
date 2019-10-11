@@ -817,4 +817,5 @@ AFRAME.registerComponent('web-fea', {
     }*/
         DoAnalysis();
     }
+
 });

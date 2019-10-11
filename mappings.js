@@ -2,13 +2,13 @@ var scene = document.querySelector('a-scene');
 
 if (scene.hasLoaded) {
     run();
-} else {
+} 
+else {
     scene.addEventListener('loaded', run);
 }
 
 function run () {
-    var mappings =
-        {
+    var mappings = {
             default: {
 
                 "vive-controls":

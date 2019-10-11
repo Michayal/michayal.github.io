@@ -9,6 +9,7 @@
         <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.0.1/dist/aframe-extras.min.js"></script>
         <script src="//cdn.rawgit.com/donmccurdy/aframe-physics-system/v4.0.1/dist/aframe-physics-system.min.js"></script>
+        <script src="https://unpkg.com/aframe-physics-extras@0.1.2/dist/aframe-physics-extras.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
         <script src="aframe-teleport-controls.js"></script>
         <script src="aframe-input-mapping-component.js"></script>
@@ -216,7 +217,7 @@
     </head>
 
     <body>
-        <a-scene web-fea avatar-recorder touch-to-click-converter physics="gravity:-9.8" vr-dat-gui="vr-dat-gui" dat-gui-controller="query: [hand-controls]">
+        <a-scene web-fea touch-to-click-converter vr-dat-gui="vr-dat-gui" dat-gui-controller="query: [vive-controls], [oculus-touch-controls]">
             <a-assets>
 
                 <a-mixin id="Cyl" geometry="primitive: cylinder;height: .35; radius: 0.05" material="color: red"></a-mixin>
@@ -252,30 +253,23 @@
                                       colliderEndEventProperty: clearedEls;">
                 </a-mixin>
 
-                <a-mixin id="teleport"
-                         teleport-controls="type: parabolic; cameraRig: #cameraRig;">
+                <a-mixin id="controller"
+                         super-hands="colliderEvent: collisions;
+                                      colliderEventProperty: els;
+                                      colliderEndEvent: collisions;
+                                      colliderEndEventProperty: clearedEls"
+                         static-body="shape: sphere; sphereRadius: 0.02;"
+                         sphere-collider="objects: [grabbable];">
                 </a-mixin>
 
-                <a-mixin id="controller-right" mixin="teleport"
+                <a-mixin id="controller-right" mixin="pointer"
                          vive-controls="hand: right" oculus-touch-controls="hand: right"
                          windows-motion-controls="hand: right"
-                         gearvr-controls daydream-controls oculus-go-controls
-                         super-hands
-                         static-body="shape: sphere; sphereRadius: 0.02;"
-                         sphere-collider="objects: #node;">
+                         gearvr-controls daydream-controls oculus-go-controls>
                 </a-mixin>
-
-                <a-mixin id="controller-left" mixin="teleport"
+                <a-mixin id="controller-left" mixin="pointer"
                          vive-controls="hand: left" oculus-touch-controls="hand: left"
-                         windows-motion-controls="hand: left"
-                         super-hands
-                         raycaster="objects: .node; far:50;" laser-controls="hand: left">
-                </a-mixin>
-
-                <a-mixin id="controller"
-                         super-hands
-                         static-body="shape: sphere; sphereRadius: 0.02;"
-                         sphere-collider="objects: .node, .elem;">
+                         windows-motion-controls="hand: left">
                 </a-mixin>
 
                 <img crossorigin="anonymous" id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
@@ -293,7 +287,7 @@
 
             <a-entity id ="cameraRig" position = "4 0 5">
                 <a-entity wasd-controls look-controls>
-                    <a-entity camera id="camera" position = "0 1.6 0">
+                    <a-entity camera id="camera" position = "0 0 0">
                         <a-entity
                                   capture-mouse
                                   raycaster="objects: .node, .elem" cursor="rayOrigin:mouse"
@@ -308,8 +302,8 @@
                         </a-entity>
                     </a-entity>
                 </a-entity>
-                <a-entity id="leftControl" hand-controls="left" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;"></a-entity>
-                <a-entity id="rightControl" hand-controls="right" mixin="controller" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;"></a-entity>
+                <a-entity id="leftControl" mixin="controller-left" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;"></a-entity>
+                <a-entity id="rightControl" mixin="controller-right" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;"></a-entity>
             </a-entity>
 
             <a-entity id='InitNodes'></a-entity>
@@ -387,5 +381,5 @@ colliderEndEventProperty: clearedEls;">
 -->
         </a-scene>
     </body>
-    <script src ="mappings.js"></script>
+    <!script src ="mappings.js"><!/script>
 </html>
