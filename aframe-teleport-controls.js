@@ -71,7 +71,7 @@
 	AFRAME.registerComponent('teleport-controls', {
 	  schema: {
 	    type: {default: 'parabolic', oneOf: ['parabolic', 'line']},
-	    button: {default: 'thumbstick', oneOf: ['thumbstick', 'trigger', 'grip', 'trackpad']},
+	    button: {default: 'thumbstick', oneOf: ['thumbstick', 'trigger', 'grip', 'trackpad', 'click', 'menu']},
 	    startEvents: {type: 'array'},
 	    endEvents: {type: 'array'},
 	    collisionEntities: {default: ''},

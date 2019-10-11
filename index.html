@@ -175,11 +175,25 @@
                 if (isMobile) {
                     //var cardboardCursor = document.getElementById('cardboardCursor');
                     //cardboardCursor.setAttribute('visible',true);
+                    // Gaze input?
+                    var gazeInput = dat.GUIVR.addInputObject( camera );
+                    scene.add(gazeInput.cursor); //  only add the cursor, not the laser
+                    ['mousedown','touchstart','keydown']
+                        .forEach( function(e){
+                        window.addEventListener(e, function(){
+                            gazeInput.pressed( true );
+                        }, false );
+                    });
+                    ['mouseup','touchend', 'keyup']
+                        .forEach( function(e){
+                        window.addEventListener(e, function(){
+                            gazeInput.pressed( false );
+                        }, false );
+                    });
+                    document.addEventListener( 'mousedown', function(){ laser.pressed( true ); } );
                 }
 
-                // Gaze input?
-                var gazeInput = dat.GUIVR.addInputObject( camera );
-                scene.add( gazeInput.cursor ); //  only add the cursor, not the laser
+
             }
 
             AFRAME.registerComponent('dat-gui-controller', {
@@ -287,7 +301,7 @@
 
             <a-entity id ="cameraRig" position = "4 0 5">
                 <a-entity wasd-controls look-controls>
-                    <a-entity camera id="camera" position = "0 0 0">
+                    <a-entity camera id="camera" position = "0 1.6 0">
                         <a-entity
                                   capture-mouse
                                   raycaster="objects: .node, .elem" cursor="rayOrigin:mouse"
