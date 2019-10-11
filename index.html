@@ -177,7 +177,7 @@
                     //cardboardCursor.setAttribute('visible',true);
                     // Gaze input?
                     var gazeInput = dat.GUIVR.addInputObject( camera );
-                    scene.add(gazeInput.cursor); //  only add the cursor, not the laser
+                    scene.add(gazeInput); //  only add the cursor, not the laser
                     ['mousedown','touchstart','keydown']
                         .forEach( function(e){
                         window.addEventListener(e, function(){
