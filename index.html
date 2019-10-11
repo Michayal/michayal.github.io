@@ -173,8 +173,8 @@
                 var isMobile = AFRAME.utils.device.isMobile();
 
                 if (isMobile) {
-                    var cardboardCursor = document.getElementById('cardboardCursor');
-                    cardboardCursor.setAttribute('visible',true);
+                    //var cardboardCursor = document.getElementById('cardboardCursor');
+                    //cardboardCursor.setAttribute('visible',true);
                 }
 
                 // Gaze input?
@@ -302,8 +302,8 @@
                         </a-entity>
                     </a-entity>
                 </a-entity>
-                <a-entity id="leftControl" mixin="controller-left" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;"></a-entity>
-                <a-entity id="rightControl" mixin="controller-right" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;"></a-entity>
+                <a-entity id="leftControl" mixin="controller-left" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;" static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .node;"></a-entity>
+                <a-entity id="rightControl" mixin="controller-right" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;" static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .node;"></a-entity>
             </a-entity>
 
             <a-entity id='InitNodes'></a-entity>
