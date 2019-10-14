@@ -98,10 +98,10 @@
                 gui4 = dat.GUIVR.create("Material Properties");
 
                 gui.addFolder(gui4);
-                gui4.add(matProps[0], 'youngsModulus', {'Polypropylene (1.5 GPa)':1.5E9,'Aluminium (69 GPa)':69E9,'Titanium (105 GPa)':105E9,'Steel (200 GPa)':200E9});
+                gui4.add(matProps[0], 'YoungsModulus', {'Polypropylene (1.5 GPa)':1.5E9,'Aluminium (69 GPa)':69E9,'Titanium (105 GPa)':105E9,'Steel (200 GPa)':200E9});
                 gui4.add(matProps[1], 'thickness', 0.001, 0.1).name('Thickness [m]');
                 gui4.add(matProps[2], 'width', 0.001, 0.1).name('Width [m]');
-                gui4.add(matProps[3], 'maxAllowableStress', {'1E6':1E6,'1E7':1E7,'1E8':1E8,'1E9':1E9,'1E10':1E10,'1E11':1E11});
+                gui4.add(matProps[3], 'maxAllowableStress', {'1 MPa':1E6,'10 MPa':1E7,'100 MPa':1E8,'1 GPa':1E9,'10 GPa':1E10,'100 GPa':1E11});
                 //gui4.add(matProps[4], 'scaleFactor',0.1,1.5).step(0.1);
 
                 /*

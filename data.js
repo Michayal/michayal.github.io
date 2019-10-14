@@ -165,7 +165,7 @@ var DefNode = [];
 var NodeList = [];
 var matProps = 
     [
-        {youngsModulus: 1.5E9},
+        {YoungsModulus: 1.5E9},
         {thickness: 0.002},
         {width: 0.02},
         {maxAllowableStress: 1E8},
@@ -469,7 +469,7 @@ var DoAnalysis = function(){
     }
 
     //Problem Parameters defined here
-    var E = matProps[0].youngsModulus;
+    var E = matProps[0].YoungsModulus;
     var t = matProps[1].thickness;
     var w = matProps[2].width;
     var fx = 0;
