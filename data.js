@@ -135,6 +135,31 @@ var Elem =
      { elemName: 'Elem17', nodeA: 6, nodeB: 9 } ];
 
 var recompute = [{Recalculate: function(){DoAnalysis()}}];
+
+function viewUndef(){
+    var model = document.getElementById('undefModel');
+    var current = undeformed[0].state;
+    if(current == true){
+        model.setAttribute('visible', 'true');
+    }
+    else if(current == false){
+        model.setAttribute('visible', 'false');
+    }
+};
+
+function viewDef(){
+    var model = document.getElementById('defModel');
+    var current = deformed[0].state;
+    if(current == true){
+        model.setAttribute('visible', 'true');
+    }
+    else if(current == false){
+        model.setAttribute('visible', 'false');
+    }
+}
+
+var undeformed  = [{state: true}];
+var deformed = [{state: true}];
 var scene = document.querySelector('a-scene');
 var DefNode = [];
 var NodeList = [];
@@ -260,13 +285,14 @@ function addForceArrow (nodeID, force, dir) {
 
 function plotDot (scene, position, size, color, id, text) {
     var sphere = document.createElement('a-entity');
+    var parent = document.getElementById('undefModel');
     sphere.setAttribute('class', 'node');
     sphere.setAttribute('mixin', 'node');
     sphere.setAttribute('radius', size);
     sphere.setAttribute('position', position);
     sphere.setAttribute('color', "#ffffff");
     sphere.setAttribute('id', id);
-    scene.appendChild(sphere);
+    parent.appendChild(sphere);
 
     addForceArrow(id,Node[Number(id.substr(4))].forceY,'y');
     addForceArrow(id,Node[Number(id.substr(4))].forceX,'x');
@@ -302,41 +328,33 @@ function plotDot (scene, position, size, color, id, text) {
 
 function plotDefDot (scene, position, size, color, id, text) {
     var sphere = document.createElement('a-sphere');
+    var parent = document.getElementById('defModel');
     sphere.setAttribute('radius', size);
     sphere.setAttribute('position', position);
-    sphere.setAttribute('color', color);
+    sphere.setAttribute('color', "#000000");
     sphere.setAttribute('id', id);
     sphere.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
         var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
         //console.log(newTextPos);
+        var i = sphere.getAttribute('id').substr(4);
         text.setAttribute('position',newTextPos);
-        text.setAttribute('value',id);
+        var textToShow = id.concat(' , ForceY = ', String(Node[i].forceY));
+        text.setAttribute('value',textToShow);
         text.setAttribute('visible',true);
         sphere.setAttribute('scale', {x: 1.3, y: 1.3, z: 1.3});
-    });
-    sphere.addEventListener('grab-end', function (evt) {
-        console.log(sphere.getAttribute('id'));
-        console.log(sphere.getAttribute('position').x);
-        var i = sphere.getAttribute('id').substr(4);
-        console.log(i);
-        console.log(Node[i].x);
-        Node[i].x = sphere.getAttribute('position').x;
-        Node[i].y = sphere.getAttribute('position').y;
-        Node[i].z = sphere.getAttribute('position').z;
-        console.log(Node[i].x);
-        updateStruct();
     });
     sphere.addEventListener('mouseleave', function () {
         sphere.setAttribute('scale', {x: 1, y: 1, z: 1});
         text.setAttribute('visible',false);
     });
     //console.log(sphere);
-    scene.appendChild(sphere);
+    parent.appendChild(sphere);
 };
 
 function plotTube (scene, position, size, color, id, text) {
     var tube = document.createElement('a-tube');
+    var parent = document.getElementById('undefModel');
     //var location = new THREE.Vector3(0,0,0);
     //console.log(location);
     tube.setAttribute('radius', size);
@@ -361,11 +379,12 @@ function plotTube (scene, position, size, color, id, text) {
         text.setAttribute('visible',false);
     });*/
     //console.log(tube);
-    scene.appendChild(tube);
+    parent.appendChild(tube);
 };
 
 function plotDefTube (scene, position, size, color, id, text) {
     var tube = document.createElement('a-tube');
+    var parent = document.getElementById('defModel');
     tube.setAttribute('class', 'elem');
     tube.setAttribute('mixin', 'elem');
     tube.setAttribute('radius', size);
@@ -391,7 +410,7 @@ function plotDefTube (scene, position, size, color, id, text) {
         text.setAttribute('visible',false);
     });
     //console.log(tube);
-    scene.appendChild(tube);
+    parent.appendChild(tube);
     //ascene = document.getElementById('scene');
     //ascene.appendChild(tube);
 };
@@ -403,7 +422,7 @@ function myPrint(){
 
 function updateStruct(){
     //console.log('Moved sphere, time to redraw tube');
-    /*
+
     for (var j = 0; j < Elem.length; j = j+1) {
 
         var nodeStart = Elem[j].nodeA;
@@ -419,7 +438,7 @@ function updateStruct(){
 
         var tube = document.getElementById(Elem[j].elemName);
         tube.setAttribute('path', tubePos);
-    } */
+    }
     DoAnalysis();
 };
 
@@ -668,12 +687,12 @@ var DoAnalysis = function(){
     var i = 0;
     for (let item of Node) {
         //console.log(Node[i].x);
-        newNode = document.getElementById(Node[i].nodeName);
+        newNode = document.getElementById('Def'+Node[i].nodeName);
         if (newNode != null){
             newNode.setAttribute('position', {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z});
         }
         else{
-            plotDot(scene, {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z}, 0.1, "#000000", Node[i].nodeName, detailText);
+            plotDefDot(scene, {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z}, 0.1, "#000000", 'Def'+Node[i].nodeName, detailText);
         }
         i = i+1;
     };
@@ -717,13 +736,13 @@ var DoAnalysis = function(){
         var color = stressColor(math.abs(stress.subset(math.index(j,0))),stressDiv);
         //console.log(color);
 
-        tube = document.getElementById(Elem[j].elemName);
+        tube = document.getElementById('Def'+Elem[j].elemName);
         if (tube != null){
             tube.setAttribute('path', tubePos);
             AFRAME.utils.entity.setComponentProperty(tube,'material.src',color);
         }
         else{
-            plotDefTube(scene, tubePos, 0.05, color, Elem[j].elemName, detailText);
+            plotDefTube(scene, tubePos, 0.05, color, 'Def'+Elem[j].elemName, detailText);
         }
     }
 };
@@ -796,25 +815,25 @@ AFRAME.registerComponent('web-fea', {
             plotDot(scene, {x: Node[i].x, y: Node[i].y, z: Node[i].z}, 0.1, "#ffffff", Node[i].nodeName, detailText);
             i = i+1;
         };
-        /*
-    for (var j = 0; j < Elem.length; j = j+1) {
 
-        var nodeStart = Elem[j].nodeA;
-        var nodeEnd = Elem[j].nodeB;
-        var tubePos = '';
-        var nodex1 = Node[nodeStart].x;
-        var nodey1 = Node[nodeStart].y;
-        var nodez1 = Node[nodeStart].z;
-        var nodex2 = Node[nodeEnd].x;
-        var nodey2 = Node[nodeEnd].y;
-        var nodez2 = Node[nodeEnd].z;
-        tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
+        for (var j = 0; j < Elem.length; j = j+1) {
 
-        //console.log(tubePos);
-        plotTube(scene, tubePos, 0.05, "color:green", Elem[j].elemName, detailText);
+            var nodeStart = Elem[j].nodeA;
+            var nodeEnd = Elem[j].nodeB;
+            var tubePos = '';
+            var nodex1 = Node[nodeStart].x;
+            var nodey1 = Node[nodeStart].y;
+            var nodez1 = Node[nodeStart].z;
+            var nodex2 = Node[nodeEnd].x;
+            var nodey2 = Node[nodeEnd].y;
+            var nodez2 = Node[nodeEnd].z;
+            tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
+
+            //console.log(tubePos);
+            plotTube(scene, tubePos, 0.05, "color:blue", Elem[j].elemName, detailText);
 
 
-    }*/
+        }
         DoAnalysis();
     }
 

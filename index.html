@@ -102,7 +102,7 @@
                 gui4.add(matProps[1], 'thickness', 0.001, 0.1).name('Thickness [m]');
                 gui4.add(matProps[2], 'width', 0.001, 0.1).name('Width [m]');
                 gui4.add(matProps[3], 'maxAllowableStress', {'1E6':1E6,'1E7':1E7,'1E8':1E8,'1E9':1E9,'1E10':1E10,'1E11':1E11});
-                gui4.add(matProps[4], 'scaleFactor',0.1,1.5).step(0.1);
+                //gui4.add(matProps[4], 'scaleFactor',0.1,1.5).step(0.1);
 
                 /*
                 gui.addFolder(gui4);
@@ -112,6 +112,8 @@
                 gui4.add(matProps[3], 'maxAllowableStress', {1E6:1E6,1E7:1E7,1E8:1E8,1E9:1E9,1E10:1E10,1E11:1E11}).name('Max Stress Allowable [Pa]').onChange(DoAnalysis);
                 */
 
+                gui.add(undeformed[0], 'state').name('View Undeformed').listen().onChange(viewUndef);
+                gui.add(deformed[0], 'state').name('View Deformed').listen().onChange(viewDef);
                 gui.add(recompute[0], 'Recalculate').name('WebFEA');
                 scene.add(gui);
 
@@ -320,7 +322,8 @@
                 <a-entity id="rightControl" mixin="controller-right" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;" static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .node;"></a-entity>
             </a-entity>
 
-            <a-entity id='InitNodes'></a-entity>
+            <a-entity id='undefModel'></a-entity>
+            <a-entity id='defModel'></a-entity>
 
             <!a-sphere id="sphere" color="#EF2D5E" position="0 1.25 -5" radius="1.25"><!/a-sphere>
 
