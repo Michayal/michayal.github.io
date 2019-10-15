@@ -76,7 +76,7 @@
                 //var InitNodes = document.querySelector("#InitNodes").object3D;
 
                 for (var i = 0; i<Node.length; i++){
-                    gui1.add(Node[i], 'forceY', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChangeY);
+                    gui1.add(Node[i], 'forceY', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChangeY).listen();
                 }
 
                 gui2 = dat.GUIVR.create("ForceX");
@@ -84,7 +84,7 @@
                 gui.addFolder(gui2);
 
                 for (var i = 0; i<Node.length; i++){
-                    gui2.add(Node[i], 'forceX', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceX')).onChange(vizChangeX);
+                    gui2.add(Node[i], 'forceX', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceX')).onChange(vizChangeX).listen();
                 }
                 /*
                 gui3 = dat.GUIVR.create("F dist");
@@ -115,6 +115,7 @@
                 gui.add(undeformed[0], 'state').name('View Undeformed').listen().onChange(viewUndef);
                 gui.add(deformed[0], 'state').name('View Deformed').listen().onChange(viewDef);
                 gui.add(recompute[0], 'Recalculate').name('WebFEA');
+                gui.add(recompute[1], 'Reset').name('Reset Model');
                 scene.add(gui);
 
                 gui.position.x = 2;
