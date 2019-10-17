@@ -114,9 +114,6 @@ var Node =
       forceY: 0,
       fdist: 0 } ];
 
-let OGNode = Node;
-Object.freeze(OGNode);
-
 var Elem =
     [ { elemName: 'Elem0', nodeA: 0, nodeB: 1 },
      { elemName: 'Elem1', nodeA: 1, nodeB: 2 },
@@ -137,36 +134,7 @@ var Elem =
      { elemName: 'Elem16', nodeA: 10, nodeB: 6 },
      { elemName: 'Elem17', nodeA: 6, nodeB: 9 } ];
 
-var recompute = [{Recalculate: function(){DoAnalysis()}},
-                 {
-                     Reset: function(){
-                         for (var i = 0; i < Node.length; i = i+1) {
-                             if(Node[i].forceY != 0){
-                                 var idCheck = 'Node'+String(i)+'.fy';
-                                 var arr = document.getElementById(idCheck);
-                                 arr.setAttribute('visible', 'false');
-                                 Node[i].forceY = 0;
-                             }
-                             if(Node[i].forceX != 0){
-                                 var idCheck = 'Node'+String(i)+'.fx';
-                                 var arr = document.getElementById(idCheck);
-                                 arr.setAttribute('visible', 'false');
-                                 Node[i].forceX = 0;
-                             }
-                             //Node[i].forceY = 0;
-                             //Node[i].forceX = 0;
-                             Node[i].x = OGNode[i].x;
-                             Node[i].y = OGNode[i].y;
-                             Node[i].z = OGNode[i].z;
-                         }
-                         DoAnalysis();
-                         for (var i = 0; i < Elem.length; i = i+1) {
-                             var tube = document.getElementById('DefElem'+String(i));
-                             var color = '#texture0';
-                             AFRAME.utils.entity.setComponentProperty(tube,'material.src',color);
-                         }
-                     }
-                 }];
+var recompute = [{Recalculate: function(){DoAnalysis()}}];
 
 function viewUndef(){
     var model = document.getElementById('undefModel');
