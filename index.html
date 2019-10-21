@@ -23,6 +23,7 @@
         <script src = "super-hands.js"></script>
         <script src ="input-listen.js"></script>
         <script src="https://vr.cwervo.com/js/vr/datguivr.min.js"></script>
+        <script>AFRAME.registerComponent('raycastable', {});</script>
 
 
         <script>
@@ -70,6 +71,15 @@
                 //console.log(NodeList);
                 //gui.add(Node[0],'nodeName',NodeList);
 
+
+                gui2 = dat.GUIVR.create("ForceX");
+
+                gui.addFolder(gui2);
+
+                for (var i = 0; i<Node.length; i++){
+                    gui2.add(Node[i], 'forceX', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceX')).onChange(vizChangeX).listen();
+                }
+                
                 gui1 = dat.GUIVR.create("ForceY");
 
                 gui.addFolder(gui1);
@@ -78,13 +88,14 @@
                 for (var i = 0; i<Node.length; i++){
                     gui1.add(Node[i], 'forceY', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChangeY).listen();
                 }
+                
+                gui3 = dat.GUIVR.create("ForceZ");
 
-                gui2 = dat.GUIVR.create("ForceX");
-
-                gui.addFolder(gui2);
+                gui.addFolder(gui3);
+                //var InitNodes = document.querySelector("#InitNodes").object3D;
 
                 for (var i = 0; i<Node.length; i++){
-                    gui2.add(Node[i], 'forceX', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceX')).onChange(vizChangeX).listen();
+                    gui3.add(Node[i], 'forceZ', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceZ')).onChange(vizChangeZ).listen();
                 }
                 /*
                 gui3 = dat.GUIVR.create("F dist");
@@ -118,11 +129,11 @@
                 gui.add(recompute[1], 'Reset').name('Reset Model');
                 scene.add(gui);
 
-                gui.position.x = 2;
-                gui.position.y = 1.5;
-                gui.position.z = 4;
+                gui.position.x = 3.6;
+                gui.position.y = 1.2;
+                gui.position.z = 0;
 
-                gui.rotation.y = 0.6;
+                gui.rotation.y = 0;
 
 
 
@@ -263,7 +274,7 @@
                          event-set__dragdrop="">
                 </a-mixin>
 
-                <a-mixin id="pointer" raycaster="showLine: true; objects: .node, a-link"
+                <a-mixin id="pointer" raycaster="objects: .node, a-link"
                          super-hands="colliderEvent: raycaster-intersection;
                                       colliderEventProperty: els;
                                       colliderEndEvent:raycaster-intersection-cleared;
@@ -302,7 +313,7 @@
                 <img id="legend" src=legend.png>
             </a-assets>
 
-            <a-entity id ="cameraRig" position = "4 0 5">
+            <a-entity id ="cameraRig" position = "1 0 3">
                 <a-entity wasd-controls look-controls>
                     <a-entity camera id="camera" position = "0 1.6 0">
                         <a-entity
@@ -345,59 +356,6 @@
                 <a-text id="lg7" position="0.125 1.75 0.25" value="<= XX Pa" align="center" color="#F00"></a-text>
             </a-box>
 
-            <!--
-<a-box depth="0.2" height="0.5" width="0.5" src="#texture0" position="6 0.5 2.5" rotation= "180 0 0"><a-text id="lg0" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-<a-box depth="0.2" height="0.5" width="0.5" src="#texture1" position="6 1 2.5" rotation= "180 0 0"><a-text id="lg1" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-<a-box depth="0.2" height="0.5" width="0.5" src="#texture2" position="6 1.5 2.5" rotation= "180 0 0"><a-text id="lg2" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-<a-box depth="0.2" height="0.5" width="0.5" src="#texture3" position="6 2 2.5" rotation= "180 0 0"><a-text id="lg3" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-<a-box depth="0.2" height="0.5" width="0.5" src="#texture4" position="6 2.5 2.5" rotation= "180 0 0"><a-text id="lg4" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-<a-box depth="0.2" height="0.5" width="0.5" src="#texture5" position="6 3 2.5" rotation= "180 0 0"><a-text id="lg5" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-<a-box depth="0.2" height="0.5" width="0.5" src="#texture6" position="6 3.5 2.5" rotation= "180 0 0"><a-text id="lg6" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#FFF"></a-text></a-box>
-<a-box depth="0.2" height="0.5" width="0.5" src="#texture7" position="6 4 2.5" rotation= "180 0 0"><a-text id="lg7" position = "0 0 -0.5" value="<= XX Pa" look-at="#camera" align="center" color="#F00"></a-text></a-box>
-
-
-<a-entity id="legend" rotation= "0 0 0" look-at="#cameraRig">
-
-</a-entity> -->
-
-
-            <!-- Hands.
-<a-entity id="teleHand"
-hand-controls="left"
-teleport-controls="type: parabolic; collisionEntities: [mixin='voxel'], #ground"
-></a-entity>
-
-<a-entity id="blockHand"
-hand-controls="right"
-controller-cursor
-!intersection-spawn="event: click; mixin: voxel"
-></a-entity>-->
-
-            <!-- Camera. -->
-            <!--
-<a-camera id="camera" position = "4 1.5 5">
-<a-entity cursor="downEvents: triggerdown; upEvents: triggerUp"
-geometry="primitive: ring; radiusInner: 0.03; radiusOuter: 0.05"
-material="color: blue; shader: flat"
-position="0 0 -1">
-</a-entity>
-</a-camera>
-
-
-<a-entity wasd-controls look-controls position = "4 0 5">
-<a-entity camera id="camera" position = "0 1.6 0"
-capture-mouse
-raycaster="objects: .node" cursor="rayOrigin:mouse"
-static-body="shape: sphere; sphereRadius: 0.001"
-super-hands="colliderEvent: raycaster-intersection;
-colliderEventProperty: els;
-colliderEndEvent:raycaster-intersection-cleared;
-colliderEndEventProperty: clearedEls;">
-</a-entity>
-</a-entity>
-
--->
         </a-scene>
     </body>
-    <!script src ="mappings.js"><!/script>
 </html>

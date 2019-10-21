@@ -814,7 +814,7 @@ AFRAME.registerComponent('grabbable', inherit(base, {
   schema: {
     maxGrabbers: { type: 'int', default: NaN },
     invert: { default: false },
-    suppressZ: { default: true }
+    suppressZ: { default: false }
   },
   init: function () {
     this.GRABBED_STATE = 'grabbed';

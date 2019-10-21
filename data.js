@@ -1,141 +1,198 @@
-//This is the 2D Truss script extended out to 2D Frame calculations
+//This is the 2D Frame script extended out to 3D Frame calculations
 
 //Gradient generator credit: https://www.strangeplanet.fr/work/gradient-generator/index.php
 
 var Node =
-    [ { nodeName: 'Node0',
-       x: 2,
-       y: 2.5,
-       z: 2.5,
-       fixedX: 1,
-       fixedY: 1,
-       fixedM: 1,
-       forceX: 0,
-       forceY: 0,
-       fdist: 0 },
-     { nodeName: 'Node1',
-      x: 3.06801,
-      y: 2.80121,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node2',
-      x: 3.97127,
-      y: 2.66541,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node3',
-      x: 5.00181,
-      y: 2,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node4',
-      x: 2.774363,
-      y: 2,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node5',
-      x: 3.00012,
-      y: 2.34964,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node6',
-      x: 3.54162,
-      y: 2,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node7',
-      x: 2,
-      y: 1.5,
-      z: 2.5,
-      fixedX: 1,
-      fixedY: 1,
-      fixedM: 1,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node8',
-      x: 3.06801,
-      y: 1.19879,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node9',
-      x: 3.97127,
-      y: 1.33459,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node10',
-      x: 3.00012,
-      y: 1.65036,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 } ];
-
-let OGNode = Node;
-Object.freeze(OGNode);
+[ { nodeName: 'Node0',
+    x: 0.4,
+    y: 0.4,
+    z: 0.4,
+    fixedX: 1,
+    fixedY: 1,
+    fixedZ: 1,
+    xRot: 1,
+    yRot: 1,
+    zRot: 1,
+    forceX: 0,
+    forceY: 0,
+    forceZ: 0,
+    fdist: 0 },
+  { nodeName: 'Node1',
+    x: 1.4,
+    y: 0.4,
+    z: 0.4,
+    fixedX: 0,
+    fixedY: 0,
+    fixedZ: 0,
+    xRot: 0,
+    yRot: 0,
+    zRot: 0,
+    forceX: 0,
+    forceY: 0,
+    forceZ: 0,
+    fdist: 0 },
+  { nodeName: 'Node2',
+    x: 1.4,
+    y: 1.4,
+    z: 0.4,
+    fixedX: 0,
+    fixedY: 0,
+    fixedZ: 0,
+    xRot: 0,
+    yRot: 0,
+    zRot: 0,
+    forceX: 0,
+    forceY: 0,
+    forceZ: 0,
+    fdist: 0 },
+  { nodeName: 'Node3',
+    x: 0.4,
+    y: 1.4,
+    z: 0.4,
+    fixedX: 1,
+    fixedY: 1,
+    fixedZ: 1,
+    xRot: 1,
+    yRot: 1,
+    zRot: 1,
+    forceX: 0,
+    forceY: 0,
+    forceZ: 0,
+    fdist: 0 },
+  { nodeName: 'Node4',
+    x: 0.4,
+    y: 0.4,
+    z: 0.9,
+    fixedX: 1,
+    fixedY: 1,
+    fixedZ: 1,
+    xRot: 1,
+    yRot: 1,
+    zRot: 1,
+    forceX: 0,
+    forceY: 0,
+    forceZ: 0,
+    fdist: 0 },
+  { nodeName: 'Node5',
+    x: 1.4,
+    y: 0.4,
+    z: 0.9,
+    fixedX: 0,
+    fixedY: 0,
+    fixedZ: 0,
+    xRot: 0,
+    yRot: 0,
+    zRot: 0,
+    forceX: 0,
+    forceY: 0,
+    forceZ: 0,
+    fdist: 0 },
+  { nodeName: 'Node6',
+    x: 1.4,
+    y: 1.4,
+    z: 0.9,
+    fixedX: 0,
+    fixedY: 0,
+    fixedZ: 0,
+    xRot: 0,
+    yRot: 0,
+    zRot: 0,
+    forceX: 0,
+    forceY: 0,
+    forceZ: 0,
+    fdist: 0 },
+  { nodeName: 'Node7',
+    x: 0.4,
+    y: 1.4,
+    z: 0.9,
+    fixedX: 1,
+    fixedY: 1,
+    fixedZ: 1,
+    xRot: 1,
+    yRot: 1,
+    zRot: 1,
+    forceX: 0,
+    forceY: 0,
+    forceZ: 0,
+    fdist: 0 },
+  { nodeName: 'Node8',
+    x: 0.4,
+    y: 0.4,
+    z: 1.4,
+    fixedX: 1,
+    fixedY: 1,
+    fixedZ: 1,
+    xRot: 1,
+    yRot: 1,
+    zRot: 1,
+    forceX: 0,
+    forceY: 0,
+    forceZ: 0,
+    fdist: 0 },
+  { nodeName: 'Node9',
+    x: 1.4,
+    y: 0.4,
+    z: 1.4,
+    fixedX: 0,
+    fixedY: 0,
+    fixedZ: 0,
+    xRot: 0,
+    yRot: 0,
+    zRot: 0,
+    forceX: 0,
+    forceY: 0,
+    forceZ: 0,
+    fdist: 0 },
+  { nodeName: 'Node10',
+    x: 1.4,
+    y: 1.4,
+    z: 1.4,
+    fixedX: 0,
+    fixedY: 0,
+    fixedZ: 0,
+    xRot: 0,
+    yRot: 0,
+    zRot: 0,
+    forceX: 0,
+    forceY: 0,
+    forceZ: 0,
+    fdist: 0 },
+  { nodeName: 'Node11',
+    x: 0.4,
+    y: 1.4,
+    z: 1.4,
+    fixedX: 1,
+    fixedY: 1,
+    fixedZ: 1,
+    xRot: 1,
+    yRot: 1,
+    zRot: 1,
+    forceX: 0,
+    forceY: 0,
+    forceZ: 0,
+    fdist: 0 } ];
 
 var Elem =
-    [ { elemName: 'Elem0', nodeA: 0, nodeB: 1 },
-     { elemName: 'Elem1', nodeA: 1, nodeB: 2 },
-     { elemName: 'Elem2', nodeA: 2, nodeB: 3 },
-     { elemName: 'Elem3', nodeA: 0, nodeB: 4 },
-     { elemName: 'Elem4', nodeA: 0, nodeB: 5 },
-     { elemName: 'Elem5', nodeA: 4, nodeB: 5 },
-     { elemName: 'Elem6', nodeA: 1, nodeB: 5 },
-     { elemName: 'Elem7', nodeA: 5, nodeB: 6 },
-     { elemName: 'Elem8', nodeA: 6, nodeB: 2 },
-     { elemName: 'Elem9', nodeA: 7, nodeB: 8 },
-     { elemName: 'Elem10', nodeA: 8, nodeB: 9 },
-     { elemName: 'Elem11', nodeA: 9, nodeB: 3 },
-     { elemName: 'Elem12', nodeA: 7, nodeB: 4 },
-     { elemName: 'Elem13', nodeA: 7, nodeB: 10 },
-     { elemName: 'Elem14', nodeA: 4, nodeB: 10 },
-     { elemName: 'Elem15', nodeA: 8, nodeB: 10 },
-     { elemName: 'Elem16', nodeA: 10, nodeB: 6 },
-     { elemName: 'Elem17', nodeA: 6, nodeB: 9 } ];
+[ { elemName: 'Elem0', nodeA: 0, nodeB: 1 },
+  { elemName: 'Elem1', nodeA: 1, nodeB: 2 },
+  { elemName: 'Elem2', nodeA: 2, nodeB: 3 },
+  { elemName: 'Elem3', nodeA: 3, nodeB: 0 },
+  { elemName: 'Elem4', nodeA: 4, nodeB: 5 },
+  { elemName: 'Elem5', nodeA: 5, nodeB: 6 },
+  { elemName: 'Elem6', nodeA: 6, nodeB: 7 },
+  { elemName: 'Elem7', nodeA: 7, nodeB: 4 },
+  { elemName: 'Elem8', nodeA: 0, nodeB: 4 },
+  { elemName: 'Elem9', nodeA: 1, nodeB: 5 },
+  { elemName: 'Elem10', nodeA: 2, nodeB: 6 },
+  { elemName: 'Elem11', nodeA: 3, nodeB: 7 },
+  { elemName: 'Elem12', nodeA: 4, nodeB: 8 },
+  { elemName: 'Elem13', nodeA: 5, nodeB: 9 },
+  { elemName: 'Elem14', nodeA: 6, nodeB: 10 },
+  { elemName: 'Elem15', nodeA: 7, nodeB: 11 },
+  { elemName: 'Elem16', nodeA: 8, nodeB: 9 },
+  { elemName: 'Elem17', nodeA: 9, nodeB: 10 },
+  { elemName: 'Elem18', nodeA: 10, nodeB: 11 },
+  { elemName: 'Elem19', nodeA: 11, nodeB: 8 } ];
 
 var recompute = [{Recalculate: function(){DoAnalysis()}},
                  {
@@ -262,6 +319,32 @@ function vizChangeX(){
     };
 }
 
+function vizChangeZ(){
+    for (var i = 0; i < Node.length; i = i+1) {
+        var idCheck = 'Node'+String(i)+'.fz';
+        var arr = document.getElementById(idCheck);
+        var forceZ = Node[i].forceZ;
+        var offset = -0.215;
+
+        if(forceZ==0){
+            arr.setAttribute('visible', 'false');
+        }
+        else if(forceZ>0){
+            var rotation = '0 90 -90'
+            arr.setAttribute('visible', 'true');
+            arr.setAttribute('rotation', rotation);
+        }
+        else if(forceZ<0){
+            offset = -offset;
+            var rotation = '0 90 90'
+            arr.setAttribute('visible', 'true');
+            arr.setAttribute('rotation', rotation);
+        }
+        var pos = {x: 0, y: 0, z: offset};
+        arr.setAttribute('position', pos);
+    }
+}
+
 function addForceArrow (nodeID, force, dir) {
     var scene = document.querySelector('a-scene');
     var nodeUsed = document.getElementById(nodeID);
@@ -313,6 +396,26 @@ function addForceArrow (nodeID, force, dir) {
         var pos = {x: offset, y: 0, z: 0};
         cyl.setAttribute('position', pos);
     }
+    else if(dir =='z'){
+        var cylID = 'Node'+String(nodeID.substr(4))+'.fz';
+        cyl.setAttribute('id', cylID);
+        if(force==0){
+            cyl.setAttribute('visible', 'false');
+        }
+        else if(force>0){
+            var rotation = '0 90 -90'
+            cyl.setAttribute('visible', 'true');
+            cyl.setAttribute('rotation', rotation);
+        }
+        else if(force<0){
+            var rotation = '0 90 90'
+            cyl.setAttribute('visible', 'true');
+            cyl.setAttribute('rotation', rotation);
+            offset = -offset;
+        }
+        var pos = {x: offset, y: 0, z: 0};
+        cyl.setAttribute('position', pos);
+    }
 }
 
 function plotDot (scene, position, size, color, id, text) {
@@ -328,6 +431,7 @@ function plotDot (scene, position, size, color, id, text) {
 
     addForceArrow(id,Node[Number(id.substr(4))].forceY,'y');
     addForceArrow(id,Node[Number(id.substr(4))].forceX,'x');
+    addForceArrow(id,Node[Number(id.substr(4))].forceX,'z');
 
     // Functions after this //
     sphere.addEventListener('mouseenter', function (evt) {
@@ -476,7 +580,8 @@ function updateStruct(){
 
 var DoAnalysis = function(){
     // Node[0].DOF = 2; //Adding a value-pair to a JSON object
-
+    // This Script is being updated for 3D Frame
+    
     var numElem = Elem.length;
     var numNodes = Node.length;
 
@@ -502,6 +607,8 @@ var DoAnalysis = function(){
 
     //Problem Parameters defined here
     var E = matProps[0].YoungsModulus;
+    var G = E/2.8;
+    console.log(G);
     var t = matProps[1].thickness;
     var w = matProps[2].width;
     var fx = 0;
