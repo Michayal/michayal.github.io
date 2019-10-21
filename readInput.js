@@ -8,7 +8,7 @@ var content = new Array();
 // Instead of 'utf-8' it can be  
 // other character set also like 'ascii' 
 
-fs.readFile('306Truss.csv', 'utf-8', (err, data) => { 
+fs.readFile('306opt.csv', 'utf-8', (err, data) => { 
     if (err) {throw err; }
 
     // Converting Raw Buffer to text 
