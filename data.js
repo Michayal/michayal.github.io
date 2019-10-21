@@ -183,7 +183,7 @@ var Node =
       fixedY: 0,
       fixedM: 0,
       forceX: 0,
-      forceY: 0,
+      forceY: -10000,
       fdist: 0 } ];
 
 var optNode =
@@ -564,7 +564,8 @@ function plotTube (scene, position, size, color, id, text) {
     tube.setAttribute('material', color);
     tube.setAttribute('shader', 'standard');
     tube.setAttribute('id', id);
-    AFRAME.utils.entity.setComponentProperty(tube,'material.opacity',0.45);
+    AFRAME.utils.entity.setComponentProperty(tube,'material.blending','additive');
+    AFRAME.utils.entity.setComponentProperty(tube,'material.opacity',0.75);
     /*
     tube.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;

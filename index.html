@@ -76,7 +76,7 @@
                 //var InitNodes = document.querySelector("#InitNodes").object3D;
 
                 for (var i = 0; i<Node.length; i++){
-                    gui1.add(Node[i], 'forceY', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChangeY).listen();
+                    gui1.add(Node[i], 'forceY', -10000, 10000).step(100).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChangeY).listen();
                 }
 
                 gui2 = dat.GUIVR.create("ForceX");
@@ -84,7 +84,7 @@
                 gui.addFolder(gui2);
 
                 for (var i = 0; i<Node.length; i++){
-                    gui2.add(Node[i], 'forceX', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceX')).onChange(vizChangeX).listen();
+                    gui2.add(Node[i], 'forceX', -10000, 10000).step(100).name(String(Node[i].nodeName).concat('.forceX')).onChange(vizChangeX).listen();
                 }
                 /*
                 gui3 = dat.GUIVR.create("F dist");
