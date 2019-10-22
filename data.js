@@ -195,8 +195,7 @@ var Elem =
   { elemName: 'Elem19', nodeA: 11, nodeB: 8 } ];
 
 var recompute = [{Recalculate: function(){DoAnalysis()}},
-                 {
-                     Reset: function(){
+                 {Reset: function(){
                          for (var i = 0; i < Node.length; i = i+1) {
                              if(Node[i].forceY != 0){
                                  var idCheck = 'Node'+String(i)+'.fy';
@@ -222,8 +221,7 @@ var recompute = [{Recalculate: function(){DoAnalysis()}},
                              var color = '#texture0';
                              AFRAME.utils.entity.setComponentProperty(tube,'material.src',color);
                          }
-                     }
-                 }];
+                     }}];
 
 function viewUndef(){
     var model = document.getElementById('undefModel');
@@ -252,8 +250,7 @@ var deformed = [{state: true}];
 var scene = document.querySelector('a-scene');
 var DefNode = [];
 var NodeList = [];
-var matProps = 
-    [
+var matProps = [
         {YoungsModulus: 1.5E9},
         {thickness: 0.002},
         {width: 0.02},
@@ -318,7 +315,6 @@ function vizChangeX(){
         arr.setAttribute('position', pos);
     };
 }
-
 function vizChangeZ(){
     for (var i = 0; i < Node.length; i = i+1) {
         var idCheck = 'Node'+String(i)+'.fz';
@@ -584,13 +580,13 @@ var DoAnalysis = function(){
     
     var numElem = Elem.length;
     var numNodes = Node.length;
+    var gDOF = numNodes*6;
+    
+    var Kglobal = math.zeros(gDOF, gDOF);
+    var Qglobal = math.zeros(gDOF,1);
 
-    var Kglobal = math.zeros(numNodes*3, numNodes*3);
-    var Qglobal = math.zeros(numNodes*3,1);
-
-    var elemDOFs = math.zeros(numElem, 6);
+    var elemDOFs = math.zeros(numElem, 12);
     var elemLengths = math.zeros(1,numElem);
-    var newElemLen;
 
     //Element and Node Connectivity defined here
     for (var i = 0; i < numElem; i = i+1) {
