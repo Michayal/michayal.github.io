@@ -203,7 +203,7 @@ var DoAnalysis = function(){
     // Node[0].DOF = 2; //Adding a value-pair to a JSON object
     // This Script is being updated for 3D Frame
 
-    console.log("Doing Analysis");
+    console.log("Doing 3D Analysis");
     var numElem = Elem.length;
     var numNodes = Node.length;
     var gDOF = numNodes*6;
@@ -217,7 +217,6 @@ var DoAnalysis = function(){
     //Problem Parameters defined here
     var E = matProps[0].YoungsModulus;
     var G = E/2.8;
-    console.log(G);
     var r = matProps[1].radius;
     var fx = 0;
     var fy = 0;
@@ -225,10 +224,10 @@ var DoAnalysis = function(){
     var Iz = Math.PI*math.pow(r,4)*0.25;
     var Iy = Math.PI*math.pow(r,4)*0.25;
     var J = Iy+Iz;
-    var EI = E*I;
+    //var EI = E*I;
     var EA = E*A;
-    var maxAllowableStress = matProps[3].maxAllowableStress;
-    var scaleFactor = matProps[4].scaleFactor;
+    var maxAllowableStress = matProps[2].maxAllowableStress;
+    var scaleFactor = matProps[3].scaleFactor;
 
 
     //Element and Node Connectivity defined here
@@ -247,6 +246,7 @@ var DoAnalysis = function(){
         elemDOFs = math.subset(elemDOFs,math.index(i,10),(Elem[i].nodeB+1)*6-2); //Node 2 yRot
         elemDOFs = math.subset(elemDOFs,math.index(i,11),(Elem[i].nodeB+1)*6-1); //Node 2 zRot
 
+
         //I think this part is unneccesary but I'll code it anyway, might need TBD
         var Xs = [Node[Elem[i].nodeA].x, Node[Elem[i].nodeB].x];
         var Ys = [Node[Elem[i].nodeA].y, Node[Elem[i].nodeB].y];
@@ -255,28 +255,93 @@ var DoAnalysis = function(){
 
         if (Node[Elem[i].nodeA].x == Node[Elem[i].nodeB].x) {
             var x3 = 0.6;
-            } else {
-                var x3 = ((Xs[1]-Xs[0])/2 + Xs[0]) + 0.01;
-
-                }
+        } else {
+            var x3 = ((Xs[1]-Xs[0])/2 + Xs[0]) + 0.01;
+        }
         var y3 = Ys[1]+0.01;
         var z3 = 0;
         //
-        
-        
-
 
         elemLengths[i] = math.sqrt(math.square(Node[Elem[i].nodeB].x - Node[Elem[i].nodeA].x) + math.square(Node[Elem[i].nodeB].y - Node[Elem[i].nodeA].y) + math.square(Node[Elem[i].nodeB].z - Node[Elem[i].nodeA].z));
 
-        var mass = elemLengths*A*1175;
+        var mass = elemLengths[i]*A*1175;
 
+        var k1 = E*A/elemLengths[i];
+        var k2 = 12*E*Iz/math.pow(elemLengths[i],3);
+        var k3 = 6*E*Iz/math.pow(elemLengths[i],2);
+        var k4 = 4*E*Iz/elemLengths[i];
+        var k5 = 2*E*Iz/elemLengths[i];
+        var k6 = 12*E*Iy/math.pow(elemLengths[i],3);
+        var k7 = 6*E*Iy/math.pow(elemLengths[i],2);
+        var k8 = 4*E*Iy/elemLengths[i];
+        var k9 = 2*E*Iy/elemLengths[i];
+        var k10 = G*J/elemLengths[i];
 
+        var a = math.matrix([[k1,0,0],[0,k2,0],[0,0,k6]]);
+        var b = math.matrix([[0,0,0],[0,0,k3],[0,-k7,0]]);
+        var negb = math.matrix([[0,0,0],[0,0,-k3],[0,k7,0]]);;
+        var c = math.matrix([[k10,0,0],[0,k8,0],[0,0,k4]]);
+        var d = math.matrix([[-k10,0,0],[0,k9,0],[0,0,k5]]);
+
+        var one = math.concat((a,b,-a,b),1);
+        var two = math.concat((math.transpose(b),c,b,d),1);
+        //var three = math.concat((math.transpose(a),math.transpose(b),a,-b),1);
+        var three = math.concat((-math.transpose(a),math.transpose(b),a,negb),1);
+        var four = math.concat((math.transpose(b),math.transpose(d),math.transpose(-b),c),1);
+        var k = math.concat(one,two,three,four,0);
+
+        if (Node[Elem[i].nodeA].x == Node[Elem[i].nodeB].x && Node[Elem[i].nodeA].y == Node[Elem[i].nodeB].y ){
+            if( Node[Elem[i].nodeB].z > Node[Elem[i].nodeA].z){
+                var Lambda = math.matrix([[0,0,1],[0,1,0],[-1,0,0]]);
+            } else {
+                var Lambda = math.matrix([[0,0,-1],[0,1,0],[1,0,0]]);
+            }
+        } else {
+            var CXx = (Node[Elem[i].nodeB].x - Node[Elem[i].nodeA].x)/elemLengths[i];
+            var CYx = (Node[Elem[i].nodeB].y - Node[Elem[i].nodeA].y)/elemLengths[i];
+            var CZx = (Node[Elem[i].nodeB].z - Node[Elem[i].nodeA].z)/elemLengths[i];
+            var D = math.sqrt(math.pow(CXx,2) + math.pow(CYx,2));
+            var CXy = -CYx/D;
+            var CYy = CXx/D;
+            var CZy = 0;
+            var CXz = -CXx*CZx/D;
+            var CYz = -CYx*CZx/D;
+            var CZz = D;
+            var Lambda = math.matrix([[CXx,CYx,CZx],[CXy,CYy,CZy],[CXz,CYz,CZz]]);
+
+        }
+
+        var zeros39 = math.zeros(3, 9);
+        var zeros33 = math.zeros(3, 3);
+        var zeros36 = math.zeros(3, 6);
+
+        var one1 = math.concat(Lambda,zeros39,1);
+        var two2 = math.concat(zeros33,Lambda,zeros36,1);
+        var three3 = math.concat(zeros36,Lambda,zeros33,1);
+        var four4 = math.concat(zeros39,Lambda,1);
+        var R = math.concat(one1,two2,three3,four4,0);
+        //console.log(R);
+        //console.log(k);
+        //console.log(math.transpose(R));
+        var K0 = math.multiply(math.transpose(R),k);
+        var K1 = math.multiply(R,K0);
+
+        for (var j = 0; j < 12; j = j+1) {
+            for (var k = 0; k < 12; k = k+1) {
+                var newIndex1 = math.subset(elemDOFs,math.index(i,j));
+                var newIndex2 = math.subset(elemDOFs,math.index(i,k));
+
+                var newK = math.add(math.subset(Kglobal,math.index(newIndex1,newIndex2)), math.subset(K1,math.index(j,k)));
+                Kglobal.subset(math.index(newIndex1,newIndex2), newK);
+            }
+        }
     }
-    console.log(elemDOFs);
-    console.log(elemLengths);
+    console.log(Kglobal);
+
+}
 
 
-    /*
+/*
 
     var dispBCs = math.zeros(numNodes*2, 1);
     for (var i = 0, num = 0; i < numNodes*3; i = i+3, num = num+1) {
@@ -537,7 +602,8 @@ var DoAnalysis = function(){
             plotDefTube(scene, tubePos, 0.05, color, 'Def'+Elem[j].elemName, detailText);
         }
     }
-*/
+
 };
+*/
 
 DoAnalysis();
