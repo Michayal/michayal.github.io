@@ -277,18 +277,68 @@ var DoAnalysis = function(){
         var k9 = 2*E*Iy/elemLengths[i];
         var k10 = G*J/elemLengths[i];
 
-        var a = math.matrix([[k1,0,0],[0,k2,0],[0,0,k6]]);
-        var b = math.matrix([[0,0,0],[0,0,k3],[0,-k7,0]]);
-        var negb = math.matrix([[0,0,0],[0,0,-k3],[0,k7,0]]);;
-        var c = math.matrix([[k10,0,0],[0,k8,0],[0,0,k4]]);
-        var d = math.matrix([[-k10,0,0],[0,k9,0],[0,0,k5]]);
-
-        var one = math.concat((a,b,-a,b),1);
-        var two = math.concat((math.transpose(b),c,b,d),1);
+        var a = math.matrix([[k1,0,0],
+                             [0,k2,0],
+                             [0,0,k6]]);
+        
+        var b = math.matrix([[0,0,0],
+                             [0,0,k3],
+                             [0,-k7,0]]);
+        
+        var negb = math.matrix([[0,0,0],
+                                [0,0,-k3],
+                                [0,k7,0]]);
+        
+        var c = math.matrix([[k10,0,0],
+                             [0,k8,0],
+                             [0,0,k4]]);
+        
+        var d = math.matrix([[-k10,0,0],
+                             [0,k9,0],
+                             [0,0,k5]]);
+        
+        var one = math.matrix([
+            [k1,0,0,0,0,0,-k1,0,0,0,0,0],
+            [0,k2,0,0,0,k3,0,-k2,0,0,0,k3],
+            [0,0,k6,0,-k7,0,0,0,-k6,0,-k7,0]]);
+        
+        var two = math.matrix([
+            [0,0,0,k10,0,0,0,0,0,-k10,0,0],
+            [0,0,-k7,0,k8,0,0,0,k3,0,k9,0],
+            [0,k3,0,0,0,k4,0,-k7,0,0,0,k5]]);
+        
+        var three = math.matrix([
+            [-k1,0,0,0,0,0,k1,0,0,0,0,0],
+            [0,-k2,0,0,0,-k7,0,k2,0,0,0,-k3],
+            [0,0,-k6,0,k3,0,0,0,k6,0,k7,0]
+        ]);
+        
+        var four = math.matrix([
+            [0,0,0,-k10,0,0,0,0,0,k10,0,0],
+            [0,0,-k7,0,k9,0,0,0,k7,0,k8,0],
+            [0,k3,0,0,0,k5,0,-k3,0,0,0,k4]]);
+        
+        var k = math.matrix([
+            [k1,0,0,0,0,0,-k1,0,0,0,0,0],
+            [0,k2,0,0,0,k3,0,-k2,0,0,0,k3],
+            [0,0,k6,0,-k7,0,0,0,-k6,0,-k7,0],
+            [0,0,0,k10,0,0,0,0,0,-k10,0,0],
+            [0,0,-k7,0,k8,0,0,0,k3,0,k9,0],
+            [0,k3,0,0,0,k4,0,-k7,0,0,0,k5],
+            [-k1,0,0,0,0,0,k1,0,0,0,0,0],
+            [0,-k2,0,0,0,-k7,0,k2,0,0,0,-k3],
+            [0,0,-k6,0,k3,0,0,0,k6,0,k7,0],
+            [0,0,0,-k10,0,0,0,0,0,k10,0,0],
+            [0,0,-k7,0,k9,0,0,0,k7,0,k8,0],
+            [0,k3,0,0,0,k5,0,-k3,0,0,0,k4]
+        ]);
+        
+        //var two = math.concat((math.transpose(b),c,b,d),1);
         //var three = math.concat((math.transpose(a),math.transpose(b),a,-b),1);
-        var three = math.concat((-math.transpose(a),math.transpose(b),a,negb),1);
-        var four = math.concat((math.transpose(b),math.transpose(d),math.transpose(-b),c),1);
-        var k = math.concat(one,two,three,four,0);
+        //var three = math.concat((-math.transpose(a),math.transpose(b),a,negb),1);
+        //var four = math.concat((math.transpose(b),math.transpose(d),math.transpose(-b),c),1);
+        //console.log(one);
+        //var k = math.concat((one,two,three,four),0);
 
         if (Node[Elem[i].nodeA].x == Node[Elem[i].nodeB].x && Node[Elem[i].nodeA].y == Node[Elem[i].nodeB].y ){
             if( Node[Elem[i].nodeB].z > Node[Elem[i].nodeA].z){
@@ -320,18 +370,17 @@ var DoAnalysis = function(){
         var three3 = math.concat(zeros36,Lambda,zeros33,1);
         var four4 = math.concat(zeros39,Lambda,1);
         var R = math.concat(one1,two2,three3,four4,0);
-        //console.log(R);
-        //console.log(k);
         //console.log(math.transpose(R));
         var K0 = math.multiply(math.transpose(R),k);
-        var K1 = math.multiply(R,K0);
+        var K1 = math.multiply(K0,R);
+        //console.log(K1);
 
         for (var j = 0; j < 12; j = j+1) {
             for (var k = 0; k < 12; k = k+1) {
                 var newIndex1 = math.subset(elemDOFs,math.index(i,j));
                 var newIndex2 = math.subset(elemDOFs,math.index(i,k));
-
-                var newK = math.add(math.subset(Kglobal,math.index(newIndex1,newIndex2)), math.subset(K1,math.index(j,k)));
+                var newK = math.add(Kglobal.subset(math.index(newIndex1,newIndex2)), K1.subset(math.index(j,k)));
+                //console.log(newK);
                 Kglobal.subset(math.index(newIndex1,newIndex2), newK);
             }
         }
