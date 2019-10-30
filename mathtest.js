@@ -40,7 +40,7 @@ var Node =
       yRot: 0,
       zRot: 0,
       forceX: 0,
-      forceY: 0,
+      forceY: -5,
       forceZ: 0,
       fdist: 0 },
      { nodeName: 'Node3',
@@ -210,6 +210,7 @@ var DoAnalysis = function(){
 
     var Kglobal = math.zeros(gDOF, gDOF);
     var Qglobal = math.zeros(gDOF,1);
+    var dispBCs = math.zeros(gDOF, 1);
 
     var elemDOFs = math.zeros(numElem, 12);
     var elemLengths = math.zeros(1,numElem);
@@ -229,6 +230,20 @@ var DoAnalysis = function(){
     var maxAllowableStress = matProps[2].maxAllowableStress;
     var scaleFactor = matProps[3].scaleFactor;
 
+    for (var i = 0; i < numNodes; i = i+1) {
+        // Encodes dispBCs from Nodal data
+        dispBCs.subset(math.index((6*i),0),Node[i].fixedX);
+        dispBCs.subset(math.index((6*i)+1,0),Node[i].fixedY);
+        dispBCs.subset(math.index((6*i)+2,0),Node[i].fixedZ);
+        dispBCs.subset(math.index((6*i)+3,0),Node[i].xRot);
+        dispBCs.subset(math.index((6*i)+4,0),Node[i].yRot);
+        dispBCs.subset(math.index((6*i)+5,0),Node[i].zRot);
+
+        //Encodes Global Q matrix from Nodal data
+        Qglobal.subset(math.index((i*6),0),Node[i].forceX);
+        Qglobal.subset(math.index((i*6) +1,0),Node[i].forceY);
+        Qglobal.subset(math.index((i*6) +2,0),Node[i].forceZ);
+    }
 
     //Element and Node Connectivity defined here
     for (var i = 0; i < numElem; i = i+1) {
@@ -280,44 +295,44 @@ var DoAnalysis = function(){
         var a = math.matrix([[k1,0,0],
                              [0,k2,0],
                              [0,0,k6]]);
-        
+
         var b = math.matrix([[0,0,0],
                              [0,0,k3],
                              [0,-k7,0]]);
-        
+
         var negb = math.matrix([[0,0,0],
                                 [0,0,-k3],
                                 [0,k7,0]]);
-        
+
         var c = math.matrix([[k10,0,0],
                              [0,k8,0],
                              [0,0,k4]]);
-        
+
         var d = math.matrix([[-k10,0,0],
                              [0,k9,0],
                              [0,0,k5]]);
-        
+
         var one = math.matrix([
             [k1,0,0,0,0,0,-k1,0,0,0,0,0],
             [0,k2,0,0,0,k3,0,-k2,0,0,0,k3],
             [0,0,k6,0,-k7,0,0,0,-k6,0,-k7,0]]);
-        
+
         var two = math.matrix([
             [0,0,0,k10,0,0,0,0,0,-k10,0,0],
             [0,0,-k7,0,k8,0,0,0,k3,0,k9,0],
             [0,k3,0,0,0,k4,0,-k7,0,0,0,k5]]);
-        
+
         var three = math.matrix([
             [-k1,0,0,0,0,0,k1,0,0,0,0,0],
             [0,-k2,0,0,0,-k7,0,k2,0,0,0,-k3],
             [0,0,-k6,0,k3,0,0,0,k6,0,k7,0]
         ]);
-        
+
         var four = math.matrix([
             [0,0,0,-k10,0,0,0,0,0,k10,0,0],
             [0,0,-k7,0,k9,0,0,0,k7,0,k8,0],
             [0,k3,0,0,0,k5,0,-k3,0,0,0,k4]]);
-        
+
         var k = math.matrix([
             [k1,0,0,0,0,0,-k1,0,0,0,0,0],
             [0,k2,0,0,0,k3,0,-k2,0,0,0,k3],
@@ -332,7 +347,7 @@ var DoAnalysis = function(){
             [0,0,-k7,0,k9,0,0,0,k7,0,k8,0],
             [0,k3,0,0,0,k5,0,-k3,0,0,0,k4]
         ]);
-        
+
         //var two = math.concat((math.transpose(b),c,b,d),1);
         //var three = math.concat((math.transpose(a),math.transpose(b),a,-b),1);
         //var three = math.concat((-math.transpose(a),math.transpose(b),a,negb),1);
@@ -387,98 +402,24 @@ var DoAnalysis = function(){
     }
     console.log(Kglobal);
 
-}
-
-
-/*
-
-    var dispBCs = math.zeros(numNodes*2, 1);
-    for (var i = 0, num = 0; i < numNodes*3; i = i+3, num = num+1) {
-        // Encodes dispBCs from Nodal data
-        dispBCs.subset(math.index(i,0),Node[num].fixedX);
-        dispBCs.subset(math.index(i+1,0),Node[num].fixedY);
-        dispBCs.subset(math.index(i+2,0),Node[num].fixedM);
-
-        //Encodes Global Q matrix from Nodal data
-        Qglobal.subset(math.index(i,0),Node[num].forceX);
-        Qglobal.subset(math.index(i+1,0),Node[num].forceY);
-    }
-    //console.log(dispBCs);
-    //console.log(Qglobal);
-
-
-    //Encodes f_dist from Nodal data
-    var f_dist = math.zeros(1,numNodes);
-    for (var i = 0; i < numNodes; i = i+1) {
-        f_dist.subset(math.index(0,i),Node[i].fdist);
-    };
-
-    //Initialize global K Matrices
-    for (var i = 0; i < numElem; i = i+1) {
-        // Create and assemble element stiffness matrix
-        var node1 = Elem[i].nodeA;
-        var node2 = Elem[i].nodeB;
-        var c = (Node[node2].x - Node[node1].x)/elemLengths[i];
-        var s = (Node[node2].y - Node[node1].y)/elemLengths[i];
-        var T = math.matrix([[c,s,0,0,0,0],[-s,c,0,0,0,0],[0,0,1,0,0,0],[0,0,0,c,s,0],[0,0,0,-s,c,0],[0,0,0,0,0,1]]);
-
-        //Do all the math here and assign them to the correct indices later.
-        var L = elemLengths[i];
-        var Lsquared = math.pow(L,2);
-        var Lcubed = math.pow(L,3);
-        var csquared = math.pow(c,2);
-        var ssquared = math.pow(s,2);
-
-        var Kelem = math.matrix([[csquared*EA/L + 12*ssquared*EI/Lcubed, c*EA*s/L - 12*s*c*EI/Lcubed, -6*s*EI/Lsquared, -csquared*EA/L - 12*ssquared*EI/Lcubed, -c*EA*s/L + 12*s*c*EI/Lcubed, -6*s*EI/Lsquared],
-                                 [c*EA*s/L - 12*s*c*EI/Lcubed, ssquared*EA/L + 12*csquared*EI/Lcubed, 6*c*EI/Lsquared, -c*EA*s/L + 12*s*c*EI/Lcubed, -ssquared*EA/L - 12*csquared*EI/Lcubed, 6*c*EI/Lsquared],
-                                 [-6*s*EI/Lsquared, 6*c*EI/Lsquared, 4*EI/L, 6*s*EI/Lsquared, -6*c*EI/Lsquared, 2*EI/L ],
-                                 [-csquared*EA/L - 12*ssquared*EI/Lcubed, -c*EA*s/L + 12*s*c*EI/Lcubed, 6*s*EI/Lsquared, csquared*EA/L + 12*ssquared*EI/Lcubed, c*EA*s/L - 12*s*c*EI/Lcubed, 6*s*EI/Lsquared],
-                                 [-c*EA*s/L + 12*s*c*EI/Lcubed, -ssquared*EA/L - 12*csquared*EI/Lcubed, -6*c*EI/Lsquared, c*EA*s/L - 12*s*c*EI/Lcubed, ssquared*EA/L + 12*csquared*EI/Lcubed, -6*c*EI/Lsquared],
-                                 [-6*s*EI/Lsquared, 6*c*EI/Lsquared, 2*EI/L, 6*s*EI/Lsquared, -6*c*EI/Lsquared, 4*EI/L]]);
-
-
-        // Create and assemble Distributed Force Vector
-        var Qdist = math.zeros(6,1);
-        Qdist.subset(math.index(0,0),L*fx/2);
-        Qdist.subset(math.index(1,0),L*fy/2);
-        Qdist.subset(math.index(2,0),(c*fy-s*fx)*Lsquared/12);
-        Qdist.subset(math.index(3,0),L*fx/2);
-        Qdist.subset(math.index(4,0),L*fy/2);
-        Qdist.subset(math.index(5,0),-(c*fy-s*fx)*Lsquared/12);
-
-        for (var j = 0; j < 6; j = j+1) {
-            var newIndex3 = math.subset(elemDOFs,math.index(i,j)); // Finds DOF index for ith Element
-
-            var newQ = math.add(math.subset(Qglobal,math.index(newIndex3,0)), math.subset(Qdist,math.index(j,0))); // Adds Qdist to Qglobal
-            Qglobal.subset(math.index(newIndex3,0),newQ);
-
-            for (var k = 0; k < 6; k = k+1) {
-                var newIndex1 = math.subset(elemDOFs,math.index(i,j));
-                var newIndex2 = math.subset(elemDOFs,math.index(i,k));
-
-                var newK = math.add(math.subset(Kglobal,math.index(newIndex1,newIndex2)), math.subset(Kelem,math.index(j,k)));
-                Kglobal.subset(math.index(newIndex1,newIndex2), newK);
-            }
-        }
-    }
-
     // Enforce Displacement BCs through penalty method
 
+    
     for (var i = 0; i < dispBCs._size[0]; i = i+1) {
         var BCindex = math.subset(dispBCs,math.index(i,0));
+
         //if Node is fixed
         if (BCindex == 1){
             Kglobal.subset(math.index(i,i),math.multiply(math.subset(Kglobal,math.index(i,i)),1E15)); //Multiplies ii in Kglobal by 1E15 if fixed
             math.subset(Qglobal,math.index(i,0),math.multiply(math.subset(Kglobal,math.index(i,i)),0)); //Cancels out forces at node if fixed
         }
     }
-
-    //Solve for qGlobal
+    
     var Kinv = math.inv(Kglobal)
     var qGlobal = math.multiply(Kinv,Qglobal);
-    //console.log(qGlobal);
-
-    stress = math.zeros(numElem,6);
+    console.log(qGlobal);
+    
+/*    stress = math.zeros(numElem,6);
     var tstress = math.zeros(numElem,1);
     var bstress = math.zeros(numElem,1);
     for (var i = 0; i < numElem; i = i+1) {
@@ -489,18 +430,31 @@ var DoAnalysis = function(){
         var T = math.matrix([[c,s,0,0,0,0],[-s,c,0,0,0,0],[0,0,1,0,0,0],[0,0,0,c,s,0],[0,0,0,-s,c,0],[0,0,0,0,0,1]]);
 
         //Do all the math here and assign them to the correct indices later.
-        var L = elemLengths[i];
-        var Lsquared = math.pow(L,2);
-        var Lcubed = math.pow(L,3);
-        var csquared = math.pow(c,2);
-        var ssquared = math.pow(s,2);
-
-        var Kelem = math.matrix([[csquared*EA/L + 12*ssquared*EI/Lcubed, c*EA*s/L - 12*s*c*EI/Lcubed, -6*s*EI/Lsquared, -csquared*EA/L - 12*ssquared*EI/Lcubed, -c*EA*s/L + 12*s*c*EI/Lcubed, -6*s*EI/Lsquared],
-                                 [c*EA*s/L - 12*s*c*EI/Lcubed, ssquared*EA/L + 12*csquared*EI/Lcubed, 6*c*EI/Lsquared, -c*EA*s/L + 12*s*c*EI/Lcubed, -ssquared*EA/L - 12*csquared*EI/Lcubed, 6*c*EI/Lsquared],
-                                 [-6*s*EI/Lsquared, 6*c*EI/Lsquared, 4*EI/L, 6*s*EI/Lsquared, -6*c*EI/Lsquared, 2*EI/L ],
-                                 [-csquared*EA/L - 12*ssquared*EI/Lcubed, -c*EA*s/L + 12*s*c*EI/Lcubed, 6*s*EI/Lsquared, csquared*EA/L + 12*ssquared*EI/Lcubed, c*EA*s/L - 12*s*c*EI/Lcubed, 6*s*EI/Lsquared],
-                                 [-c*EA*s/L + 12*s*c*EI/Lcubed, -ssquared*EA/L - 12*csquared*EI/Lcubed, -6*c*EI/Lsquared, c*EA*s/L - 12*s*c*EI/Lcubed, ssquared*EA/L + 12*csquared*EI/Lcubed, -6*c*EI/Lsquared],
-                                 [-6*s*EI/Lsquared, 6*c*EI/Lsquared, 2*EI/L, 6*s*EI/Lsquared, -6*c*EI/Lsquared, 4*EI/L]]);
+        var k1 = E*A/elemLengths[i];
+        var k2 = 12*E*Iz/math.pow(elemLengths[i],3);
+        var k3 = 6*E*Iz/math.pow(elemLengths[i],2);
+        var k4 = 4*E*Iz/elemLengths[i];
+        var k5 = 2*E*Iz/elemLengths[i];
+        var k6 = 12*E*Iy/math.pow(elemLengths[i],3);
+        var k7 = 6*E*Iy/math.pow(elemLengths[i],2);
+        var k8 = 4*E*Iy/elemLengths[i];
+        var k9 = 2*E*Iy/elemLengths[i];
+        var k10 = G*J/elemLengths[i];
+        
+        var k = math.matrix([
+            [k1,0,0,0,0,0,-k1,0,0,0,0,0],
+            [0,k2,0,0,0,k3,0,-k2,0,0,0,k3],
+            [0,0,k6,0,-k7,0,0,0,-k6,0,-k7,0],
+            [0,0,0,k10,0,0,0,0,0,-k10,0,0],
+            [0,0,-k7,0,k8,0,0,0,k3,0,k9,0],
+            [0,k3,0,0,0,k4,0,-k7,0,0,0,k5],
+            [-k1,0,0,0,0,0,k1,0,0,0,0,0],
+            [0,-k2,0,0,0,-k7,0,k2,0,0,0,-k3],
+            [0,0,-k6,0,k3,0,0,0,k6,0,k7,0],
+            [0,0,0,-k10,0,0,0,0,0,k10,0,0],
+            [0,0,-k7,0,k9,0,0,0,k7,0,k8,0],
+            [0,k3,0,0,0,k5,0,-k3,0,0,0,k4]
+        ]);
 
 
         var qelem = math.zeros(6,1);
@@ -512,23 +466,7 @@ var DoAnalysis = function(){
         qelem.subset(math.index(5,0),math.subset(qGlobal,math.index(math.subset(elemDOFs,math.index(i,5)),0)));
 
 
-        var Qdist = math.zeros(6,1);
-        Qdist.subset(math.index(0,0),L*fx/2);
-        Qdist.subset(math.index(1,0),L*fy/2);
-        Qdist.subset(math.index(2,0),(c*fy-s*fx)*Lsquared/12);
-        Qdist.subset(math.index(3,0),L*fx/2);
-        Qdist.subset(math.index(4,0),L*fy/2);
-        Qdist.subset(math.index(5,0),-(c*fy-s*fx)*Lsquared/12);
-
-        //Old Force Method
-        /*
-        Qelem = math.multiply(T,Kelem,qelem)
-        //console.log(Qelem);
-        stress.subset(math.index(i,0),math.multiply(-A,math.subset(Qelem,math.index(0,0))));
-
-
-
-        //New Force Method, figure out why this is this way...
+        //New Force Method
         var val1 = math.multiply(Kelem,qelem);
         var GlobalForce = math.subtract(val1,Qdist); //ElemForce
         var force = math.multiply(T,GlobalForce);
@@ -564,12 +502,13 @@ var DoAnalysis = function(){
     for (var i = 0; i < numElem; i = i+1) {
         buckling.subset(math.index(i,0),-math.square(math.pi)*EA*0.0833/math.square(elemLengths[i]));
     }
-    //console.log(maxStress);
+    //console.log(maxStress);*/
 
-    var deformedNodes = math.zeros(numNodes,2);
+    var deformedNodes = math.zeros(numNodes,3);
     for (var i = 0; i < numNodes; i = i+1) {
-        deformedNodes.subset(math.index(i,0), Node[i].x + math.subset(qGlobal,math.index(3*i,0)));
-        deformedNodes.subset(math.index(i,1), Node[i].y + math.subset(qGlobal,math.index((3*i)+1,0)));
+        deformedNodes.subset(math.index(i,0), Node[i].x + math.subset(qGlobal,math.index(6*i,0)));
+        deformedNodes.subset(math.index(i,1), Node[i].y + math.subset(qGlobal,math.index((6*i)+1,0)));
+        deformedNodes.subset(math.index(i,2), Node[i].z + math.subset(qGlobal,math.index((6*i)+2,0)));
     }
     //console.log(deformedNodes);
 
@@ -579,7 +518,7 @@ var DoAnalysis = function(){
         //Node Objects are created and characterized here
 
         DefNode[i] = { DefnodeName : 'DefNode'+ String(i), x : math.subset(deformedNodes,math.index(i,0)),
-                      y : math.subset(deformedNodes,math.index(i,1)), z : Node[i].z};
+                      y : math.subset(deformedNodes,math.index(i,1)), z : math.subset(deformedNodes,math.index(i,2))};
         //Node[i].x = math.subset(deformedNodes,math.index(i,0));
         //Node[i].y = math.subset(deformedNodes,math.index(i,1));
     }
@@ -653,6 +592,5 @@ var DoAnalysis = function(){
     }
 
 };
-*/
 
 DoAnalysis();

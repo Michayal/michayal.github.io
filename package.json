@@ -2,7 +2,7 @@
   "name": "webtruss",
   "version": "1.0.0",
   "description": "Visualize FEA in WebVR",
-  "main": "mathtest.js",
+  "main": "data.js",
   "dependencies": {
     "aframe": "^0.9.2",
     "aframe-click-drag-component": "^3.0.1",
@@ -19,7 +19,7 @@
     "url": "git+https://github.com/Michayal/WebTruss.git"
   },
   "author": "Michayal Mathew",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Michayal/WebTruss/issues"
   },

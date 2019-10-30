@@ -19,109 +19,94 @@
         <script src="components/random-color.js"></script>
         <script src="components/snap.js"></script>
         <script src="math.js" type="text/javascript"></script>
-        <script src="mathtest.js"></script>
-        <script src = "https://unpkg.com/mathjs@6.2.1"></script>
-        <script src = "super-hands.js"></script>
+        <script src="data.js"></script>
+        <script src ="https://unpkg.com/mathjs@6.2.1"></script>
+        <script src ="super-hands.js"></script>
         <script src ="input-listen.js"></script>
         <script src="https://vr.cwervo.com/js/vr/datguivr.min.js"></script>
         <script>AFRAME.registerComponent('raycastable', {});</script>
 
-    </head>
+        <script>
+            var scene, camera, renderer, gui;
 
-    <body>
-    </body>
-</html>
-<!--
-<script>
-var scene, camera, renderer, gui;
+            AFRAME.registerComponent("vr-dat-gui", {
+                init: function() {
+                    scene = document.querySelector("a-scene").object3D;
+                    camera = this.el.camera;
+                    renderer = this.el.renderer;
+                    //console.log({ scene, camera, renderer });
+                    addGuiElements(scene, camera, renderer);
+                }
+            });
 
-AFRAME.registerComponent("vr-dat-gui", {
-init: function() {
-scene = document.querySelector("a-scene").object3D;
-camera = this.el.camera;
-renderer = this.el.renderer;
-//console.log({ scene, camera, renderer });
-addGuiElements(scene, camera, renderer);
-}
-});
+            var guiData = {
+                testControllerEvents: function() {
+                    eventList.forEach(function(e) {
+                        var event = new Event(e);
+                        console.log(e + " : ");
+                        document.getElementById("leftControl").dispatchEvent(event);
+                    });
+                }
+            };
 
-var guiData = {
-testControllerEvents: function() {
-eventList.forEach(function(e) {
-var event = new Event(e);
-console.log(e + " : ");
-document.getElementById("leftControl").dispatchEvent(event);
-});
-}
-};
+            let sphereMaterial = new THREE.MeshStandardMaterial({color:0xff6699});
+            sphereMaterial.roughness = 0.60;
+            sphereMaterial.metalness = 0.5;
+            sphereMaterial.options = ['#ff6699', '#000000', '#ffffff'];
 
-let sphereMaterial = new THREE.MeshStandardMaterial({color:0xff6699});
-sphereMaterial.roughness = 0.60;
-sphereMaterial.metalness = 0.5;
-sphereMaterial.options = ['#ff6699', '#000000', '#ffffff'];
-
-function updateMaterial(){
-material = mesh.material = new THREE.MeshStandardMaterial({
-shading: state.shading,
-color: state.color
-});
-material.roughness = state.roughness;
-material.metalness = 1;
-material.envMap = textureCube;
-material.wireframe = state.wireframe;
-}
+            function updateMaterial(){
+                material = mesh.material = new THREE.MeshStandardMaterial({
+                    shading: state.shading,
+                    color: state.color
+                });
+                material.roughness = state.roughness;
+                material.metalness = 1;
+                material.envMap = textureCube;
+                material.wireframe = state.wireframe;
+            }
 
 
-function addGuiElements(scene, camera, renderer) {
-gui = dat.GUIVR.create("Settings");
-//console.log(NodeList);
-//gui.add(Node[0],'nodeName',NodeList);
+            function addGuiElements(scene, camera, renderer) {
+                gui = dat.GUIVR.create("Settings");
+                //console.log(NodeList);
+                //gui.add(Node[0],'nodeName',NodeList);
 
 
-gui2 = dat.GUIVR.create("ForceX");
+                gui2 = dat.GUIVR.create("ForceX");
 
-gui.addFolder(gui2);
+                gui.addFolder(gui2);
 
-for (var i = 0; i<Node.length; i++){
-gui2.add(Node[i], 'forceX', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceX')).onChange(vizChangeX).listen();
-}
+                for (var i = 0; i<Node.length; i++){
+                    gui2.add(Node[i], 'forceX', -50, 50).step(10).name(String(Node[i].nodeName).concat('.forceX')).onChange(vizChangeX).listen();
+                }
 
-gui1 = dat.GUIVR.create("ForceY");
+                gui1 = dat.GUIVR.create("ForceY");
 
-gui.addFolder(gui1);
-//var InitNodes = document.querySelector("#InitNodes").object3D;
+                gui.addFolder(gui1);
+                //var InitNodes = document.querySelector("#InitNodes").object3D;
 
-for (var i = 0; i<Node.length; i++){
-gui1.add(Node[i], 'forceY', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChangeY).listen();
-}
+                for (var i = 0; i<Node.length; i++){
+                    gui1.add(Node[i], 'forceY', -50, 50).step(10).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChangeY).listen();
+                }
 
-gui3 = dat.GUIVR.create("ForceZ");
+                gui3 = dat.GUIVR.create("ForceZ");
 
-gui.addFolder(gui3);
-//var InitNodes = document.querySelector("#InitNodes").object3D;
+                gui.addFolder(gui3);
+                //var InitNodes = document.querySelector("#InitNodes").object3D;
 
-for (var i = 0; i<Node.length; i++){
-gui3.add(Node[i], 'forceZ', -5000, 5000).step(100).name(String(Node[i].nodeName).concat('.forceZ')).onChange(vizChangeZ).listen();
-}
-/*
-gui3 = dat.GUIVR.create("F dist");
+                for (var i = 0; i<Node.length; i++){
+                    gui3.add(Node[i], 'forceZ', -50, 5000).step(1).name(String(Node[i].nodeName).concat('.forceZ')).onChange(vizChangeZ).listen();
+                }
 
-gui.addFolder(gui3);
+                gui4 = dat.GUIVR.create("Material Properties");
 
-for (var i = 0; i<Node.length; i++){
-gui3.add(Node[i], 'fdist', -100, 100).step(10).name(String(Node[i].nodeName).concat('.fdist'));
-}*/
+                gui.addFolder(gui4);
+                gui4.add(matProps[0], 'YoungsModulus', {'Polypropylene (1.5 GPa)':1.5E9,'Aluminium (69 GPa)':69E9,'Titanium (105 GPa)':105E9,'Steel (200 GPa)':200E9});
+                gui4.add(matProps[1], 'radius', 0.001, 0.1).name('Radius [m]');
+                gui4.add(matProps[2], 'maxAllowableStress', {'1 MPa':1E6,'10 MPa':1E7,'100 MPa':1E8,'1 GPa':1E9,'10 GPa':1E10,'100 GPa':1E11});
+                //gui4.add(matProps[3], 'scaleFactor',0.1,1.5).step(0.1);
 
-gui4 = dat.GUIVR.create("Material Properties");
-
-gui.addFolder(gui4);
-gui4.add(matProps[0], 'YoungsModulus', {'Polypropylene (1.5 GPa)':1.5E9,'Aluminium (69 GPa)':69E9,'Titanium (105 GPa)':105E9,'Steel (200 GPa)':200E9});
-gui4.add(matProps[1], 'thickness', 0.001, 0.1).name('Thickness [m]');
-gui4.add(matProps[2], 'width', 0.001, 0.1).name('Width [m]');
-gui4.add(matProps[3], 'maxAllowableStress', {'1 MPa':1E6,'10 MPa':1E7,'100 MPa':1E8,'1 GPa':1E9,'10 GPa':1E10,'100 GPa':1E11});
-//gui4.add(matProps[4], 'scaleFactor',0.1,1.5).step(0.1);
-
-/*
+                /*
 gui.addFolder(gui4);
 gui4.add(matProps[0], 'youngsModulus', {'Polypropylene (1.5 GPa)':1.5E9,'Aluminium (69 GPa)':69E9,'Titanium (105 GPa)':105E9,'Steel (200 GPa)':200E9}).name('Youngs Modulus [Pa]').onChange(DoAnalysis);
 gui4.add(matProps[1], 'thickness', 0.001, 0.1).name('Thickness [m]').onChange(DoAnalysis);
@@ -129,239 +114,207 @@ gui4.add(matProps[2], 'width', 0.001, 0.1).name('Width [m]').onChange(DoAnalysis
 gui4.add(matProps[3], 'maxAllowableStress', {1E6:1E6,1E7:1E7,1E8:1E8,1E9:1E9,1E10:1E10,1E11:1E11}).name('Max Stress Allowable [Pa]').onChange(DoAnalysis);
 */
 
-gui.add(undeformed[0], 'state').name('View Undeformed').listen().onChange(viewUndef);
-gui.add(deformed[0], 'state').name('View Deformed').listen().onChange(viewDef);
-gui.add(recompute[0], 'Recalculate').name('WebFEA');
-gui.add(recompute[1], 'Reset').name('Reset Model');
-scene.add(gui);
+                gui.add(undeformed[0], 'state').name('View Undeformed').listen().onChange(viewUndef);
+                gui.add(deformed[0], 'state').name('View Deformed').listen().onChange(viewDef);
+                gui.add(recompute[0], 'Recalculate').name('WebFEA');
+                gui.add(recompute[1], 'Reset').name('Reset Model');
+                scene.add(gui);
 
-gui.position.x = 3.6;
-gui.position.y = 1.2;
-gui.position.z = 0;
+                gui.position.x = 3.6;
+                gui.position.y = 1.2;
+                gui.position.z = 0;
 
-gui.rotation.y = 0;
+                gui.rotation.y = 0;
 
+                //scene.add(gui);
+                //scene.add(gui2);
 
+                // Mouse input
+                //  you can use the mouse to interact with the GUI on-screen!
+                dat.GUIVR.enableMouse( camera, renderer );
+                //  or turn it off when going into VR
+                window.addEventListener( 'vrdisplaypresentchange', function( e ){
+                    if( e.display.isPresenting ){
+                        dat.GUIVR.disableMouse();
+                    }
+                    else{
+                        dat.GUIVR.enableMouse( camera, renderer );
+                    }
+                }, false );
 
-//gui.add(gui2);
+                // On mobile remove elements that are resource heavy
+                var isMobile = AFRAME.utils.device.isMobile();
 
-
-
-/* (InitNodes.children.length).forEach(function(node) {
-gui.add(InitNodes.children.scale.x, node, 0, 10);
-});*/
-
-
-//gui.add(Node,'nodeName',{'Node0':Node.Node0, 'Node1':Node.Node1})
-
-//gui.rotation.set({x : 0.17, y : 0.6, z : -0.08});
-
-/*
-var sphere = document.querySelector("#sphere").object3D;
-console.log(sphere.el.attributes.color);
-//sphere.el.attributes.color = '#EF2D5E'
-sphere.shading = THREE.FlatShading;
-["x", "y", "z"].forEach(function(axis) {
-gui.add(sphere.scale, axis, 0, 10);
-});
-
-gui.add(guiData, "testControllerEvents");
-gui.add(sphere,'shading', { 'THREE.SmoothShading': THREE.SmoothShading, 'THREE.FlatShading': THREE.FlatShading }).listen().onChange( updateMaterial );
-gui.add(sphere.el.attributes,'color', { 'default':'#EF2D5E','red': '#FF0000', 'green': '#00FF00','blue': '#0000FF'});
-gui.add(sphereMaterial, 'wireframe' );
-//gui.add(sphere.color, 'color', ['#ff6699', '#000000', '#ffffff']);
-//gui.add(dropdown,["1","2","3"]);
-*/
-
-//scene.add(gui);
-//scene.add(gui2);
-
-// Mouse input
-//  you can use the mouse to interact with the GUI on-screen!
-dat.GUIVR.enableMouse( camera, renderer );
-//  or turn it off when going into VR
-window.addEventListener( 'vrdisplaypresentchange', function( e ){
-if( e.display.isPresenting ){
-dat.GUIVR.disableMouse();
-}
-else{
-dat.GUIVR.enableMouse( camera, renderer );
-}
-}, false );
-
-// On mobile remove elements that are resource heavy
-var isMobile = AFRAME.utils.device.isMobile();
-
-if (isMobile) {
-//var cardboardCursor = document.getElementById('cardboardCursor');
-//cardboardCursor.setAttribute('visible',true);
-// Gaze input?
-var gazeInput = dat.GUIVR.addInputObject( camera );
-scene.add(gazeInput); //  only add the cursor, not the laser
-['mousedown','touchstart','keydown']
-.forEach( function(e){
-window.addEventListener(e, function(){
-gazeInput.pressed( true );
-}, false );
-});
-['mouseup','touchend', 'keyup']
-.forEach( function(e){
-window.addEventListener(e, function(){
-gazeInput.pressed( false );
-}, false );
-});
-document.addEventListener( 'mousedown', function(){ laser.pressed( true ); } );
-}
+                if (isMobile) {
+                    //var cardboardCursor = document.getElementById('cardboardCursor');
+                    //cardboardCursor.setAttribute('visible',true);
+                    // Gaze input?
+                    var gazeInput = dat.GUIVR.addInputObject( camera );
+                    scene.add(gazeInput); //  only add the cursor, not the laser
+                    ['mousedown','touchstart','keydown']
+                        .forEach( function(e){
+                        window.addEventListener(e, function(){
+                            gazeInput.pressed( true );
+                        }, false );
+                    });
+                    ['mouseup','touchend', 'keyup']
+                        .forEach( function(e){
+                        window.addEventListener(e, function(){
+                            gazeInput.pressed( false );
+                        }, false );
+                    });
+                    document.addEventListener( 'mousedown', function(){ laser.pressed( true ); } );
+                }
 
 
-}
+            }
 
-AFRAME.registerComponent('dat-gui-controller', {
-schema : {
-query : {default : ""}
-},
-init : function() {
-if (this.data.query === "") {
-console.warn("Dat-gui-controller: no query, please add one");
-return;
-}
-scene = this.el.sceneEl.object3D;
+            AFRAME.registerComponent('dat-gui-controller', {
+                schema : {
+                    query : {default : ""}
+                },
+                init : function() {
+                    if (this.data.query === "") {
+                        console.warn("Dat-gui-controller: no query, please add one");
+                        return;
+                    }
+                    scene = this.el.sceneEl.object3D;
 
-var controls = document.querySelectorAll(this.data.query);
+                    var controls = document.querySelectorAll(this.data.query);
 
-controls.forEach(function (controllerEl) {
-var object3D = controllerEl.object3D;
-// https://github.com/dataarts/dat.guiVR/wiki/Input-Support-(Vive-Controllers,-Mouse,-etc)
-var vrInput = dat.GUIVR.addInputObject( object3D );
+                    controls.forEach(function (controllerEl) {
+                        var object3D = controllerEl.object3D;
+                        // https://github.com/dataarts/dat.guiVR/wiki/Input-Support-(Vive-Controllers,-Mouse,-etc)
+                        var vrInput = dat.GUIVR.addInputObject( object3D );
 
-['trigger', 'trackpad', 'grip'].forEach(function (baseEvent) {
-['up', 'down'].forEach(function (e) { controllerEl.addEventListener(baseEvent + e, function(){
-var gripEvent = baseEvent === 'grip';
-console.log((gripEvent ? 'gripped' : 'pressed') + " " + controllerEl + " " + e);
-var value = (e === "down");
-(gripEvent ? vrInput.gripped(value) : vrInput.pressed(value));
-})})
-});
-scene.add(vrInput);
-});
-}
-});
+                        ['trigger', 'trackpad', 'grip'].forEach(function (baseEvent) {
+                            ['up', 'down'].forEach(function (e) { controllerEl.addEventListener(baseEvent + e, function(){
+                                var gripEvent = baseEvent === 'grip';
+                                console.log((gripEvent ? 'gripped' : 'pressed') + " " + controllerEl + " " + e);
+                                var value = (e === "down");
+                                (gripEvent ? vrInput.gripped(value) : vrInput.pressed(value));
+                            })})
+                        });
+                        scene.add(vrInput);
+                    });
+                }
+            });
 
-</script>
-</head>
+        </script>
+        </head>
 
-<body>
-<a-scene web-fea touch-to-click-converter vr-dat-gui="vr-dat-gui" dat-gui-controller="query: [vive-controls], [oculus-touch-controls]">
-<a-assets>
+    <body>
+        <a-scene web-fea touch-to-click-converter vr-dat-gui="vr-dat-gui" dat-gui-controller="query: [vive-controls], [oculus-touch-controls]">
+            <a-assets>
 
-<a-mixin id="Cyl" geometry="primitive: cylinder;height: .35; radius: 0.05" material="color: red"></a-mixin>
-<a-mixin id="Cone" position="0 .25 0" geometry="primitive: cone;height:.15;radius-bottom:.1" material="color: red"></a-mixin>
-<a-mixin id="right" rotation="0 0 -90"></a-mixin>
-<a-mixin id="left" rotation="0 0 90"></a-mixin>
-<a-mixin id="up" rotation="0 0 0"></a-mixin>
-<a-mixin id="down" rotation="0 0 180"></a-mixin>
+                <a-mixin id="Cyl" geometry="primitive: cylinder;height: .35; radius: 0.05" material="color: red"></a-mixin>
+                <a-mixin id="Cone" position="0 .25 0" geometry="primitive: cone;height:.15;radius-bottom:.1" material="color: red"></a-mixin>
+                <a-mixin id="right" rotation="0 0 -90"></a-mixin>
+                <a-mixin id="left" rotation="0 0 90"></a-mixin>
+                <a-mixin id="up" rotation="0 0 0"></a-mixin>
+                <a-mixin id="down" rotation="0 0 180"></a-mixin>
 
-<a-mixin id="node" geometry="primitive: sphere; radius: 0.1"
-material="shader: standard; color: #ffffff"
-hoverable
-grabbable="startButtons: triggerdown, mousedown, pointup; endButtons: triggerup, mouseup, pointdown"
-draggable
-droppable
-shadow
-event-set__hoveron="_event: hover-start; material.opacity: 0.7; transparent: true"
-event-set__hoveroff="_event: hover-end; material.opacity: 1; transparent: false"
-event-set__dragdrop="">
-</a-mixin>
+                <a-mixin id="node" geometry="primitive: sphere; radius: 0.1"
+                         material="shader: standard; color: #ffffff"
+                         hoverable
+                         grabbable="startButtons: triggerdown, mousedown, pointup; endButtons: triggerup, mouseup, pointdown"
+                         draggable
+                         droppable
+                         shadow
+                         event-set__hoveron="_event: hover-start; material.opacity: 0.7; transparent: true"
+                         event-set__hoveroff="_event: hover-end; material.opacity: 1; transparent: false"
+                         event-set__dragdrop="">
+                </a-mixin>
 
-<a-mixin id="elem" geometry="primitive: sphere; radius: 0.1"
-hoverable
-event-set__hoveron="_event: hover-start; material.opacity: 0.7; transparent: true"
-event-set__hoveroff="_event: hover-end; material.opacity: 1; transparent: false"
-event-set__dragdrop="">
-</a-mixin>
+                <a-mixin id="elem" geometry="primitive: sphere; radius: 0.1"
+                         hoverable
+                         event-set__hoveron="_event: hover-start; material.opacity: 0.7; transparent: true"
+                         event-set__hoveroff="_event: hover-end; material.opacity: 1; transparent: false"
+                         event-set__dragdrop="">
+                </a-mixin>
 
-<a-mixin id="pointer" raycaster="objects: .node, a-link"
-super-hands="colliderEvent: raycaster-intersection;
-colliderEventProperty: els;
-colliderEndEvent:raycaster-intersection-cleared;
-colliderEndEventProperty: clearedEls;">
-</a-mixin>
+                <a-mixin id="pointer" raycaster="objects: .node, a-link"
+                         super-hands="colliderEvent: raycaster-intersection;
+                                      colliderEventProperty: els;
+                                      colliderEndEvent:raycaster-intersection-cleared;
+                                      colliderEndEventProperty: clearedEls;">
+                </a-mixin>
 
-<a-mixin id="controller"
-super-hands="colliderEvent: collisions;
-colliderEventProperty: els;
-colliderEndEvent: collisions;
-colliderEndEventProperty: clearedEls"
-static-body="shape: sphere; sphereRadius: 0.02;"
-sphere-collider="objects: [grabbable];">
-</a-mixin>
+                <a-mixin id="controller"
+                         super-hands="colliderEvent: collisions;
+                                      colliderEventProperty: els;
+                                      colliderEndEvent: collisions;
+                                      colliderEndEventProperty: clearedEls"
+                         static-body="shape: sphere; sphereRadius: 0.02;"
+                         sphere-collider="objects: [grabbable];">
+                </a-mixin>
 
-<a-mixin id="controller-right" mixin="pointer"
-vive-controls="hand: right" oculus-touch-controls="hand: right"
-windows-motion-controls="hand: right"
-gearvr-controls daydream-controls oculus-go-controls>
-</a-mixin>
-<a-mixin id="controller-left" mixin="pointer"
-vive-controls="hand: left" oculus-touch-controls="hand: left"
-windows-motion-controls="hand: left">
-</a-mixin>
+                <a-mixin id="controller-right" mixin="pointer"
+                         vive-controls="hand: right" oculus-touch-controls="hand: right"
+                         windows-motion-controls="hand: right"
+                         gearvr-controls daydream-controls oculus-go-controls>
+                </a-mixin>
+                <a-mixin id="controller-left" mixin="pointer"
+                         vive-controls="hand: left" oculus-touch-controls="hand: left"
+                         windows-motion-controls="hand: left">
+                </a-mixin>
 
-<img crossorigin="anonymous" id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
-<img crossorigin="anonymous" id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg">
-<img id="texture0" src=texture0.png>
-<img id="texture1" src=texture1.png>
-<img id="texture2" src=texture2.png>
-<img id="texture3" src=texture3.png>
-<img id="texture4" src=texture4.png>
-<img id="texture5" src=texture5.png>
-<img id="texture6" src=texture6.png>
-<img id="texture7" src=texture7.png>
-<img id="legend" src=legend.png>
-</a-assets>
+                <img crossorigin="anonymous" id="groundTexture" src="https://cdn.aframe.io/a-painter/images/floor.jpg">
+                <img crossorigin="anonymous" id="skyTexture" src="https://cdn.aframe.io/a-painter/images/sky.jpg">
+                <img id="texture0" src=texture0.png>
+                <img id="texture1" src=texture1.png>
+                <img id="texture2" src=texture2.png>
+                <img id="texture3" src=texture3.png>
+                <img id="texture4" src=texture4.png>
+                <img id="texture5" src=texture5.png>
+                <img id="texture6" src=texture6.png>
+                <img id="texture7" src=texture7.png>
+                <img id="legend" src=legend.png>
+            </a-assets>
 
-<a-entity id ="cameraRig" position = "1 0 3">
-<a-entity wasd-controls look-controls>
-<a-entity camera id="camera" position = "0 1.6 0">
-<a-entity
-capture-mouse
-raycaster="objects: .node, .elem" cursor="rayOrigin:mouse"
-static-body="shape: sphere; sphereRadius: 0.001"
-super-hands="colliderEvent: raycaster-intersection;
-colliderEventProperty: els;
-colliderEndEvent:raycaster-intersection-cleared;
-colliderEndEventProperty: clearedEls;">
-<!a-entity id="cardboardCursor" visible = "false" cursor="fuse: true; fuseTimeout: 500"
-geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
-material="color: black; shader: flat"><!/a-entity>
-</a-entity>
-</a-entity>
-</a-entity>
-<a-entity id="leftControl" mixin="controller-left" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;" static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .node;"></a-entity>
-<a-entity id="rightControl" mixin="controller-right" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;" static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .node;"></a-entity>
-</a-entity>
+            <a-entity id ="cameraRig" position = "1 0 3">
+                <a-entity wasd-controls look-controls>
+                    <a-entity camera id="camera" position = "0 1.6 0">
+                        <a-entity
+                                  capture-mouse
+                                  raycaster="objects: .node, .elem" cursor="rayOrigin:mouse"
+                                  static-body="shape: sphere; sphereRadius: 0.001"
+                                  super-hands="colliderEvent: raycaster-intersection;
+                                               colliderEventProperty: els;
+                                               colliderEndEvent:raycaster-intersection-cleared;
+                                               colliderEndEventProperty: clearedEls;">
+                            <!a-entity id="cardboardCursor" visible = "false" cursor="fuse: true; fuseTimeout: 500"
+                            geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+                            material="color: black; shader: flat"><!/a-entity>
+                        </a-entity>
+                    </a-entity>
+                </a-entity>
+                <a-entity id="leftControl" mixin="controller-left" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;" static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .node;"></a-entity>
+                <a-entity id="rightControl" mixin="controller-right" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;" static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .node;"></a-entity>
+            </a-entity>
 
-<a-entity id='undefModel'></a-entity>
-<a-entity id='defModel'></a-entity>
+            <a-entity id='undefModel'></a-entity>
+            <a-entity id='defModel'></a-entity>
 
-<!a-sphere id="sphere" color="#EF2D5E" position="0 1.25 -5" radius="1.25"><!/a-sphere>
+            <!a-sphere id="sphere" color="#EF2D5E" position="0 1.25 -5" radius="1.25"><!/a-sphere>
 
-<a-text id="detailText" value="Node value:" look-at="#camera" align="center" color="#FFF" visible="false" position="2 3 5" rotation = "0 0 0"></a-text>
+            <a-text id="detailText" value="Node value:" look-at="#camera" align="center" color="#FFF" visible="false" position="2 3 5" rotation = "0 0 0"></a-text>
 
-<a-sky id="bg" radius="30" src="#skyTexture" theta-length="90" position="0 0 0"></a-sky>
+            <a-sky id="bg" radius="30" src="#skyTexture" theta-length="90" position="0 0 0"></a-sky>
 
-<a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1" position="0 0 0"></a-cylinder>
+            <a-cylinder id="ground" src="#groundTexture" radius="32" height="0.1" position="0 0 0"></a-cylinder>
 
-<a-box id="legend" depth="0.2" height="4" width="2" src="#legend" position="7 2 1.5" rotation= "0 -45 0" look-at="#camera">
-<a-text id="lg0" position="0.125 -1.75 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
-<a-text id="lg1" position="0.125 -1.25 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
-<a-text id="lg2" position="0.125 -0.75 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
-<a-text id="lg3" position="0.125 -0.25 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
-<a-text id="lg4" position="0.125 0.25 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
-<a-text id="lg5" position="0.125 0.75 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
-<a-text id="lg6" position="0.125 1.25 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
-<a-text id="lg7" position="0.125 1.75 0.25" value="<= XX Pa" align="center" color="#F00"></a-text>
-</a-box>
+            <a-box id="legend" depth="0.2" height="4" width="2" src="#legend" position="7 2 1.5" rotation= "0 -45 0" look-at="#camera">
+                <a-text id="lg0" position="0.125 -1.75 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg1" position="0.125 -1.25 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg2" position="0.125 -0.75 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg3" position="0.125 -0.25 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg4" position="0.125 0.25 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg5" position="0.125 0.75 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg6" position="0.125 1.25 0.25" value="<= XX Pa" align="center" color="#000"></a-text>
+                <a-text id="lg7" position="0.125 1.75 0.25" value="<= XX Pa" align="center" color="#F00"></a-text>
+            </a-box>
 
-</a-scene>
-</body>
+        </a-scene>
+    </body>
 </html>
