@@ -77,7 +77,7 @@
                 gui.addFolder(gui2);
 
                 for (var i = 0; i<Node.length; i++){
-                    gui2.add(Node[i], 'forceX', -50, 50).step(10).name(String(Node[i].nodeName).concat('.forceX')).onChange(vizChangeX).listen();
+                    gui2.add(Node[i], 'forceX', -50, 50).step(5).name(String(Node[i].nodeName).concat('.forceX')).onChange(vizChangeX).listen();
                 }
 
                 gui1 = dat.GUIVR.create("ForceY");
@@ -86,7 +86,7 @@
                 //var InitNodes = document.querySelector("#InitNodes").object3D;
 
                 for (var i = 0; i<Node.length; i++){
-                    gui1.add(Node[i], 'forceY', -50, 50).step(10).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChangeY).listen();
+                    gui1.add(Node[i], 'forceY', -50, 50).step(5).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChangeY).listen();
                 }
 
                 gui3 = dat.GUIVR.create("ForceZ");
@@ -95,7 +95,7 @@
                 //var InitNodes = document.querySelector("#InitNodes").object3D;
 
                 for (var i = 0; i<Node.length; i++){
-                    gui3.add(Node[i], 'forceZ', -50, 5000).step(1).name(String(Node[i].nodeName).concat('.forceZ')).onChange(vizChangeZ).listen();
+                    gui3.add(Node[i], 'forceZ', -50, 50).step(5).name(String(Node[i].nodeName).concat('.forceZ')).onChange(vizChangeZ).listen();
                 }
 
                 gui4 = dat.GUIVR.create("Material Properties");
@@ -293,8 +293,8 @@ gui4.add(matProps[3], 'maxAllowableStress', {1E6:1E6,1E7:1E7,1E8:1E8,1E9:1E9,1E1
                 <a-entity id="rightControl" mixin="controller-right" teleport-controls="type: parabolic; cameraRig: #cameraRig; teleportOrigin: #camera; button: thumbstick;" static-body="shape: sphere; sphereRadius: 0.02;" sphere-collider="objects: .node;"></a-entity>
             </a-entity>
 
-            <a-entity id='undefModel'></a-entity>
-            <a-entity id='defModel'></a-entity>
+            <a-entity id='undefModel' position="0 1 0"></a-entity>
+            <a-entity id='defModel' position="0 1 0"></a-entity>
 
             <!a-sphere id="sphere" color="#EF2D5E" position="0 1.25 -5" radius="1.25"><!/a-sphere>
 

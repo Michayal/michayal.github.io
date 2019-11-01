@@ -18,9 +18,9 @@ var Node =
        forceZ: 0,
        fdist: 0 },
      { nodeName: 'Node1',
-      x: 1.4,
+      x: 0.4,
       y: 0.4,
-      z: 0.4,
+      z: 1.4,
       fixedX: 0,
       fixedY: 0,
       fixedZ: 0,
@@ -33,8 +33,8 @@ var Node =
       fdist: 0 },
      { nodeName: 'Node2',
       x: 1.4,
-      y: 1.4,
-      z: 0.4,
+      y: 0.4,
+      z: 1.4,
       fixedX: 0,
       fixedY: 0,
       fixedZ: 0,
@@ -46,8 +46,8 @@ var Node =
       forceZ: 0,
       fdist: 0 },
      { nodeName: 'Node3',
-      x: 0.4,
-      y: 1.4,
+      x: 1.4,
+      y: 0.4,
       z: 0.4,
       fixedX: 1,
       fixedY: 1,
@@ -61,8 +61,8 @@ var Node =
       fdist: 0 },
      { nodeName: 'Node4',
       x: 0.4,
-      y: 0.4,
-      z: 0.9,
+      y: 0.9,
+      z: 0.4,
       fixedX: 1,
       fixedY: 1,
       fixedZ: 1,
@@ -74,9 +74,9 @@ var Node =
       forceZ: 0,
       fdist: 0 },
      { nodeName: 'Node5',
-      x: 1.4,
-      y: 0.4,
-      z: 0.9,
+      x: 0.4,
+      y: 0.9,
+      z: 1.4,
       fixedX: 0,
       fixedY: 0,
       fixedZ: 0,
@@ -89,8 +89,8 @@ var Node =
       fdist: 0 },
      { nodeName: 'Node6',
       x: 1.4,
-      y: 1.4,
-      z: 0.9,
+      y: 0.9,
+      z: 1.4,
       fixedX: 0,
       fixedY: 0,
       fixedZ: 0,
@@ -102,9 +102,9 @@ var Node =
       forceZ: 0,
       fdist: 0 },
      { nodeName: 'Node7',
-      x: 0.4,
-      y: 1.4,
-      z: 0.9,
+      x: 1.4,
+      y: 0.9,
+      z: 0.4,
       fixedX: 1,
       fixedY: 1,
       fixedZ: 1,
@@ -117,8 +117,8 @@ var Node =
       fdist: 0 },
      { nodeName: 'Node8',
       x: 0.4,
-      y: 0.4,
-      z: 1.4,
+      y: 1.4,
+      z: 0.4,
       fixedX: 1,
       fixedY: 1,
       fixedZ: 1,
@@ -130,8 +130,8 @@ var Node =
       forceZ: 0,
       fdist: 0 },
      { nodeName: 'Node9',
-      x: 1.4,
-      y: 0.4,
+      x: 0.4,
+      y: 1.4,
       z: 1.4,
       fixedX: 0,
       fixedY: 0,
@@ -158,9 +158,9 @@ var Node =
       forceZ: 0,
       fdist: 0 },
      { nodeName: 'Node11',
-      x: 0.4,
+      x: 1.4,
       y: 1.4,
-      z: 1.4,
+      z: 0.4,
       fixedX: 1,
       fixedY: 1,
       fixedZ: 1,
@@ -252,7 +252,7 @@ var DefNode = [];
 var NodeList = [];
 var matProps = [
     {YoungsModulus: 1.5E9},
-    {radius: 0.04},
+    {radius: 0.002},
     {maxAllowableStress: 1E8},
     {scaleFactor: 0.75}
 ];
@@ -427,11 +427,11 @@ function plotDot (scene, position, size, color, id, text) {
     //console.log(Object.values(sphere.components));
 
     if(Node[Number(id.substr(4))].fixedX == 1){ AFRAME.utils.entity.setComponentProperty(sphere,'grabbable.suppressX','true');}
-    
+
     if(Node[Number(id.substr(4))].fixedY == 1){ AFRAME.utils.entity.setComponentProperty(sphere,'grabbable.suppressY','true');}
-    
+
     if(Node[Number(id.substr(4))].fixedZ == 1){ AFRAME.utils.entity.setComponentProperty(sphere,'grabbable.suppressZ','true');}
-    
+
     //console.log(sphere.getAttribute('suppressX'));
     addForceArrow(id,Node[Number(id.substr(4))].forceY,'y');
     addForceArrow(id,Node[Number(id.substr(4))].forceX,'x');
@@ -599,6 +599,8 @@ var DoAnalysis = function(){
     var Qglobal = math.zeros(gDOF,1);
     var dispBCs = math.zeros(gDOF, 1);
 
+    //var kArray = math.zeros(numElem, 10);
+
     var elemDOFs = math.zeros(numElem, 12);
     var elemLengths = math.zeros(1,numElem);
 
@@ -608,11 +610,23 @@ var DoAnalysis = function(){
     var r = matProps[1].radius;
     var fx = 0;
     var fy = 0;
-    var A = Math.PI*math.pow(r,2);
-    var Iz = Math.PI*math.pow(r,4)*0.25;
-    var Iy = Math.PI*math.pow(r,4)*0.25;
+
+    //Square Cross Section
+    //var A = r*r;
+    //var Iz = math.pow(r,4)/12;
+    //var Iy = math.pow(r,4)/12;
+
+    // Holly's test case
+    var A = 0.002*0.01;
+    var Iy = (math.pow(0.002,3)*0.01)/12;
+    var Iz = (math.pow(0.01,3)*0.002)/12;
+
+    // Circular Cross Section
+    //var A = Math.PI*math.pow(r,2);
+    //var Iz = Math.PI*math.pow(r,4)*0.25;
+    //var Iy = Math.PI*math.pow(r,4)*0.25;
+
     var J = Iy+Iz;
-    //var EI = E*I;
     var EA = E*A;
     var maxAllowableStress = matProps[2].maxAllowableStress;
     var scaleFactor = matProps[3].scaleFactor;
@@ -648,6 +662,8 @@ var DoAnalysis = function(){
         elemDOFs = math.subset(elemDOFs,math.index(i,10),(Elem[i].nodeB+1)*6-2); //Node 2 yRot
         elemDOFs = math.subset(elemDOFs,math.index(i,11),(Elem[i].nodeB+1)*6-1); //Node 2 zRot
 
+        var elementDOF = [(Elem[i].nodeA+1)*6-6, (Elem[i].nodeA+1)*6-5, (Elem[i].nodeA+1)*6-4, (Elem[i].nodeA+1)*6-3, (Elem[i].nodeA+1)*6-2, (Elem[i].nodeA+1)*6-1,
+                          (Elem[i].nodeB+1)*6-6, (Elem[i].nodeB+1)*6-5, (Elem[i].nodeB+1)*6-4, (Elem[i].nodeB+1)*6-3, (Elem[i].nodeB+1)*6-2, (Elem[i].nodeB+1)*6-1];
 
         //I think this part is unneccesary but I'll code it anyway, might need TBD
         var Xs = [Node[Elem[i].nodeA].x, Node[Elem[i].nodeB].x];
@@ -678,6 +694,9 @@ var DoAnalysis = function(){
         var k8 = 4*E*Iy/elemLengths[i];
         var k9 = 2*E*Iy/elemLengths[i];
         var k10 = G*J/elemLengths[i];
+
+        //var kArray = [elemLengths[i],E,Iy,Iz,k1,k2,k3,k4,k5,k6,k7,k8,k9,k10];
+        //console.table(kArray);
 
         var a = math.matrix([[k1,0,0],
                              [0,k2,0],
@@ -777,17 +796,20 @@ var DoAnalysis = function(){
         var K1 = math.multiply(K0,R);
         //console.log(K1);
 
+
         for (var j = 0; j < 12; j = j+1) {
             for (var k = 0; k < 12; k = k+1) {
-                var newIndex1 = math.subset(elemDOFs,math.index(i,j));
-                var newIndex2 = math.subset(elemDOFs,math.index(i,k));
+                var newIndex1 = elementDOF[j];
+                var newIndex2 = elementDOF[k];
                 var newK = math.add(Kglobal.subset(math.index(newIndex1,newIndex2)), K1.subset(math.index(j,k)));
                 //console.log(newK);
                 Kglobal.subset(math.index(newIndex1,newIndex2), newK);
             }
         }
     }
-    console.log(Kglobal);
+
+    //console.log(K1);
+
 
     // Enforce Displacement BCs through penalty method
 
@@ -797,13 +819,31 @@ var DoAnalysis = function(){
 
         //if Node is fixed
         if (BCindex == 1){
-            Kglobal.subset(math.index(i,i),math.multiply(math.subset(Kglobal,math.index(i,i)),1E15)); //Multiplies ii in Kglobal by 1E15 if fixed
-            math.subset(Qglobal,math.index(i,0),math.multiply(math.subset(Kglobal,math.index(i,i)),0)); //Cancels out forces at node if fixed
+
+            for (var j = 0; j < 72; j = j+1) {
+                Kglobal.subset(math.index(i,j),0);
+                Kglobal.subset(math.index(j,i),0);
+                Qglobal.subset(math.index(i,0),0);
+                Kglobal.subset(math.index(i,i),1);
+            }
+            //Kglobal.subset(math.index(i,i),math.multiply(math.subset(Kglobal,math.index(i,i)),1E15)); //Multiplies ii in Kglobal by 1E15 if fixed
+            //math.subset(Qglobal,math.index(i,0),math.multiply(math.subset(Kglobal,math.index(i,i)),0)); //Cancels out forces at node if fixed
         }
     }
 
     var Kinv = math.inv(Kglobal)
     var qGlobal = math.multiply(Kinv,Qglobal);
+
+    /*
+    for (var i = 0; i < qGlobal._size[0]; i = i+1) {
+        if(Math.abs(qGlobal.subset(math.index(i,0)))< 1E-16){
+            qGlobal.subset(math.index(i,0),0)
+        }
+
+    }*/
+
+    console.log(Kglobal);
+    console.log(Qglobal);
     console.log(qGlobal);
 
     /*    stress = math.zeros(numElem,6);
@@ -966,7 +1006,7 @@ var DoAnalysis = function(){
 
 
         //var color = stressColor(math.abs(stress.subset(math.index(j,0))),stressDiv);
-        color = '#texture0';
+        color = '#texture7';
         //console.log(color);
 
         tube = document.getElementById('Def'+Elem[j].elemName);
