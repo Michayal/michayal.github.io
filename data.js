@@ -771,7 +771,7 @@ var DoAnalysis = function(){
             var CXx = (Node[Elem[i].nodeB].x - Node[Elem[i].nodeA].x)/elemLengths[i];
             var CYx = (Node[Elem[i].nodeB].y - Node[Elem[i].nodeA].y)/elemLengths[i];
             var CZx = (Node[Elem[i].nodeB].z - Node[Elem[i].nodeA].z)/elemLengths[i];
-            var D = math.sqrt(math.pow(CXx,2) + math.pow(CYx,2));
+            var D = math.sqrt(CXx*CXx + CYx*CYx);
             var CXy = -CYx/D;
             var CYy = CXx/D;
             var CZy = 0;
@@ -781,6 +781,7 @@ var DoAnalysis = function(){
             var Lambda = math.matrix([[CXx,CYx,CZx],[CXy,CYy,CZy],[CXz,CYz,CZz]]);
 
         }
+        console.log(Lambda);
 
         var zeros39 = math.zeros(3, 9);
         var zeros33 = math.zeros(3, 3);
@@ -791,6 +792,13 @@ var DoAnalysis = function(){
         var three3 = math.concat(zeros36,Lambda,zeros33,1);
         var four4 = math.concat(zeros39,Lambda,1);
         var R = math.concat(one1,two2,three3,four4,0);
+        
+        //console.log(one1);
+        //console.log(two2);
+        //console.log(three3);
+        //console.log(four4);
+        //console.log(R);
+        
         //console.log(math.transpose(R));
         var K0 = math.multiply(math.transpose(R),k);
         var K1 = math.multiply(K0,R);
