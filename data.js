@@ -43,7 +43,7 @@ var Node =
       zRot: 0,
       forceX: 0,
       forceY: -5,
-      forceZ: 0,
+      forceZ: 5000,
       fdist: 0 },
      { nodeName: 'Node3',
       x: 1.4,
@@ -319,24 +319,27 @@ function vizChangeZ(){
         var idCheck = 'Node'+String(i)+'.fz';
         var arr = document.getElementById(idCheck);
         var forceZ = Node[i].forceZ;
-        var offset = -0.215;
+        var offset = 0.215;
 
         if(forceZ==0){
             arr.setAttribute('visible', 'false');
         }
         else if(forceZ>0){
-            var rotation = '0 90 -90'
+            var rotation = '0 270 -90'
             arr.setAttribute('visible', 'true');
             arr.setAttribute('rotation', rotation);
+            var pos = {x: 0, y: 0, z: offset};
+            arr.setAttribute('position', pos);
         }
         else if(forceZ<0){
             offset = -offset;
             var rotation = '0 90 90'
             arr.setAttribute('visible', 'true');
             arr.setAttribute('rotation', rotation);
+            var pos = {x: 0, y: 0, z: offset};
+            arr.setAttribute('position', pos);
         }
-        var pos = {x: 0, y: 0, z: offset};
-        arr.setAttribute('position', pos);
+
     }
 }
 
@@ -397,19 +400,21 @@ function addForceArrow (nodeID, force, dir) {
         if(force==0){
             cyl.setAttribute('visible', 'false');
         }
-        else if(force>0){
-            var rotation = '0 90 -90'
+       else if(force>0){
+            var rotation = '0 270 -90'
             cyl.setAttribute('visible', 'true');
             cyl.setAttribute('rotation', rotation);
+            var pos = {x: 0, y: 0, z: offset};
+            cyl.setAttribute('position', pos);
         }
         else if(force<0){
+            offset = -offset;
             var rotation = '0 90 90'
             cyl.setAttribute('visible', 'true');
             cyl.setAttribute('rotation', rotation);
-            offset = -offset;
+            var pos = {x: 0, y: 0, z: offset};
+            cyl.setAttribute('position', pos);
         }
-        var pos = {x: offset, y: 0, z: 0};
-        cyl.setAttribute('position', pos);
     }
 }
 
@@ -435,7 +440,7 @@ function plotDot (scene, position, size, color, id, text) {
     //console.log(sphere.getAttribute('suppressX'));
     addForceArrow(id,Node[Number(id.substr(4))].forceY,'y');
     addForceArrow(id,Node[Number(id.substr(4))].forceX,'x');
-    addForceArrow(id,Node[Number(id.substr(4))].forceX,'z');
+    addForceArrow(id,Node[Number(id.substr(4))].forceZ,'z');
 
     // Functions after this //
     sphere.addEventListener('mouseenter', function (evt) {
@@ -546,8 +551,8 @@ function plotDefTube (scene, position, size, color, id, text) {
         var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
         var i = tube.getAttribute('id').substr(4);
         text.setAttribute('position',newTextPos);
-        var textToShow = id.concat(' , Stress = ', String(round(math.subset(stress,math.index(Number(i),0))/1E6),2)+ ' Mpa');
-        text.setAttribute('value',textToShow);
+        //var textToShow = id.concat(' , Stress = ', String(round(math.subset(stress,math.index(Number(i),0))/1E6),2)+ ' Mpa');
+        //text.setAttribute('value',textToShow);
         text.setAttribute('visible',true);
     });
     tube.addEventListener('mouseleave', function () {
@@ -781,7 +786,7 @@ var DoAnalysis = function(){
             var Lambda = math.matrix([[CXx,CYx,CZx],[CXy,CYy,CZy],[CXz,CYz,CZz]]);
 
         }
-        console.log(Lambda);
+        //console.log(Lambda);
 
         var zeros39 = math.zeros(3, 9);
         var zeros33 = math.zeros(3, 3);
@@ -792,13 +797,13 @@ var DoAnalysis = function(){
         var three3 = math.concat(zeros36,Lambda,zeros33,1);
         var four4 = math.concat(zeros39,Lambda,1);
         var R = math.concat(one1,two2,three3,four4,0);
-        
+
         //console.log(one1);
         //console.log(two2);
         //console.log(three3);
         //console.log(four4);
         //console.log(R);
-        
+
         //console.log(math.transpose(R));
         var K0 = math.multiply(math.transpose(R),k);
         var K1 = math.multiply(K0,R);
