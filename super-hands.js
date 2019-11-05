@@ -814,7 +814,9 @@ AFRAME.registerComponent('grabbable', inherit(base, {
   schema: {
     maxGrabbers: { type: 'int', default: NaN },
     invert: { default: false },
-    suppressZ: { default: true }
+    suppressX: { default: false },
+    suppressY: { default: false },
+    suppressZ: { default: false }
   },
   init: function () {
     this.GRABBED_STATE = 'grabbed';
@@ -839,9 +841,9 @@ AFRAME.registerComponent('grabbable', inherit(base, {
   },
   update: function () {
     this.physicsUpdate();
-    this.xFactor = this.data.invert ? -1 : 1;
+    this.xFactor = this.data.invert ? -1 : 1* !this.data.suppressX;
     this.zFactor = (this.data.invert ? -1 : 1)* !this.data.suppressZ;
-    this.yFactor = this.data.invert ? -1 : 1; 
+    this.yFactor = this.data.invert ? -1 : 1* !this.data.suppressY; 
   },
   tick: function () {
     var entityPosition;

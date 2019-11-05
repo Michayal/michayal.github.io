@@ -1,341 +1,423 @@
-//This is the 2D Truss script extended out to 2D Frame calculations
+//This is the 2D Frame script extended out to 3D Frame calculations
 
 //Gradient generator credit: https://www.strangeplanet.fr/work/gradient-generator/index.php
 
+var undeformed  = [{state: true}];
+var deformed = [{state: true}];
+var scene = document.querySelector('a-scene');
+var DefNode = [];
+var NodeList = [];
+var matProps = [
+    {YoungsModulus: 1.5E9},
+    {radius: 0.01},
+    {maxAllowableStress: 1E8},
+    {scaleFactor: 1.0}
+];
+
 var resetNode =
     [ { nodeName: 'Node0',
-       x: 0,
-       y: -1,
-       z: 2.5,
+       x: 0.4,
+       y: 0.4,
+       z: 0.4,
        fixedX: 1,
        fixedY: 1,
-       fixedM: 1,
+       fixedZ: 1,
+       xRot: 1,
+       yRot: 1,
+       zRot: 1,
        forceX: 0,
        forceY: 0,
+       forceZ: 0,
        fdist: 0 },
      { nodeName: 'Node1',
-      x: 1,
-      y: -1,
-      z: 2.5,
+      x: 0.4,
+      y: 0.4,
+      z: 1.4,
       fixedX: 0,
       fixedY: 0,
-      fixedM: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
       forceX: 0,
       forceY: 0,
+      forceZ: 0,
       fdist: 0 },
      { nodeName: 'Node2',
-      x: 2,
-      y: -1,
-      z: 2.5,
+      x: 1.4,
+      y: 0.4,
+      z: 1.4,
       fixedX: 0,
       fixedY: 0,
-      fixedM: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
       forceX: 0,
       forceY: 0,
+      forceZ: 0,
       fdist: 0 },
      { nodeName: 'Node3',
-      x: 0,
-      y: -2,
-      z: 2.5,
-      fixedX: 1,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node4',
-      x: 1,
-      y: -2,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node5',
-      x: 2,
-      y: -2,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node6',
-      x: 0.5,
-      y: -1.5,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node7',
-      x: 1.5,
-      y: -1.5,
-      z: 2.5,
+      x: 1.4,
+      y: 0.4,
+      z: 0.4,
       fixedX: 1,
       fixedY: 1,
-      fixedM: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
       forceX: 0,
       forceY: 0,
+      forceZ: 0,
       fdist: 0 },
-     { nodeName: 'Node8',
-      x: 2.5,
-      y: -1.5,
-      z: 2.5,
+     { nodeName: 'Node4',
+      x: 0.4,
+      y: 0.9,
+      z: 0.4,
+      fixedX: 1,
+      fixedY: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node5',
+      x: 0.4,
+      y: 0.9,
+      z: 1.4,
       fixedX: 0,
       fixedY: 0,
-      fixedM: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
       forceX: 0,
       forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node6',
+      x: 1.4,
+      y: 0.9,
+      z: 1.4,
+      fixedX: 0,
+      fixedY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node7',
+      x: 1.4,
+      y: 0.9,
+      z: 0.4,
+      fixedX: 1,
+      fixedY: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node8',
+      x: 0.4,
+      y: 1.4,
+      z: 0.4,
+      fixedX: 1,
+      fixedY: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node9',
+      x: 0.4,
+      y: 1.4,
+      z: 1.4,
+      fixedX: 0,
+      fixedY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node10',
+      x: 1.4,
+      y: 1.4,
+      z: 1.4,
+      fixedX: 0,
+      fixedY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node11',
+      x: 1.4,
+      y: 1.4,
+      z: 0.4,
+      fixedX: 1,
+      fixedY: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
       fdist: 0 } ];
 
 var Node =
     [ { nodeName: 'Node0',
-       x: 0,
-       y: -1,
-       z: 2.5,
+       x: 0.4,
+       y: 0.4,
+       z: 0.4,
        fixedX: 1,
        fixedY: 1,
-       fixedM: 1,
+       fixedZ: 1,
+       xRot: 1,
+       yRot: 1,
+       zRot: 1,
        forceX: 0,
        forceY: 0,
+       forceZ: 0,
        fdist: 0 },
      { nodeName: 'Node1',
-      x: 1,
-      y: -1,
-      z: 2.5,
+      x: 0.4,
+      y: 0.4,
+      z: 1.4,
       fixedX: 0,
       fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: -50,
+      forceY: -50,
+      forceZ: 5000,
       fdist: 0 },
      { nodeName: 'Node2',
-      x: 2,
-      y: -1,
-      z: 2.5,
+      x: 1.4,
+      y: 0.4,
+      z: 1.4,
       fixedX: 0,
       fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: -50,
+      forceY: -50,
+      forceZ: 5000,
       fdist: 0 },
      { nodeName: 'Node3',
-      x: 0,
-      y: -2,
-      z: 2.5,
-      fixedX: 1,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node4',
-      x: 1,
-      y: -2,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node5',
-      x: 2,
-      y: -2,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node6',
-      x: 0.5,
-      y: -1.5,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node7',
-      x: 1.5,
-      y: -1.5,
-      z: 2.5,
+      x: 1.4,
+      y: 0.4,
+      z: 0.4,
       fixedX: 1,
       fixedY: 1,
-      fixedM: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
       forceX: 0,
       forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node8',
-      x: 2.5,
-      y: -1.5,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: -10000,
-      fdist: 0 } ];
-
-var optNode =
-    [ { nodeName: 'Node0',
-       x: 0,
-       y: -1,
-       z: 2.5,
-       fixedX: 1,
-       fixedY: 1,
-       fixedM: 1,
-       forceX: 0,
-       forceY: 0,
-       fdist: 0 },
-     { nodeName: 'Node1',
-      x: 0.99359,
-      y: -0.97663,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node2',
-      x: 2.14983,
-      y: -1.1431,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node3',
-      x: 0,
-      y: -2,
-      z: 2.5,
-      fixedX: 1,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
+      forceZ: 0,
       fdist: 0 },
      { nodeName: 'Node4',
-      x: 0.77508,
-      y: -2.23595,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node5',
-      x: 2.11214,
-      y: -2.00264,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node6',
-      x: 0.73688,
-      y: -1.73742,
-      z: 2.5,
-      fixedX: 0,
-      fixedY: 0,
-      fixedM: 0,
-      forceX: 0,
-      forceY: 0,
-      fdist: 0 },
-     { nodeName: 'Node7',
-      x: 1.8474,
-      y: -1.5784799999999999,
-      z: 2.5,
+      x: 0.4,
+      y: 0.9,
+      z: 0.4,
       fixedX: 1,
       fixedY: 1,
-      fixedM: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
       forceX: 0,
       forceY: 0,
+      forceZ: 0,
       fdist: 0 },
-     { nodeName: 'Node8',
-      x: 2.5,
-      y: -1.5,
-      z: 2.5,
+     { nodeName: 'Node5',
+      x: 0.4,
+      y: 0.9,
+      z: 1.4,
       fixedX: 0,
       fixedY: 0,
-      fixedM: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
       forceX: 0,
       forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node6',
+      x: 1.4,
+      y: 0.9,
+      z: 1.4,
+      fixedX: 0,
+      fixedY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node7',
+      x: 1.4,
+      y: 0.9,
+      z: 0.4,
+      fixedX: 1,
+      fixedY: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node8',
+      x: 0.4,
+      y: 1.4,
+      z: 0.4,
+      fixedX: 1,
+      fixedY: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node9',
+      x: 0.4,
+      y: 1.4,
+      z: 1.4,
+      fixedX: 0,
+      fixedY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node10',
+      x: 1.4,
+      y: 1.4,
+      z: 1.4,
+      fixedX: 0,
+      fixedY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node11',
+      x: 1.4,
+      y: 1.4,
+      z: 0.4,
+      fixedX: 1,
+      fixedY: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
       fdist: 0 } ];
-
-
 
 var Elem =
-    [ { elemName: 'Elem0', nodeA: 0, nodeB: 1 },
-     { elemName: 'Elem1', nodeA: 1, nodeB: 2 },
-     { elemName: 'Elem2', nodeA: 2, nodeB: 8 },
-     { elemName: 'Elem3', nodeA: 8, nodeB: 5 },
-     { elemName: 'Elem4', nodeA: 5, nodeB: 4 },
-     { elemName: 'Elem5', nodeA: 4, nodeB: 3 },
-     { elemName: 'Elem6', nodeA: 3, nodeB: 6 },
-     { elemName: 'Elem7', nodeA: 6, nodeB: 0 },
-     { elemName: 'Elem8', nodeA: 6, nodeB: 1 },
-     { elemName: 'Elem9', nodeA: 6, nodeB: 4 },
-     { elemName: 'Elem10', nodeA: 1, nodeB: 4 },
-     { elemName: 'Elem11', nodeA: 1, nodeB: 7 },
-     { elemName: 'Elem12', nodeA: 4, nodeB: 7 },
-     { elemName: 'Elem13', nodeA: 7, nodeB: 2 },
-     { elemName: 'Elem14', nodeA: 7, nodeB: 5 },
-     { elemName: 'Elem15', nodeA: 2, nodeB: 5 } ];
+    [ { elemName: 'Elem0', nodeA: 0, nodeB: 1, thic: matProps[1].radius },
+     { elemName: 'Elem1', nodeA: 1, nodeB: 2, thic: matProps[1].radius },
+     { elemName: 'Elem2', nodeA: 2, nodeB: 3, thic: matProps[1].radius },
+     { elemName: 'Elem3', nodeA: 3, nodeB: 0, thic: matProps[1].radius },
+     { elemName: 'Elem4', nodeA: 4, nodeB: 5, thic: matProps[1].radius },
+     { elemName: 'Elem5', nodeA: 5, nodeB: 6, thic: matProps[1].radius },
+     { elemName: 'Elem6', nodeA: 6, nodeB: 7, thic: matProps[1].radius },
+     { elemName: 'Elem7', nodeA: 7, nodeB: 4, thic: matProps[1].radius },
+     { elemName: 'Elem8', nodeA: 0, nodeB: 4, thic: matProps[1].radius },
+     { elemName: 'Elem9', nodeA: 1, nodeB: 5, thic: matProps[1].radius },
+     { elemName: 'Elem10', nodeA: 2, nodeB: 6, thic: matProps[1].radius },
+     { elemName: 'Elem11', nodeA: 3, nodeB: 7, thic: matProps[1].radius },
+     { elemName: 'Elem12', nodeA: 4, nodeB: 8, thic: matProps[1].radius },
+     { elemName: 'Elem13', nodeA: 5, nodeB: 9, thic: matProps[1].radius },
+     { elemName: 'Elem14', nodeA: 6, nodeB: 10, thic: matProps[1].radius },
+     { elemName: 'Elem15', nodeA: 7, nodeB: 11, thic: matProps[1].radius },
+     { elemName: 'Elem16', nodeA: 8, nodeB: 9, thic: matProps[1].radius },
+     { elemName: 'Elem17', nodeA: 9, nodeB: 10, thic: matProps[1].radius },
+     { elemName: 'Elem18', nodeA: 10, nodeB: 11, thic: matProps[1].radius },
+     { elemName: 'Elem19', nodeA: 11, nodeB: 8, thic: matProps[1].radius } ];
 
-
-var recompute = [{Analyze: function(){DoAnalysis()}},
-                 {
-                     Reset: function(){
-                         for (var i = 0; i < Node.length; i = i+1) {
-                             if(Node[i].forceY != 0){
-                                 var idCheck = 'Node'+String(i)+'.fy';
-                                 var arr = document.getElementById(idCheck);
-                                 arr.setAttribute('visible', 'false');
-                                 Node[i].forceY = 0;
-                             }
-                             if(Node[i].forceX != 0){
-                                 var idCheck = 'Node'+String(i)+'.fx';
-                                 var arr = document.getElementById(idCheck);
-                                 arr.setAttribute('visible', 'false');
-                                 Node[i].forceX = 0;
-                             }
-                             Node[i].x = resetNode[i].x;
-                             Node[i].y = resetNode[i].y;
-                             Node[i].z = resetNode[i].z;
-
-                             var moveNode = document.getElementById(Node[i].nodeName);
-                             moveNode.setAttribute('position', {x: Node[i].x, y: Node[i].y, z: Node[i].z});
-
+var recompute = [{Recalculate: function(){DoAnalysis()}},
+                 {Reset: function(){
+                     for (var i = 0; i < Node.length; i = i+1) {
+                         if(Node[i].forceY != 0){
+                             var idCheck = 'Node'+String(i)+'.fy';
+                             var arr = document.getElementById(idCheck);
+                             arr.setAttribute('visible', 'false');
+                             Node[i].forceY = 0;
                          }
-                         matProps[0].YoungsModulus = 1.5E9;
-                         matProps[1].thickness = 0.002;
-                         matProps[2].width = 0.02;
-                         matProps[3].maxAllowableStress = 1E8;
-
-                         updateStruct();
-                         for (var i = 0; i < Elem.length; i = i+1) {
-                             var tube = document.getElementById('DefElem'+String(i));
-                             var color = '#texture0';
-                             AFRAME.utils.entity.setComponentProperty(tube,'material.src',color);
+                         if(Node[i].forceX != 0){
+                             var idCheck = 'Node'+String(i)+'.fx';
+                             var arr = document.getElementById(idCheck);
+                             arr.setAttribute('visible', 'false');
+                             Node[i].forceX = 0;
                          }
+                         if(Node[i].forceZ != 0){
+                             var idCheck = 'Node'+String(i)+'.fz';
+                             var arr = document.getElementById(idCheck);
+                             arr.setAttribute('visible', 'false');
+                             Node[i].forceZ = 0;
+                         }
+                         Node[i].x = resetNode[i].x;
+                         Node[i].y = resetNode[i].y;
+                         Node[i].z = resetNode[i].z;
+
+                         var moveNode = document.getElementById(Node[i].nodeName);
+                         moveNode.setAttribute('position', {x: Node[i].x, y: Node[i].y, z: Node[i].z});
                      }
-                 }];
+
+                     matProps[0].YoungsModulus = 1.5E9;
+                     matProps[1].radius = 0.01;
+                     matProps[2].maxAllowableStress = 1E8;
+                     matProps[3].scaleFactor = 1.0;
+
+
+                     updateStruct();
+                     for (var i = 0; i < Elem.length; i = i+1) {
+                         var tube = document.getElementById('DefElem'+String(i));
+                         var color = '#texture0';
+                         AFRAME.utils.entity.setComponentProperty(tube,'material.src',color);
+                     }
+                 }}];
 
 function viewUndef(){
     var model = document.getElementById('undefModel');
@@ -359,19 +441,7 @@ function viewDef(){
     }
 }
 
-var undeformed  = [{state: true}];
-var deformed = [{state: true}];
-var scene = document.querySelector('a-scene');
-var DefNode = [];
-var NodeList = [];
-var matProps = 
-    [
-        {YoungsModulus: 1.5E9},
-        {thickness: 0.002},
-        {width: 0.02},
-        {maxAllowableStress: 1E8},
-        {scaleFactor: 0.75}
-    ];
+
 
 var stress;
 var color = '#texture0';
@@ -379,6 +449,30 @@ var color = '#texture0';
 //var gradient = [ "#001EFF", "#3CFF00", "#FFEE00", "#FFAE00", "#FF7300", "#FF0000", "#FFFFFF"];
 //var gradient = ['0 30 255','60 255 0','255 238 0','255 174 0','255 155 0','255 255 255'];
 //var gradient = ["#001EFF", "#1469AA", "#28B455", "#3CFF00", "#9DF600", "#FFEE00", "#FFCE00", "#FFAE00", "#FF9000", "#FF7300", "#FF3900", "#FF0000", "#FF7F7F", "#FFFFFF"];
+
+function changeThic(){
+    for (var j = 0; j < Elem.length; j = j+1) {
+        Elem[j].thic = matProps[1].radius;
+        tube = document.getElementById(Elem[j].elemName);
+        if (tube != null){
+            tube.setAttribute('radius', Elem[j].thic);
+        }
+    }
+    DoAnalysis();
+}
+
+function changeScale(){
+    var scale = matProps[3].scaleFactor;
+    console.log(scale);
+    var scaleF = '';
+    scaleF = scaleF.concat(scale, ' ', scale, ' ', scale) ;
+    var undef = document.getElementById('undefModel');
+    undef.setAttribute('scale', scaleF);
+    var def = document.getElementById('defModel');
+    def.setAttribute('scale', scaleF);
+
+    DoAnalysis();
+}
 
 function vizChangeY(){
     for (var i = 0; i < Node.length; i = i+1) {
@@ -429,6 +523,34 @@ function vizChangeX(){
         var pos = {x: offset, y: 0, z: 0};
         arr.setAttribute('position', pos);
     };
+}
+function vizChangeZ(){
+    for (var i = 0; i < Node.length; i = i+1) {
+        var idCheck = 'Node'+String(i)+'.fz';
+        var arr = document.getElementById(idCheck);
+        var forceZ = Node[i].forceZ;
+        var offset = 0.215;
+
+        if(forceZ==0){
+            arr.setAttribute('visible', 'false');
+        }
+        else if(forceZ>0){
+            var rotation = '0 270 -90'
+            arr.setAttribute('visible', 'true');
+            arr.setAttribute('rotation', rotation);
+            var pos = {x: 0, y: 0, z: offset};
+            arr.setAttribute('position', pos);
+        }
+        else if(forceZ<0){
+            offset = -offset;
+            var rotation = '0 90 90'
+            arr.setAttribute('visible', 'true');
+            arr.setAttribute('rotation', rotation);
+            var pos = {x: 0, y: 0, z: offset};
+            arr.setAttribute('position', pos);
+        }
+
+    }
 }
 
 function addForceArrow (nodeID, force, dir) {
@@ -482,6 +604,28 @@ function addForceArrow (nodeID, force, dir) {
         var pos = {x: offset, y: 0, z: 0};
         cyl.setAttribute('position', pos);
     }
+    else if(dir =='z'){
+        var cylID = 'Node'+String(nodeID.substr(4))+'.fz';
+        cyl.setAttribute('id', cylID);
+        if(force==0){
+            cyl.setAttribute('visible', 'false');
+        }
+        else if(force>0){
+            var rotation = '0 270 -90'
+            cyl.setAttribute('visible', 'true');
+            cyl.setAttribute('rotation', rotation);
+            var pos = {x: 0, y: 0, z: offset};
+            cyl.setAttribute('position', pos);
+        }
+        else if(force<0){
+            offset = -offset;
+            var rotation = '0 90 90'
+            cyl.setAttribute('visible', 'true');
+            cyl.setAttribute('rotation', rotation);
+            var pos = {x: 0, y: 0, z: offset};
+            cyl.setAttribute('position', pos);
+        }
+    }
 }
 
 function plotDot (scene, position, size, color, id, text) {
@@ -494,9 +638,16 @@ function plotDot (scene, position, size, color, id, text) {
     sphere.setAttribute('color', "#ffffff");
     sphere.setAttribute('id', id);
     parent.appendChild(sphere);
+    //console.log(Object.keys(sphere.components).length);
+    //console.log(Object.values(sphere.components));
 
-    addForceArrow(id,Node[Number(id.substr(4))].forceY,'y');
-    addForceArrow(id,Node[Number(id.substr(4))].forceX,'x');
+    if(Node[Number(id.substr(4))].fixedX == 1){ AFRAME.utils.entity.setComponentProperty(sphere,'grabbable.suppressX','true');}
+
+    if(Node[Number(id.substr(4))].fixedY == 1){ AFRAME.utils.entity.setComponentProperty(sphere,'grabbable.suppressY','true');}
+
+    if(Node[Number(id.substr(4))].fixedZ == 1){ AFRAME.utils.entity.setComponentProperty(sphere,'grabbable.suppressZ','true');}
+
+    //console.log(sphere.getAttribute('suppressX'));
 
     // Functions after this //
     sphere.addEventListener('mouseenter', function (evt) {
@@ -505,7 +656,12 @@ function plotDot (scene, position, size, color, id, text) {
         //console.log(newTextPos);
         var i = sphere.getAttribute('id').substr(4);
         text.setAttribute('position',newTextPos);
-        var textToShow = id.concat(' , ForceY = ', String(Node[i].forceY));
+        if(Node[Number(id.substr(4))].fixedX == 1){
+            var textToShow = id.concat(' = Fixed');
+        }
+        else{
+            var textToShow = id.concat(' , Force = ', String(Node[i].forceY));
+        }
         text.setAttribute('value',textToShow);
         text.setAttribute('visible',true);
         sphere.setAttribute('scale', {x: 1.3, y: 1.3, z: 1.3});
@@ -518,7 +674,6 @@ function plotDot (scene, position, size, color, id, text) {
         //console.log(sphere.getAttribute('id'));
         //console.log(sphere.getAttribute('position').x);
         var i = sphere.getAttribute('id').substr(4);
-        console.log('grabbed');
         Node[i].x = sphere.getAttribute('position').x;
         Node[i].y = sphere.getAttribute('position').y;
         Node[i].z = sphere.getAttribute('position').z;
@@ -534,6 +689,7 @@ function plotDefDot (scene, position, size, color, id, text) {
     sphere.setAttribute('position', position);
     sphere.setAttribute('color', "#000000");
     sphere.setAttribute('id', id);
+
     sphere.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
         var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
@@ -551,6 +707,10 @@ function plotDefDot (scene, position, size, color, id, text) {
     });
     //console.log(sphere);
     parent.appendChild(sphere);
+
+    addForceArrow(id,Node[Number(id.substr(7))].forceY,'y');
+    addForceArrow(id,Node[Number(id.substr(7))].forceX,'x');
+    addForceArrow(id,Node[Number(id.substr(7))].forceZ,'z');
 };
 
 function plotTube (scene, position, size, color, id, text) {
@@ -604,8 +764,8 @@ function plotDefTube (scene, position, size, color, id, text) {
         var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
         var i = tube.getAttribute('id').substr(4);
         text.setAttribute('position',newTextPos);
-        var textToShow = id.concat(' , Stress = ', String(round(math.subset(stress,math.index(Number(i),0))/1E6),2)+ ' Mpa');
-        text.setAttribute('value',textToShow);
+        //var textToShow = id.concat(' , Stress = ', String(round(math.subset(stress,math.index(Number(i),0))/1E6),2)+ ' Mpa');
+        //text.setAttribute('value',textToShow);
         text.setAttribute('visible',true);
     });
     tube.addEventListener('mouseleave', function () {
@@ -646,135 +806,273 @@ function updateStruct(){
 
 var DoAnalysis = function(){
     // Node[0].DOF = 2; //Adding a value-pair to a JSON object
+    // This Script is being updated for 3D Frame
 
+    console.log("Doing 3D Analysis");
     var numElem = Elem.length;
     var numNodes = Node.length;
+    var gDOF = numNodes*6;
 
-    var Kglobal = math.zeros(numNodes*3, numNodes*3);
-    var Qglobal = math.zeros(numNodes*3,1);
+    var Kglobal = math.zeros(gDOF, gDOF);
+    var Qglobal = math.zeros(gDOF,1);
+    var dispBCs = math.zeros(gDOF, 1);
 
-    var elemDOFs = math.zeros(numElem, 6);
+    //var kArray = math.zeros(numElem, 10);
+
+    var elemDOFs = math.zeros(numElem, 12);
     var elemLengths = math.zeros(1,numElem);
-    var newElemLen;
-
-    //Element and Node Connectivity defined here
-    for (var i = 0; i < numElem; i = i+1) {
-        elemDOFs = math.subset(elemDOFs,math.index(i,0),(Elem[i].nodeA+1)*3-3); //Node 1 xDOF
-        elemDOFs = math.subset(elemDOFs,math.index(i,1),(Elem[i].nodeA+1)*3-2); //Node 1 yDOF
-        elemDOFs = math.subset(elemDOFs,math.index(i,2),(Elem[i].nodeA+1)*3-1); //Node 1 mDOF
-        elemDOFs = math.subset(elemDOFs,math.index(i,3),(Elem[i].nodeB+1)*3-3); //Node 2 xDOF
-        elemDOFs = math.subset(elemDOFs,math.index(i,4),(Elem[i].nodeB+1)*3-2); //Node 2 yDOF
-        elemDOFs = math.subset(elemDOFs,math.index(i,5),(Elem[i].nodeB+1)*3-1); //Node 2 mDOF
-
-        elemLengths[i] = math.sqrt(math.square(Node[Elem[i].nodeB].x - Node[Elem[i].nodeA].x) + math.square(Node[Elem[i].nodeB].y - Node[Elem[i].nodeA].y) + math.square(Node[Elem[i].nodeB].z - Node[Elem[i].nodeA].z));
-
-    }
 
     //Problem Parameters defined here
     var E = matProps[0].YoungsModulus;
-    var t = matProps[1].thickness;
-    var w = matProps[2].width;
+    var G = E/2.8;
+    var r = matProps[1].radius;
     var fx = 0;
     var fy = 0;
-    var A = t*w;
-    var I = 1/12*w*math.pow(t,3);
-    var EI = E*I;
+
+    //Square Cross Section
+    //var A = r*r;
+    //var Iz = math.pow(r,4)/12;
+    //var Iy = math.pow(r,4)/12;
+
+    // Holly's test case
+    //var A = 0.002*0.01;
+    //var Iy = (math.pow(0.002,3)*0.01)/12;
+    //var Iz = (math.pow(0.01,3)*0.002)/12;
+
+    // Circular Cross Section
+    var A = Math.PI*math.pow(r,2);
+    var Iz = Math.PI*math.pow(r,4)*0.25;
+    var Iy = Math.PI*math.pow(r,4)*0.25;
+
+    var J = Iy+Iz;
     var EA = E*A;
-    var maxAllowableStress = matProps[3].maxAllowableStress;
-    var scaleFactor = matProps[4].scaleFactor;
-    //console.log(maxAllowableStress);
-    //this.maxAllowableStress = 1E8;
-    //var maxAllowableStress = 0.18;
+    var maxAllowableStress = matProps[2].maxAllowableStress;
+    var scaleFactor = matProps[3].scaleFactor;
 
-
-
-    var dispBCs = math.zeros(numNodes*2, 1);
-    for (var i = 0, num = 0; i < numNodes*3; i = i+3, num = num+1) {
+    for (var i = 0; i < numNodes; i = i+1) {
         // Encodes dispBCs from Nodal data
-        dispBCs.subset(math.index(i,0),Node[num].fixedX);
-        dispBCs.subset(math.index(i+1,0),Node[num].fixedY);
-        dispBCs.subset(math.index(i+2,0),Node[num].fixedM);
+        dispBCs.subset(math.index((6*i),0),Node[i].fixedX);
+        dispBCs.subset(math.index((6*i)+1,0),Node[i].fixedY);
+        dispBCs.subset(math.index((6*i)+2,0),Node[i].fixedZ);
+        dispBCs.subset(math.index((6*i)+3,0),Node[i].xRot);
+        dispBCs.subset(math.index((6*i)+4,0),Node[i].yRot);
+        dispBCs.subset(math.index((6*i)+5,0),Node[i].zRot);
 
         //Encodes Global Q matrix from Nodal data
-        Qglobal.subset(math.index(i,0),Node[num].forceX);
-        Qglobal.subset(math.index(i+1,0),Node[num].forceY);
+        Qglobal.subset(math.index((i*6),0),Node[i].forceX);
+        Qglobal.subset(math.index((i*6) +1,0),Node[i].forceY);
+        Qglobal.subset(math.index((i*6) +2,0),Node[i].forceZ);
     }
-    //console.log(dispBCs);
-    //console.log(Qglobal);
 
-
-    //Encodes f_dist from Nodal data
-    var f_dist = math.zeros(1,numNodes);
-    for (var i = 0; i < numNodes; i = i+1) {
-        f_dist.subset(math.index(0,i),Node[i].fdist);
-    };
-
-    //Initialize global K Matrices
+    //Element and Node Connectivity defined here
     for (var i = 0; i < numElem; i = i+1) {
-        // Create and assemble element stiffness matrix
-        var node1 = Elem[i].nodeA;
-        var node2 = Elem[i].nodeB;
-        var c = (Node[node2].x - Node[node1].x)/elemLengths[i];
-        var s = (Node[node2].y - Node[node1].y)/elemLengths[i];
-        var T = math.matrix([[c,s,0,0,0,0],[-s,c,0,0,0,0],[0,0,1,0,0,0],[0,0,0,c,s,0],[0,0,0,-s,c,0],[0,0,0,0,0,1]]);
+        elemDOFs = math.subset(elemDOFs,math.index(i,0),(Elem[i].nodeA+1)*6-6); //Node 1 xDOF
+        elemDOFs = math.subset(elemDOFs,math.index(i,1),(Elem[i].nodeA+1)*6-5); //Node 1 yDOF
+        elemDOFs = math.subset(elemDOFs,math.index(i,2),(Elem[i].nodeA+1)*6-4); //Node 1 zDOF
+        elemDOFs = math.subset(elemDOFs,math.index(i,3),(Elem[i].nodeA+1)*6-3); //Node 1 xRot
+        elemDOFs = math.subset(elemDOFs,math.index(i,4),(Elem[i].nodeA+1)*6-2); //Node 1 yRot
+        elemDOFs = math.subset(elemDOFs,math.index(i,5),(Elem[i].nodeA+1)*6-1); //Node 1 zRot
 
-        //Do all the math here and assign them to the correct indices later.
-        var L = elemLengths[i];
-        var Lsquared = math.pow(L,2);
-        var Lcubed = math.pow(L,3);
-        var csquared = math.pow(c,2);
-        var ssquared = math.pow(s,2);
+        elemDOFs = math.subset(elemDOFs,math.index(i,6),(Elem[i].nodeB+1)*6-6); //Node 2 xDOF
+        elemDOFs = math.subset(elemDOFs,math.index(i,7),(Elem[i].nodeB+1)*6-5); //Node 2 yDOF
+        elemDOFs = math.subset(elemDOFs,math.index(i,8),(Elem[i].nodeB+1)*6-4); //Node 2 zDOF
+        elemDOFs = math.subset(elemDOFs,math.index(i,9),(Elem[i].nodeB+1)*6-3); //Node 2 xRot
+        elemDOFs = math.subset(elemDOFs,math.index(i,10),(Elem[i].nodeB+1)*6-2); //Node 2 yRot
+        elemDOFs = math.subset(elemDOFs,math.index(i,11),(Elem[i].nodeB+1)*6-1); //Node 2 zRot
 
-        var Kelem = math.matrix([[csquared*EA/L + 12*ssquared*EI/Lcubed, c*EA*s/L - 12*s*c*EI/Lcubed, -6*s*EI/Lsquared, -csquared*EA/L - 12*ssquared*EI/Lcubed, -c*EA*s/L + 12*s*c*EI/Lcubed, -6*s*EI/Lsquared],
-                                 [c*EA*s/L - 12*s*c*EI/Lcubed, ssquared*EA/L + 12*csquared*EI/Lcubed, 6*c*EI/Lsquared, -c*EA*s/L + 12*s*c*EI/Lcubed, -ssquared*EA/L - 12*csquared*EI/Lcubed, 6*c*EI/Lsquared],
-                                 [-6*s*EI/Lsquared, 6*c*EI/Lsquared, 4*EI/L, 6*s*EI/Lsquared, -6*c*EI/Lsquared, 2*EI/L ],
-                                 [-csquared*EA/L - 12*ssquared*EI/Lcubed, -c*EA*s/L + 12*s*c*EI/Lcubed, 6*s*EI/Lsquared, csquared*EA/L + 12*ssquared*EI/Lcubed, c*EA*s/L - 12*s*c*EI/Lcubed, 6*s*EI/Lsquared],
-                                 [-c*EA*s/L + 12*s*c*EI/Lcubed, -ssquared*EA/L - 12*csquared*EI/Lcubed, -6*c*EI/Lsquared, c*EA*s/L - 12*s*c*EI/Lcubed, ssquared*EA/L + 12*csquared*EI/Lcubed, -6*c*EI/Lsquared],
-                                 [-6*s*EI/Lsquared, 6*c*EI/Lsquared, 2*EI/L, 6*s*EI/Lsquared, -6*c*EI/Lsquared, 4*EI/L]]);
+        var elementDOF = [(Elem[i].nodeA+1)*6-6, (Elem[i].nodeA+1)*6-5, (Elem[i].nodeA+1)*6-4, (Elem[i].nodeA+1)*6-3, (Elem[i].nodeA+1)*6-2, (Elem[i].nodeA+1)*6-1,
+                          (Elem[i].nodeB+1)*6-6, (Elem[i].nodeB+1)*6-5, (Elem[i].nodeB+1)*6-4, (Elem[i].nodeB+1)*6-3, (Elem[i].nodeB+1)*6-2, (Elem[i].nodeB+1)*6-1];
+
+        //I think this part is unneccesary but I'll code it anyway, might need TBD
+        var Xs = [Node[Elem[i].nodeA].x, Node[Elem[i].nodeB].x];
+        var Ys = [Node[Elem[i].nodeA].y, Node[Elem[i].nodeB].y];
+        Xs.sort();
+        Ys.sort();
+
+        if (Node[Elem[i].nodeA].x == Node[Elem[i].nodeB].x) {
+            var x3 = 0.6;
+        } else {
+            var x3 = ((Xs[1]-Xs[0])/2 + Xs[0]) + 0.01;
+        }
+        var y3 = Ys[1]+0.01;
+        var z3 = 0;
+        //
+
+        elemLengths[i] = math.sqrt(math.square(Node[Elem[i].nodeB].x - Node[Elem[i].nodeA].x) + math.square(Node[Elem[i].nodeB].y - Node[Elem[i].nodeA].y) + math.square(Node[Elem[i].nodeB].z - Node[Elem[i].nodeA].z))*scaleFactor;
+
+        var mass = elemLengths[i]*A*1175;
+
+        var k1 = E*A/elemLengths[i];
+        var k2 = 12*E*Iz/math.pow(elemLengths[i],3);
+        var k3 = 6*E*Iz/math.pow(elemLengths[i],2);
+        var k4 = 4*E*Iz/elemLengths[i];
+        var k5 = 2*E*Iz/elemLengths[i];
+        var k6 = 12*E*Iy/math.pow(elemLengths[i],3);
+        var k7 = 6*E*Iy/math.pow(elemLengths[i],2);
+        var k8 = 4*E*Iy/elemLengths[i];
+        var k9 = 2*E*Iy/elemLengths[i];
+        var k10 = G*J/elemLengths[i];
+
+        //var kArray = [elemLengths[i],E,Iy,Iz,k1,k2,k3,k4,k5,k6,k7,k8,k9,k10];
+        //console.table(kArray);
+
+        var a = math.matrix([[k1,0,0],
+                             [0,k2,0],
+                             [0,0,k6]]);
+
+        var b = math.matrix([[0,0,0],
+                             [0,0,k3],
+                             [0,-k7,0]]);
+
+        var negb = math.matrix([[0,0,0],
+                                [0,0,-k3],
+                                [0,k7,0]]);
+
+        var c = math.matrix([[k10,0,0],
+                             [0,k8,0],
+                             [0,0,k4]]);
+
+        var d = math.matrix([[-k10,0,0],
+                             [0,k9,0],
+                             [0,0,k5]]);
+
+        var one = math.matrix([
+            [k1,0,0,0,0,0,-k1,0,0,0,0,0],
+            [0,k2,0,0,0,k3,0,-k2,0,0,0,k3],
+            [0,0,k6,0,-k7,0,0,0,-k6,0,-k7,0]]);
+
+        var two = math.matrix([
+            [0,0,0,k10,0,0,0,0,0,-k10,0,0],
+            [0,0,-k7,0,k8,0,0,0,k3,0,k9,0],
+            [0,k3,0,0,0,k4,0,-k7,0,0,0,k5]]);
+
+        var three = math.matrix([
+            [-k1,0,0,0,0,0,k1,0,0,0,0,0],
+            [0,-k2,0,0,0,-k7,0,k2,0,0,0,-k3],
+            [0,0,-k6,0,k3,0,0,0,k6,0,k7,0]
+        ]);
+
+        var four = math.matrix([
+            [0,0,0,-k10,0,0,0,0,0,k10,0,0],
+            [0,0,-k7,0,k9,0,0,0,k7,0,k8,0],
+            [0,k3,0,0,0,k5,0,-k3,0,0,0,k4]]);
+
+        var k = math.matrix([
+            [k1,0,0,0,0,0,-k1,0,0,0,0,0],
+            [0,k2,0,0,0,k3,0,-k2,0,0,0,k3],
+            [0,0,k6,0,-k7,0,0,0,-k6,0,-k7,0],
+            [0,0,0,k10,0,0,0,0,0,-k10,0,0],
+            [0,0,-k7,0,k8,0,0,0,k3,0,k9,0],
+            [0,k3,0,0,0,k4,0,-k7,0,0,0,k5],
+            [-k1,0,0,0,0,0,k1,0,0,0,0,0],
+            [0,-k2,0,0,0,-k7,0,k2,0,0,0,-k3],
+            [0,0,-k6,0,k3,0,0,0,k6,0,k7,0],
+            [0,0,0,-k10,0,0,0,0,0,k10,0,0],
+            [0,0,-k7,0,k9,0,0,0,k7,0,k8,0],
+            [0,k3,0,0,0,k5,0,-k3,0,0,0,k4]
+        ]);
+
+        //var two = math.concat((math.transpose(b),c,b,d),1);
+        //var three = math.concat((math.transpose(a),math.transpose(b),a,-b),1);
+        //var three = math.concat((-math.transpose(a),math.transpose(b),a,negb),1);
+        //var four = math.concat((math.transpose(b),math.transpose(d),math.transpose(-b),c),1);
+        //console.log(one);
+        //var k = math.concat((one,two,three,four),0);
+
+        if (Node[Elem[i].nodeA].x == Node[Elem[i].nodeB].x && Node[Elem[i].nodeA].y == Node[Elem[i].nodeB].y ){
+            if( Node[Elem[i].nodeB].z > Node[Elem[i].nodeA].z){
+                var Lambda = math.matrix([[0,0,1],[0,1,0],[-1,0,0]]);
+            } else {
+                var Lambda = math.matrix([[0,0,-1],[0,1,0],[1,0,0]]);
+            }
+        } else {
+            var CXx = (Node[Elem[i].nodeB].x - Node[Elem[i].nodeA].x)/elemLengths[i];
+            var CYx = (Node[Elem[i].nodeB].y - Node[Elem[i].nodeA].y)/elemLengths[i];
+            var CZx = (Node[Elem[i].nodeB].z - Node[Elem[i].nodeA].z)/elemLengths[i];
+            var D = math.sqrt(CXx*CXx + CYx*CYx);
+            var CXy = -CYx/D;
+            var CYy = CXx/D;
+            var CZy = 0;
+            var CXz = -CXx*CZx/D;
+            var CYz = -CYx*CZx/D;
+            var CZz = D;
+            var Lambda = math.matrix([[CXx,CYx,CZx],[CXy,CYy,CZy],[CXz,CYz,CZz]]);
+
+        }
+        //console.log(Lambda);
+
+        var zeros39 = math.zeros(3, 9);
+        var zeros33 = math.zeros(3, 3);
+        var zeros36 = math.zeros(3, 6);
+
+        var one1 = math.concat(Lambda,zeros39,1);
+        var two2 = math.concat(zeros33,Lambda,zeros36,1);
+        var three3 = math.concat(zeros36,Lambda,zeros33,1);
+        var four4 = math.concat(zeros39,Lambda,1);
+        var R = math.concat(one1,two2,three3,four4,0);
+
+        //console.log(one1);
+        //console.log(two2);
+        //console.log(three3);
+        //console.log(four4);
+        //console.log(R);
+
+        //console.log(math.transpose(R));
+        var K0 = math.multiply(math.transpose(R),k);
+        var K1 = math.multiply(K0,R);
+        //console.log(K1);
 
 
-        // Create and assemble Distributed Force Vector
-        var Qdist = math.zeros(6,1);
-        Qdist.subset(math.index(0,0),L*fx/2);
-        Qdist.subset(math.index(1,0),L*fy/2);
-        Qdist.subset(math.index(2,0),(c*fy-s*fx)*Lsquared/12);
-        Qdist.subset(math.index(3,0),L*fx/2);
-        Qdist.subset(math.index(4,0),L*fy/2);
-        Qdist.subset(math.index(5,0),-(c*fy-s*fx)*Lsquared/12);
-
-        for (var j = 0; j < 6; j = j+1) {
-            var newIndex3 = math.subset(elemDOFs,math.index(i,j)); // Finds DOF index for ith Element
-
-            var newQ = math.add(math.subset(Qglobal,math.index(newIndex3,0)), math.subset(Qdist,math.index(j,0))); // Adds Qdist to Qglobal
-            Qglobal.subset(math.index(newIndex3,0),newQ);
-
-            for (var k = 0; k < 6; k = k+1) {
-                var newIndex1 = math.subset(elemDOFs,math.index(i,j));
-                var newIndex2 = math.subset(elemDOFs,math.index(i,k));
-
-                var newK = math.add(math.subset(Kglobal,math.index(newIndex1,newIndex2)), math.subset(Kelem,math.index(j,k)));
+        for (var j = 0; j < 12; j = j+1) {
+            for (var k = 0; k < 12; k = k+1) {
+                var newIndex1 = elementDOF[j];
+                var newIndex2 = elementDOF[k];
+                var newK = math.add(Kglobal.subset(math.index(newIndex1,newIndex2)), K1.subset(math.index(j,k)));
+                //console.log(newK);
                 Kglobal.subset(math.index(newIndex1,newIndex2), newK);
             }
         }
     }
 
+    //console.log(K1);
+
+
     // Enforce Displacement BCs through penalty method
+
 
     for (var i = 0; i < dispBCs._size[0]; i = i+1) {
         var BCindex = math.subset(dispBCs,math.index(i,0));
+
         //if Node is fixed
         if (BCindex == 1){
-            Kglobal.subset(math.index(i,i),math.multiply(math.subset(Kglobal,math.index(i,i)),1E15)); //Multiplies ii in Kglobal by 1E15 if fixed
-            math.subset(Qglobal,math.index(i,0),math.multiply(math.subset(Kglobal,math.index(i,i)),0)); //Cancels out forces at node if fixed
+
+            for (var j = 0; j < 72; j = j+1) {
+                Kglobal.subset(math.index(i,j),0);
+                Kglobal.subset(math.index(j,i),0);
+                Qglobal.subset(math.index(i,0),0);
+                Kglobal.subset(math.index(i,i),1);
+            }
+            //Kglobal.subset(math.index(i,i),math.multiply(math.subset(Kglobal,math.index(i,i)),1E15)); //Multiplies ii in Kglobal by 1E15 if fixed
+            //math.subset(Qglobal,math.index(i,0),math.multiply(math.subset(Kglobal,math.index(i,i)),0)); //Cancels out forces at node if fixed
         }
     }
 
-    //Solve for qGlobal
     var Kinv = math.inv(Kglobal)
     var qGlobal = math.multiply(Kinv,Qglobal);
-    //console.log(qGlobal);
 
-    stress = math.zeros(numElem,6);
+    /*
+    for (var i = 0; i < qGlobal._size[0]; i = i+1) {
+        if(Math.abs(qGlobal.subset(math.index(i,0)))< 1E-16){
+            qGlobal.subset(math.index(i,0),0)
+        }
+
+    }*/
+
+    console.log(Kglobal);
+    console.log(Qglobal);
+    console.log(qGlobal);
+
+    /*    stress = math.zeros(numElem,6);
     var tstress = math.zeros(numElem,1);
     var bstress = math.zeros(numElem,1);
     for (var i = 0; i < numElem; i = i+1) {
@@ -785,18 +1083,31 @@ var DoAnalysis = function(){
         var T = math.matrix([[c,s,0,0,0,0],[-s,c,0,0,0,0],[0,0,1,0,0,0],[0,0,0,c,s,0],[0,0,0,-s,c,0],[0,0,0,0,0,1]]);
 
         //Do all the math here and assign them to the correct indices later.
-        var L = elemLengths[i];
-        var Lsquared = math.pow(L,2);
-        var Lcubed = math.pow(L,3);
-        var csquared = math.pow(c,2);
-        var ssquared = math.pow(s,2);
+        var k1 = E*A/elemLengths[i];
+        var k2 = 12*E*Iz/math.pow(elemLengths[i],3);
+        var k3 = 6*E*Iz/math.pow(elemLengths[i],2);
+        var k4 = 4*E*Iz/elemLengths[i];
+        var k5 = 2*E*Iz/elemLengths[i];
+        var k6 = 12*E*Iy/math.pow(elemLengths[i],3);
+        var k7 = 6*E*Iy/math.pow(elemLengths[i],2);
+        var k8 = 4*E*Iy/elemLengths[i];
+        var k9 = 2*E*Iy/elemLengths[i];
+        var k10 = G*J/elemLengths[i];
 
-        var Kelem = math.matrix([[csquared*EA/L + 12*ssquared*EI/Lcubed, c*EA*s/L - 12*s*c*EI/Lcubed, -6*s*EI/Lsquared, -csquared*EA/L - 12*ssquared*EI/Lcubed, -c*EA*s/L + 12*s*c*EI/Lcubed, -6*s*EI/Lsquared],
-                                 [c*EA*s/L - 12*s*c*EI/Lcubed, ssquared*EA/L + 12*csquared*EI/Lcubed, 6*c*EI/Lsquared, -c*EA*s/L + 12*s*c*EI/Lcubed, -ssquared*EA/L - 12*csquared*EI/Lcubed, 6*c*EI/Lsquared],
-                                 [-6*s*EI/Lsquared, 6*c*EI/Lsquared, 4*EI/L, 6*s*EI/Lsquared, -6*c*EI/Lsquared, 2*EI/L ],
-                                 [-csquared*EA/L - 12*ssquared*EI/Lcubed, -c*EA*s/L + 12*s*c*EI/Lcubed, 6*s*EI/Lsquared, csquared*EA/L + 12*ssquared*EI/Lcubed, c*EA*s/L - 12*s*c*EI/Lcubed, 6*s*EI/Lsquared],
-                                 [-c*EA*s/L + 12*s*c*EI/Lcubed, -ssquared*EA/L - 12*csquared*EI/Lcubed, -6*c*EI/Lsquared, c*EA*s/L - 12*s*c*EI/Lcubed, ssquared*EA/L + 12*csquared*EI/Lcubed, -6*c*EI/Lsquared],
-                                 [-6*s*EI/Lsquared, 6*c*EI/Lsquared, 2*EI/L, 6*s*EI/Lsquared, -6*c*EI/Lsquared, 4*EI/L]]);
+        var k = math.matrix([
+            [k1,0,0,0,0,0,-k1,0,0,0,0,0],
+            [0,k2,0,0,0,k3,0,-k2,0,0,0,k3],
+            [0,0,k6,0,-k7,0,0,0,-k6,0,-k7,0],
+            [0,0,0,k10,0,0,0,0,0,-k10,0,0],
+            [0,0,-k7,0,k8,0,0,0,k3,0,k9,0],
+            [0,k3,0,0,0,k4,0,-k7,0,0,0,k5],
+            [-k1,0,0,0,0,0,k1,0,0,0,0,0],
+            [0,-k2,0,0,0,-k7,0,k2,0,0,0,-k3],
+            [0,0,-k6,0,k3,0,0,0,k6,0,k7,0],
+            [0,0,0,-k10,0,0,0,0,0,k10,0,0],
+            [0,0,-k7,0,k9,0,0,0,k7,0,k8,0],
+            [0,k3,0,0,0,k5,0,-k3,0,0,0,k4]
+        ]);
 
 
         var qelem = math.zeros(6,1);
@@ -808,23 +1119,7 @@ var DoAnalysis = function(){
         qelem.subset(math.index(5,0),math.subset(qGlobal,math.index(math.subset(elemDOFs,math.index(i,5)),0)));
 
 
-        var Qdist = math.zeros(6,1);
-        Qdist.subset(math.index(0,0),L*fx/2);
-        Qdist.subset(math.index(1,0),L*fy/2);
-        Qdist.subset(math.index(2,0),(c*fy-s*fx)*Lsquared/12);
-        Qdist.subset(math.index(3,0),L*fx/2);
-        Qdist.subset(math.index(4,0),L*fy/2);
-        Qdist.subset(math.index(5,0),-(c*fy-s*fx)*Lsquared/12);
-
-        //Old Force Method
-        /*
-        Qelem = math.multiply(T,Kelem,qelem)
-        //console.log(Qelem);
-        stress.subset(math.index(i,0),math.multiply(-A,math.subset(Qelem,math.index(0,0))));
-        */
-
-
-        //New Force Method, figure out why this is this way...
+        //New Force Method
         var val1 = math.multiply(Kelem,qelem);
         var GlobalForce = math.subtract(val1,Qdist); //ElemForce
         var force = math.multiply(T,GlobalForce);
@@ -860,12 +1155,13 @@ var DoAnalysis = function(){
     for (var i = 0; i < numElem; i = i+1) {
         buckling.subset(math.index(i,0),-math.square(math.pi)*EA*0.0833/math.square(elemLengths[i]));
     }
-    //console.log(maxStress);
+    //console.log(maxStress);*/
 
-    var deformedNodes = math.zeros(numNodes,2);
+    var deformedNodes = math.zeros(numNodes,3);
     for (var i = 0; i < numNodes; i = i+1) {
-        deformedNodes.subset(math.index(i,0), Node[i].x + math.subset(qGlobal,math.index(3*i,0)));
-        deformedNodes.subset(math.index(i,1), Node[i].y + math.subset(qGlobal,math.index((3*i)+1,0)));
+        deformedNodes.subset(math.index(i,0), Node[i].x + math.subset(qGlobal,math.index(6*i,0)));
+        deformedNodes.subset(math.index(i,1), Node[i].y + math.subset(qGlobal,math.index((6*i)+1,0)));
+        deformedNodes.subset(math.index(i,2), Node[i].z + math.subset(qGlobal,math.index((6*i)+2,0)));
     }
     //console.log(deformedNodes);
 
@@ -875,7 +1171,7 @@ var DoAnalysis = function(){
         //Node Objects are created and characterized here
 
         DefNode[i] = { DefnodeName : 'DefNode'+ String(i), x : math.subset(deformedNodes,math.index(i,0)),
-                      y : math.subset(deformedNodes,math.index(i,1)), z : Node[i].z};
+                      y : math.subset(deformedNodes,math.index(i,1)), z : math.subset(deformedNodes,math.index(i,2))};
         //Node[i].x = math.subset(deformedNodes,math.index(i,0));
         //Node[i].y = math.subset(deformedNodes,math.index(i,1));
     }
@@ -894,7 +1190,7 @@ var DoAnalysis = function(){
             newNode.setAttribute('position', {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z});
         }
         else{
-            plotDefDot(scene, {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z}, 0.1, "#000000", 'Def'+Node[i].nodeName, detailText);
+            plotDefDot(scene, {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z}, 0.08, "#000000", 'Def'+Node[i].nodeName, detailText);
         }
         i = i+1;
     };
@@ -935,16 +1231,18 @@ var DoAnalysis = function(){
         tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
 
 
-        var color = stressColor(math.abs(stress.subset(math.index(j,0))),stressDiv);
+        //var color = stressColor(math.abs(stress.subset(math.index(j,0))),stressDiv);
+        color = '#texture7';
         //console.log(color);
 
         tube = document.getElementById('Def'+Elem[j].elemName);
         if (tube != null){
             tube.setAttribute('path', tubePos);
+            tube.setAttribute('radius', Elem[j].thic);
             AFRAME.utils.entity.setComponentProperty(tube,'material.src',color);
         }
         else{
-            plotDefTube(scene, tubePos, 0.05, color, 'Def'+Elem[j].elemName, detailText);
+            plotDefTube(scene, tubePos, Elem[j].thic, color, 'Def'+Elem[j].elemName, detailText);
         }
     }
 };
@@ -954,7 +1252,7 @@ function stressColor(elemStress, stressDiv){
     //console.log(elemStress);
     //console.log(segment);
 
-    if (segment==1){color = '#texture0';} 
+    if (segment==1){color = '#texture0';}
     else if (segment==2){color = '#texture1';}
     else if (segment==3){color = '#texture2';}
     else if (segment==4){color = '#texture3';}
@@ -1007,7 +1305,7 @@ AFRAME.registerComponent('web-fea', {
         var detailText = document.getElementById('detailText');
         //console.log(detailText);
         var i = 0;
-        var scaleFactor = matProps[4].scaling;
+        //var scaleFactor = matProps[4].scaling;
         for (let item of Node) {
             //console.log(Node[i].x);
             NodeList.push({'nodeName': Node[i].nodeName});
@@ -1032,7 +1330,7 @@ AFRAME.registerComponent('web-fea', {
             tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
 
             //console.log(tubePos);
-            plotTube(scene, tubePos, 0.05, "color:blue", Elem[j].elemName, detailText);
+            plotTube(scene, tubePos, Elem[j].thic, "color:blue", Elem[j].elemName, detailText);
 
 
         }

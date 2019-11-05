@@ -278,7 +278,7 @@ AFRAME.registerSystem('input-mapping', {
     }
   },
 
-  keyboardHandler: function keyboardHandler(event) {
+  keyboardHandler: function keyboardHandler(event) {/*
     this.checkValidInputMapping();
     if (AFRAME.inputMappings && AFRAME.inputMappings.mappings[AFRAME.currentInputMapping] && AFRAME.inputMappings.mappings[AFRAME.currentInputMapping].keyboard) {
       var currentKeyboardMapping = AFRAME.inputMappings.mappings[AFRAME.currentInputMapping].keyboard;
@@ -288,7 +288,7 @@ AFRAME.registerSystem('input-mapping', {
       if (mapEvent) {
         this.sceneEl.emit(mapEvent);
       }
-    }
+    }*/
   },
 
   updateBehavioursPerController: function updateBehavioursPerController(behaviours, mappingsPerController, mappingName) {
