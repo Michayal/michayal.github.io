@@ -2,7 +2,19 @@
 
 //Gradient generator credit: https://www.strangeplanet.fr/work/gradient-generator/index.php
 
-var Node =
+var undeformed  = [{state: true}];
+var deformed = [{state: true}];
+var scene = document.querySelector('a-scene');
+var DefNode = [];
+var NodeList = [];
+var matProps = [
+    {YoungsModulus: 1.5E9},
+    {radius: 0.01},
+    {maxAllowableStress: 1E8},
+    {scaleFactor: 1.0}
+];
+
+var resetNode =
     [ { nodeName: 'Node0',
        x: 0.4,
        y: 0.4,
@@ -42,7 +54,177 @@ var Node =
       yRot: 0,
       zRot: 0,
       forceX: 0,
-      forceY: -5,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node3',
+      x: 1.4,
+      y: 0.4,
+      z: 0.4,
+      fixedX: 1,
+      fixedY: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node4',
+      x: 0.4,
+      y: 0.9,
+      z: 0.4,
+      fixedX: 1,
+      fixedY: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node5',
+      x: 0.4,
+      y: 0.9,
+      z: 1.4,
+      fixedX: 0,
+      fixedY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node6',
+      x: 1.4,
+      y: 0.9,
+      z: 1.4,
+      fixedX: 0,
+      fixedY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node7',
+      x: 1.4,
+      y: 0.9,
+      z: 0.4,
+      fixedX: 1,
+      fixedY: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node8',
+      x: 0.4,
+      y: 1.4,
+      z: 0.4,
+      fixedX: 1,
+      fixedY: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node9',
+      x: 0.4,
+      y: 1.4,
+      z: 1.4,
+      fixedX: 0,
+      fixedY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node10',
+      x: 1.4,
+      y: 1.4,
+      z: 1.4,
+      fixedX: 0,
+      fixedY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 },
+     { nodeName: 'Node11',
+      x: 1.4,
+      y: 1.4,
+      z: 0.4,
+      fixedX: 1,
+      fixedY: 1,
+      fixedZ: 1,
+      xRot: 1,
+      yRot: 1,
+      zRot: 1,
+      forceX: 0,
+      forceY: 0,
+      forceZ: 0,
+      fdist: 0 } ];
+
+var Node =
+    [ { nodeName: 'Node0',
+       x: 0.4,
+       y: 0.4,
+       z: 0.4,
+       fixedX: 1,
+       fixedY: 1,
+       fixedZ: 1,
+       xRot: 1,
+       yRot: 1,
+       zRot: 1,
+       forceX: 0,
+       forceY: 0,
+       forceZ: 0,
+       fdist: 0 },
+     { nodeName: 'Node1',
+      x: 0.4,
+      y: 0.4,
+      z: 1.4,
+      fixedX: 0,
+      fixedY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: -50,
+      forceY: -50,
+      forceZ: 5000,
+      fdist: 0 },
+     { nodeName: 'Node2',
+      x: 1.4,
+      y: 0.4,
+      z: 1.4,
+      fixedX: 0,
+      fixedY: 0,
+      fixedZ: 0,
+      xRot: 0,
+      yRot: 0,
+      zRot: 0,
+      forceX: -50,
+      forceY: -50,
       forceZ: 5000,
       fdist: 0 },
      { nodeName: 'Node3',
@@ -173,26 +355,26 @@ var Node =
       fdist: 0 } ];
 
 var Elem =
-    [ { elemName: 'Elem0', nodeA: 0, nodeB: 1 },
-     { elemName: 'Elem1', nodeA: 1, nodeB: 2 },
-     { elemName: 'Elem2', nodeA: 2, nodeB: 3 },
-     { elemName: 'Elem3', nodeA: 3, nodeB: 0 },
-     { elemName: 'Elem4', nodeA: 4, nodeB: 5 },
-     { elemName: 'Elem5', nodeA: 5, nodeB: 6 },
-     { elemName: 'Elem6', nodeA: 6, nodeB: 7 },
-     { elemName: 'Elem7', nodeA: 7, nodeB: 4 },
-     { elemName: 'Elem8', nodeA: 0, nodeB: 4 },
-     { elemName: 'Elem9', nodeA: 1, nodeB: 5 },
-     { elemName: 'Elem10', nodeA: 2, nodeB: 6 },
-     { elemName: 'Elem11', nodeA: 3, nodeB: 7 },
-     { elemName: 'Elem12', nodeA: 4, nodeB: 8 },
-     { elemName: 'Elem13', nodeA: 5, nodeB: 9 },
-     { elemName: 'Elem14', nodeA: 6, nodeB: 10 },
-     { elemName: 'Elem15', nodeA: 7, nodeB: 11 },
-     { elemName: 'Elem16', nodeA: 8, nodeB: 9 },
-     { elemName: 'Elem17', nodeA: 9, nodeB: 10 },
-     { elemName: 'Elem18', nodeA: 10, nodeB: 11 },
-     { elemName: 'Elem19', nodeA: 11, nodeB: 8 } ];
+    [ { elemName: 'Elem0', nodeA: 0, nodeB: 1, thic: matProps[1].radius },
+     { elemName: 'Elem1', nodeA: 1, nodeB: 2, thic: matProps[1].radius },
+     { elemName: 'Elem2', nodeA: 2, nodeB: 3, thic: matProps[1].radius },
+     { elemName: 'Elem3', nodeA: 3, nodeB: 0, thic: matProps[1].radius },
+     { elemName: 'Elem4', nodeA: 4, nodeB: 5, thic: matProps[1].radius },
+     { elemName: 'Elem5', nodeA: 5, nodeB: 6, thic: matProps[1].radius },
+     { elemName: 'Elem6', nodeA: 6, nodeB: 7, thic: matProps[1].radius },
+     { elemName: 'Elem7', nodeA: 7, nodeB: 4, thic: matProps[1].radius },
+     { elemName: 'Elem8', nodeA: 0, nodeB: 4, thic: matProps[1].radius },
+     { elemName: 'Elem9', nodeA: 1, nodeB: 5, thic: matProps[1].radius },
+     { elemName: 'Elem10', nodeA: 2, nodeB: 6, thic: matProps[1].radius },
+     { elemName: 'Elem11', nodeA: 3, nodeB: 7, thic: matProps[1].radius },
+     { elemName: 'Elem12', nodeA: 4, nodeB: 8, thic: matProps[1].radius },
+     { elemName: 'Elem13', nodeA: 5, nodeB: 9, thic: matProps[1].radius },
+     { elemName: 'Elem14', nodeA: 6, nodeB: 10, thic: matProps[1].radius },
+     { elemName: 'Elem15', nodeA: 7, nodeB: 11, thic: matProps[1].radius },
+     { elemName: 'Elem16', nodeA: 8, nodeB: 9, thic: matProps[1].radius },
+     { elemName: 'Elem17', nodeA: 9, nodeB: 10, thic: matProps[1].radius },
+     { elemName: 'Elem18', nodeA: 10, nodeB: 11, thic: matProps[1].radius },
+     { elemName: 'Elem19', nodeA: 11, nodeB: 8, thic: matProps[1].radius } ];
 
 var recompute = [{Recalculate: function(){DoAnalysis()}},
                  {Reset: function(){
@@ -209,13 +391,27 @@ var recompute = [{Recalculate: function(){DoAnalysis()}},
                              arr.setAttribute('visible', 'false');
                              Node[i].forceX = 0;
                          }
-                         //Node[i].forceY = 0;
-                         //Node[i].forceX = 0;
-                         Node[i].x = OGNode[i].x;
-                         Node[i].y = OGNode[i].y;
-                         Node[i].z = OGNode[i].z;
+                         if(Node[i].forceZ != 0){
+                             var idCheck = 'Node'+String(i)+'.fz';
+                             var arr = document.getElementById(idCheck);
+                             arr.setAttribute('visible', 'false');
+                             Node[i].forceZ = 0;
+                         }
+                         Node[i].x = resetNode[i].x;
+                         Node[i].y = resetNode[i].y;
+                         Node[i].z = resetNode[i].z;
+
+                         var moveNode = document.getElementById(Node[i].nodeName);
+                         moveNode.setAttribute('position', {x: Node[i].x, y: Node[i].y, z: Node[i].z});
                      }
-                     DoAnalysis();
+
+                     matProps[0].YoungsModulus = 1.5E9;
+                     matProps[1].radius = 0.01;
+                     matProps[2].maxAllowableStress = 1E8;
+                     matProps[3].scaleFactor = 1.0;
+
+
+                     updateStruct();
                      for (var i = 0; i < Elem.length; i = i+1) {
                          var tube = document.getElementById('DefElem'+String(i));
                          var color = '#texture0';
@@ -245,17 +441,7 @@ function viewDef(){
     }
 }
 
-var undeformed  = [{state: true}];
-var deformed = [{state: true}];
-var scene = document.querySelector('a-scene');
-var DefNode = [];
-var NodeList = [];
-var matProps = [
-    {YoungsModulus: 1.5E9},
-    {radius: 0.002},
-    {maxAllowableStress: 1E8},
-    {scaleFactor: 0.75}
-];
+
 
 var stress;
 var color = '#texture0';
@@ -263,6 +449,30 @@ var color = '#texture0';
 //var gradient = [ "#001EFF", "#3CFF00", "#FFEE00", "#FFAE00", "#FF7300", "#FF0000", "#FFFFFF"];
 //var gradient = ['0 30 255','60 255 0','255 238 0','255 174 0','255 155 0','255 255 255'];
 //var gradient = ["#001EFF", "#1469AA", "#28B455", "#3CFF00", "#9DF600", "#FFEE00", "#FFCE00", "#FFAE00", "#FF9000", "#FF7300", "#FF3900", "#FF0000", "#FF7F7F", "#FFFFFF"];
+
+function changeThic(){
+    for (var j = 0; j < Elem.length; j = j+1) {
+        Elem[j].thic = matProps[1].radius;
+        tube = document.getElementById(Elem[j].elemName);
+        if (tube != null){
+            tube.setAttribute('radius', Elem[j].thic);
+        }
+    }
+    DoAnalysis();
+}
+
+function changeScale(){
+    var scale = matProps[3].scaleFactor;
+    console.log(scale);
+    var scaleF = '';
+    scaleF = scaleF.concat(scale, ' ', scale, ' ', scale) ;
+    var undef = document.getElementById('undefModel');
+    undef.setAttribute('scale', scaleF);
+    var def = document.getElementById('defModel');
+    def.setAttribute('scale', scaleF);
+    
+    DoAnalysis();
+}
 
 function vizChangeY(){
     for (var i = 0; i < Node.length; i = i+1) {
@@ -346,7 +556,7 @@ function vizChangeZ(){
 function addForceArrow (nodeID, force, dir) {
     var scene = document.querySelector('a-scene');
     var nodeUsed = document.getElementById(nodeID);
-
+    
     var cyl = document.createElement('a-entity');
     cyl.setAttribute('mixin', 'down Cyl');
     nodeUsed.appendChild(cyl);
@@ -400,7 +610,7 @@ function addForceArrow (nodeID, force, dir) {
         if(force==0){
             cyl.setAttribute('visible', 'false');
         }
-       else if(force>0){
+        else if(force>0){
             var rotation = '0 270 -90'
             cyl.setAttribute('visible', 'true');
             cyl.setAttribute('rotation', rotation);
@@ -438,9 +648,6 @@ function plotDot (scene, position, size, color, id, text) {
     if(Node[Number(id.substr(4))].fixedZ == 1){ AFRAME.utils.entity.setComponentProperty(sphere,'grabbable.suppressZ','true');}
 
     //console.log(sphere.getAttribute('suppressX'));
-    addForceArrow(id,Node[Number(id.substr(4))].forceY,'y');
-    addForceArrow(id,Node[Number(id.substr(4))].forceX,'x');
-    addForceArrow(id,Node[Number(id.substr(4))].forceZ,'z');
 
     // Functions after this //
     sphere.addEventListener('mouseenter', function (evt) {
@@ -482,6 +689,7 @@ function plotDefDot (scene, position, size, color, id, text) {
     sphere.setAttribute('position', position);
     sphere.setAttribute('color', "#000000");
     sphere.setAttribute('id', id);
+    
     sphere.addEventListener('mouseenter', function (evt) {
         var oldTextPos = evt.detail.intersection.point;
         var newTextPos = {x: oldTextPos.x - 0.25, y: oldTextPos.y - 0.25, z: oldTextPos.z + 0.25}
@@ -499,6 +707,10 @@ function plotDefDot (scene, position, size, color, id, text) {
     });
     //console.log(sphere);
     parent.appendChild(sphere);
+    
+    addForceArrow(id,Node[Number(id.substr(7))].forceY,'y');
+    addForceArrow(id,Node[Number(id.substr(7))].forceX,'x');
+    addForceArrow(id,Node[Number(id.substr(7))].forceZ,'z');
 };
 
 function plotTube (scene, position, size, color, id, text) {
@@ -622,14 +834,14 @@ var DoAnalysis = function(){
     //var Iy = math.pow(r,4)/12;
 
     // Holly's test case
-    var A = 0.002*0.01;
-    var Iy = (math.pow(0.002,3)*0.01)/12;
-    var Iz = (math.pow(0.01,3)*0.002)/12;
+    //var A = 0.002*0.01;
+    //var Iy = (math.pow(0.002,3)*0.01)/12;
+    //var Iz = (math.pow(0.01,3)*0.002)/12;
 
     // Circular Cross Section
-    //var A = Math.PI*math.pow(r,2);
-    //var Iz = Math.PI*math.pow(r,4)*0.25;
-    //var Iy = Math.PI*math.pow(r,4)*0.25;
+    var A = Math.PI*math.pow(r,2);
+    var Iz = Math.PI*math.pow(r,4)*0.25;
+    var Iy = Math.PI*math.pow(r,4)*0.25;
 
     var J = Iy+Iz;
     var EA = E*A;
@@ -685,7 +897,7 @@ var DoAnalysis = function(){
         var z3 = 0;
         //
 
-        elemLengths[i] = math.sqrt(math.square(Node[Elem[i].nodeB].x - Node[Elem[i].nodeA].x) + math.square(Node[Elem[i].nodeB].y - Node[Elem[i].nodeA].y) + math.square(Node[Elem[i].nodeB].z - Node[Elem[i].nodeA].z));
+        elemLengths[i] = math.sqrt(math.square(Node[Elem[i].nodeB].x - Node[Elem[i].nodeA].x) + math.square(Node[Elem[i].nodeB].y - Node[Elem[i].nodeA].y) + math.square(Node[Elem[i].nodeB].z - Node[Elem[i].nodeA].z))*scaleFactor;
 
         var mass = elemLengths[i]*A*1175;
 
@@ -1025,10 +1237,11 @@ var DoAnalysis = function(){
         tube = document.getElementById('Def'+Elem[j].elemName);
         if (tube != null){
             tube.setAttribute('path', tubePos);
+            tube.setAttribute('radius', Elem[j].thic);
             AFRAME.utils.entity.setComponentProperty(tube,'material.src',color);
         }
         else{
-            plotDefTube(scene, tubePos, 0.04, color, 'Def'+Elem[j].elemName, detailText);
+            plotDefTube(scene, tubePos, Elem[j].thic, color, 'Def'+Elem[j].elemName, detailText);
         }
     }
 };
@@ -1116,7 +1329,7 @@ AFRAME.registerComponent('web-fea', {
             tubePos = tubePos.concat(nodex1, ' ', nodey1, ' ', nodez1, ', ', nodex2, ' ', nodey2, ' ', nodez2)
 
             //console.log(tubePos);
-            plotTube(scene, tubePos, 0.05, "color:blue", Elem[j].elemName, detailText);
+            plotTube(scene, tubePos, Elem[j].thic, "color:blue", Elem[j].elemName, detailText);
 
 
         }
