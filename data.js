@@ -457,8 +457,11 @@ function changeThic(){
         if (tube != null){
             tube.setAttribute('radius', Elem[j].thic);
         }
+        defTube = document.getElementById('Def'+Elem[j].elemName);
+        if (defTube != null){
+            defTube.setAttribute('radius', Elem[j].thic);
+        }
     }
-    DoAnalysis();
 }
 
 function changeScale(){
@@ -1238,7 +1241,6 @@ var DoAnalysis = function(){
         tube = document.getElementById('Def'+Elem[j].elemName);
         if (tube != null){
             tube.setAttribute('path', tubePos);
-            tube.setAttribute('radius', Elem[j].thic);
             AFRAME.utils.entity.setComponentProperty(tube,'material.src',color);
         }
         else{
