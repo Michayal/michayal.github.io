@@ -376,7 +376,7 @@ var Elem =
      { elemName: 'Elem18', nodeA: 10, nodeB: 11, thic: matProps[1].radius },
      { elemName: 'Elem19', nodeA: 11, nodeB: 8, thic: matProps[1].radius } ];
 
-var recompute = [{Recalculate: function(){DoAnalysis()}},
+var recompute = [{Analyze: function(){DoAnalysis()}},
                  {Reset: function(){
                      for (var i = 0; i < Node.length; i = i+1) {
                          if(Node[i].forceY != 0){
@@ -543,7 +543,7 @@ function vizChangeZ(){
         }
         else if(forceZ<0){
             offset = -offset;
-            var rotation = '0 90 90'
+            var rotation = '0 270 90'
             arr.setAttribute('visible', 'true');
             arr.setAttribute('rotation', rotation);
             var pos = {x: 0, y: 0, z: offset};
@@ -565,7 +565,7 @@ function addForceArrow (nodeID, force, dir) {
     cone.setAttribute('mixin', 'Cone');
     cyl.appendChild(cone);
     if(dir == 'y'){
-        var cylID = 'Node'+String(nodeID.substr(4))+'.fy';
+        var cylID = String(nodeID.substr(3))+'.fy';
         cyl.setAttribute('id', cylID);
         if(force==0){
             cyl.setAttribute('visible', 'false');
@@ -585,7 +585,7 @@ function addForceArrow (nodeID, force, dir) {
         cyl.setAttribute('position', pos);
     }
     else if(dir =='x'){
-        var cylID = 'Node'+String(nodeID.substr(4))+'.fx';
+        var cylID = String(nodeID.substr(3))+'.fx';
         cyl.setAttribute('id', cylID);
         if(force==0){
             cyl.setAttribute('visible', 'false');
@@ -605,7 +605,7 @@ function addForceArrow (nodeID, force, dir) {
         cyl.setAttribute('position', pos);
     }
     else if(dir =='z'){
-        var cylID = 'Node'+String(nodeID.substr(4))+'.fz';
+        var cylID = String(nodeID.substr(3))+'.fz';
         cyl.setAttribute('id', cylID);
         if(force==0){
             cyl.setAttribute('visible', 'false');
@@ -619,7 +619,7 @@ function addForceArrow (nodeID, force, dir) {
         }
         else if(force<0){
             offset = -offset;
-            var rotation = '0 90 90'
+            var rotation = '0 270 90'
             cyl.setAttribute('visible', 'true');
             cyl.setAttribute('rotation', rotation);
             var pos = {x: 0, y: 0, z: offset};
@@ -1068,9 +1068,9 @@ var DoAnalysis = function(){
 
     }*/
 
-    console.log(Kglobal);
-    console.log(Qglobal);
-    console.log(qGlobal);
+    //console.log(Kglobal);
+    //console.log(Qglobal);
+    //console.log(qGlobal);
 
     /*    stress = math.zeros(numElem,6);
     var tstress = math.zeros(numElem,1);

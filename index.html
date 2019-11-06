@@ -102,14 +102,6 @@
                 gui4.add(matProps[2], 'maxAllowableStress', {'1 MPa':1E6,'10 MPa':1E7,'100 MPa':1E8,'1 GPa':1E9,'10 GPa':1E10,'100 GPa':1E11}).listen();
                 gui4.add(matProps[3], 'scaleFactor',0.1,1.5).step(0.1).listen().onChange(changeScale);
 
-                /*
-gui.addFolder(gui4);
-gui4.add(matProps[0], 'youngsModulus', {'Polypropylene (1.5 GPa)':1.5E9,'Aluminium (69 GPa)':69E9,'Titanium (105 GPa)':105E9,'Steel (200 GPa)':200E9}).name('Youngs Modulus [Pa]').onChange(DoAnalysis);
-gui4.add(matProps[1], 'thickness', 0.001, 0.1).name('Thickness [m]').onChange(DoAnalysis);
-gui4.add(matProps[2], 'width', 0.001, 0.1).name('Width [m]').onChange(DoAnalysis);
-gui4.add(matProps[3], 'maxAllowableStress', {1E6:1E6,1E7:1E7,1E8:1E8,1E9:1E9,1E10:1E10,1E11:1E11}).name('Max Stress Allowable [Pa]').onChange(DoAnalysis);
-*/
-
                 gui.add(undeformed[0], 'state').name('View Undeformed').listen().onChange(viewUndef);
                 gui.add(deformed[0], 'state').name('View Deformed').listen().onChange(viewDef);
                 gui.add(recompute[0], 'Analyze').name('WebFEA');
