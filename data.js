@@ -1133,10 +1133,10 @@ var DoAnalysis = function(){
 
         //console.log(force);
         //Calculate Element Stresses
-        stress.subset(math.index(i,0),force.subset(math.index(0,0))/A - force.subset(math.index(2,0))*0.5*t/I); //X Node1
-        stress.subset(math.index(i,1),force.subset(math.index(0,0))/A - force.subset(math.index(2,0))*-0.5*t/I); //Y
-        stress.subset(math.index(i,2),force.subset(math.index(1,0))/A); //Moment
-        stress.subset(math.index(i,3),force.subset(math.index(3,0))/A - force.subset(math.index(5,0))*0.5*t/I); //X Node2
+        stress.subset(math.index(i,0),force.subset(math.index(0,0))/A - force.subset(math.index(2,0))*0.5*t/I); // Sig_xx top node 1
+        stress.subset(math.index(i,1),force.subset(math.index(0,0))/A - force.subset(math.index(2,0))*-0.5*t/I); // Sig_xx bot node 1
+        stress.subset(math.index(i,2),force.subset(math.index(1,0))/A); //Shear node 1
+        stress.subset(math.index(i,3),force.subset(math.index(3,0))/A - force.subset(math.index(5,0))*0.5*t/I); // Sig_xx top node 2
         stress.subset(math.index(i,4),force.subset(math.index(0,0))/A - force.subset(math.index(5,0))*-0.5*t/I);
         stress.subset(math.index(i,5),force.subset(math.index(4,0))/A);
 
