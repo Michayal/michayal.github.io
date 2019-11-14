@@ -1,6 +1,6 @@
 //This is the 2D Frame script extended out to 3D Frame calculations
 
-//Gradient generator credit: https://www.strangeplanet.fr/work/gradient-generator/index.php
+//Gradient generator credit: https://www.strangeplanet.fr/work/gradient-generator/?c=25:001EFF:3CFF00:FFEE00:FFAE00:FF7300:FF0000
 
 var undeformed  = [{state: true}];
 var deformed = [{state: true}];
@@ -10,10 +10,10 @@ var NodeList = [];
 var matProps = [
     {YoungsModulus: 2E7},
     {poissonsRatio: 0.3},
-    {maxAllowableStress: 1E8},
+    {maxAllowableStress: 1E6},
     {scaleFactor: 1.0}
 ];
-
+var gradient = ["#001EFF", "#0C4BCC", "#187899", "#24A566", "#30D232", "#3CFF00", "#63FB00", "#8AF800", "#B1F400", "#D8F100", "#FFEE00", "#FFE100", "#FFD400", "#FFC700", "#FFBA00", "#FFAE00", "#FFA200", "#FF9600", "#FF8A00", "#FF7E00", "#FF7300", "#FF5600", "#FF3900", "#FF1C00", "#FF0000"];
 
 var Node =
     [ { nodeName: 'Node0',
@@ -663,9 +663,10 @@ function TriMaker(nodeA,nodeB,nodeC,color){
     points.push(new THREE.Vector2(nodeC.x,nodeC.y)); //nodeC
 
     var shape = new THREE.Shape(points);
+    var Fcolor = new THREE.Color( color );
     //var geometry = new THREE.ShapeGeometry(shape);
     var material = new THREE.MeshBasicMaterial({
-        color: color
+        color: Fcolor
     });
 
     var extrudeSettings = {
@@ -1006,7 +1007,7 @@ var DoAnalysis = function(){
         }
         i = i+1;
     };
-    var stressDiv = maxAllowableStress/7;
+    var stressDiv = maxAllowableStress/25;
     updateLegend(stressDiv,maxAllowableStress);
     //console.log(Node);
 
@@ -1030,17 +1031,17 @@ function updateLegend(stressDiv, maxAllowableStress){
     var lg0 = document.getElementById('lg0');
     lg0.setAttribute('value','<'+ String(round(stressDiv*1/1E6, 2)) +' MPa');
     var lg1 = document.getElementById('lg1');
-    lg1.setAttribute('value','<'+ String(round(stressDiv*2/1E6, 2)) +' MPa');
+    lg1.setAttribute('value','<'+ String(round(stressDiv*6/1E6, 2)) +' MPa');
     var lg2 = document.getElementById('lg2');
-    lg2.setAttribute('value','<'+ String(round(stressDiv*3/1E6, 2)) +' MPa');
+    lg2.setAttribute('value','<'+ String(round(stressDiv*11/1E6, 2)) +' MPa');
     var lg3 = document.getElementById('lg3');
-    lg3.setAttribute('value','<'+ String(round(stressDiv*4/1E6, 2)) +' MPa');
+    lg3.setAttribute('value','<'+ String(round(stressDiv*16/1E6, 2)) +' MPa');
     var lg4 = document.getElementById('lg4');
-    lg4.setAttribute('value','<'+ String(round(stressDiv*5/1E6, 2)) +' MPa');
+    lg4.setAttribute('value','<'+ String(round(stressDiv*21/1E6, 2)) +' MPa');
     var lg5 = document.getElementById('lg5');
-    lg5.setAttribute('value','<'+ String(round(stressDiv*6/1E6, 2)) +' MPa');
+    lg5.setAttribute('value','<'+ String(round(stressDiv*25/1E6, 2)) +' MPa');
     var lg6 = document.getElementById('lg6');
-    lg6.setAttribute('value','<'+ String(round(stressDiv*7/1E6, 2)) +' MPa');
+    lg6.setAttribute('value','<'+ String(round(stressDiv*25/1E6, 2)) +' MPa');
     var lg7 = document.getElementById('lg7');
     lg7.setAttribute('value','>='+ String(round(maxAllowableStress/1E6, 2)) +' MPa');
 }
@@ -1049,18 +1050,26 @@ function updateLegend(stressDiv, maxAllowableStress){
 
 function stressColor(elemStress, stressDiv){
     var segment = round(elemStress/(stressDiv+1));
-    //console.log(elemStress);
+    console.log(elemStress);
+    console.log(stressDiv);
+
+    /*
+    if (segment<=1){var color = '#001EFF';}
+    else if (segment==2){var color = '#3CFF00';}
+    else if (segment==3){var color = '#FFEE00';}
+    else if (segment==4){var color = '#FFAE00';}
+    else if (segment==5){var color = '#FF7300';}
+    else if (segment==6){var color = '#FF0000';}
+    else if (segment>=7){var color = '#FFFFFF';}*/
+    
+    if(segment >25){
+        var color = '#FFFFFF';
+    }
+    
+    var color = gradient[segment];
+
     //console.log(segment);
-
-    if (segment==1){var color = "0x#001EFF";}
-    else if (segment==2){var color = "0x#3CFF00";}
-    else if (segment==3){var color = "0x#FFEE00";}
-    else if (segment==4){var color = "0x#FFAE00";}
-    else if (segment==5){var color = "0x#FF7300";}
-    else if (segment==6){var color = "0x#FF0000";}
-    else if (segment>=7){var color = "#FFFFFF";}
-
-    console.log(color);
+    //console.log(color);
     //color = 'color: '.concat(color);
     return color;
 };
