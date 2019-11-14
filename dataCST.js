@@ -656,13 +656,11 @@ function plotDefDot (scene, position, size, color, id, text) {
     //addForceArrow(id,Node[Number(id.substr(7))].forceZ,'z');
 };
 
-function plotTri (scene,Tri,color,id) {
-    var parent = document.getElementById('undefTri');
-    var newTri = document.createElement('a-entity');
+function TriMaker(nodeA,nodeB,nodeC,color){
     var points = [];
-    points.push(new THREE.Vector2(Node[Tri.nodeA].x,Node[Tri.nodeA].y)); //nodeA
-    points.push(new THREE.Vector2(Node[Tri.nodeB].x,Node[Tri.nodeB].y)); //nodeB
-    points.push(new THREE.Vector2(Node[Tri.nodeC].x,Node[Tri.nodeC].y)); //nodeC
+    points.push(new THREE.Vector2(nodeA.x,nodeA.y)); //nodeA
+    points.push(new THREE.Vector2(nodeB.x,nodeB.y)); //nodeB
+    points.push(new THREE.Vector2(nodeC.x,nodeC.y)); //nodeC
 
     var shape = new THREE.Shape(points);
     //var geometry = new THREE.ShapeGeometry(shape);
@@ -678,6 +676,15 @@ function plotTri (scene,Tri,color,id) {
 
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     var mesh = new THREE.Mesh(geometry, material);
+    
+    return mesh
+}
+
+
+function plotTri (scene,Tri,color,id) {
+    var parent = document.getElementById('undefTri');
+    var newTri = document.createElement('a-entity');
+    mesh = TriMaker(Node[Tri.nodeA],Node[Tri.nodeB],Node[Tri.nodeC],color);
     newTri.object3D.add(mesh);
     newTri.setAttribute('id', id);
     parent.appendChild(newTri);
@@ -687,25 +694,7 @@ function plotTri (scene,Tri,color,id) {
 function plotDefTri (scene,Tri,color,id) {
     var parent = document.getElementById('defTri');
     var newTri = document.createElement('a-entity');
-    var points = [];
-    points.push(new THREE.Vector2(DefNode[Tri.nodeA].x,DefNode[Tri.nodeA].y)); //nodeA
-    points.push(new THREE.Vector2(DefNode[Tri.nodeB].x,DefNode[Tri.nodeB].y)); //nodeB
-    points.push(new THREE.Vector2(DefNode[Tri.nodeC].x,DefNode[Tri.nodeC].y)); //nodeC
-
-    var shape = new THREE.Shape(points);
-    //var geometry = new THREE.ShapeGeometry(shape);
-    var material = new THREE.MeshBasicMaterial({
-        color: color
-    });
-
-    var extrudeSettings = {
-        steps: 2,
-        depth: 0.1,
-        bevelEnabled: false
-    };
-
-    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    var mesh = new THREE.Mesh(geometry, material);
+    mesh = TriMaker(DefNode[Tri.nodeA],DefNode[Tri.nodeB],DefNode[Tri.nodeC],color);
     newTri.object3D.add(mesh);
     newTri.setAttribute('id', id);
     parent.appendChild(newTri);
@@ -717,22 +706,9 @@ function updateTri (Tri,color,id) {
     var oldTri = document.getElementById(id);
     oldTri.object3D.remove(oldTri.object3D.children[0]);
 
-    var points = [];
-    points.push(new THREE.Vector2(Node[Tri.nodeA].x,Node[Tri.nodeA].y)); //nodeA
-    points.push(new THREE.Vector2(Node[Tri.nodeB].x,Node[Tri.nodeB].y)); //nodeB
-    points.push(new THREE.Vector2(Node[Tri.nodeC].x,Node[Tri.nodeC].y)); //nodeC
-
-    var shape = new THREE.Shape(points);
-    //var geometry = new THREE.ShapeGeometry(shape);
-    var material = new THREE.MeshBasicMaterial({
-        color: color
-    });
-
-    var extrudeSettings = {
-        steps: 2,
-        depth: 0.1,
-        bevelEnabled: false
-    };
+    mesh = TriMaker(Node[Tri.nodeA],Node[Tri.nodeB],Node[Tri.nodeC],color);
+    oldTri.object3D.add(mesh);
+    //parent.appendChild(oldTri);
 }
 
 function updateDefTri (Tri,color,id) {
@@ -740,28 +716,9 @@ function updateDefTri (Tri,color,id) {
     var oldTri = document.getElementById(id);
     oldTri.object3D.remove(oldTri.object3D.children[0]);
 
-    var points = [];
-    points.push(new THREE.Vector2(DefNode[Tri.nodeA].x,DefNode[Tri.nodeA].y)); //nodeA
-    points.push(new THREE.Vector2(DefNode[Tri.nodeB].x,DefNode[Tri.nodeB].y)); //nodeB
-    points.push(new THREE.Vector2(DefNode[Tri.nodeC].x,DefNode[Tri.nodeC].y)); //nodeC
-
-    var shape = new THREE.Shape(points);
-    //var geometry = new THREE.ShapeGeometry(shape);
-    var material = new THREE.MeshBasicMaterial({
-        color: color
-    });
-
-    var extrudeSettings = {
-        steps: 2,
-        depth: 0.1,
-        bevelEnabled: false
-    };
-
-    var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    var mesh = new THREE.Mesh(geometry, material);
+    mesh = TriMaker(DefNode[Tri.nodeA],DefNode[Tri.nodeB],DefNode[Tri.nodeC],color);
     oldTri.object3D.add(mesh);
-    oldTri.setAttribute('id', id);
-    parent.appendChild(oldTri);
+    //parent.appendChild(oldTri);
     //
 };
 
@@ -840,7 +797,7 @@ function updateStruct(){
     for (var j = 0; j < Tri.length; j = j+1) {
         updateTri(Tri[j],'#0000ff',Tri[j].elemName);
     }
-    //DoAnalysis();
+    DoAnalysis();
 };
 
 var DoAnalysis = function(){
@@ -1101,7 +1058,7 @@ function stressColor(elemStress, stressDiv){
     else if (segment==4){var color = "0x#FFAE00";}
     else if (segment==5){var color = "0x#FF7300";}
     else if (segment==6){var color = "0x#FF0000";}
-    else if (segment>=7){var color = "0x#FFFFFF";}
+    else if (segment>=7){var color = "#FFFFFF";}
 
     console.log(color);
     //color = 'color: '.concat(color);
