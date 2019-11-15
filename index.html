@@ -24,6 +24,7 @@
 
         <script>
             var scene, camera, renderer, gui;
+            var maxForce = 20000;
 
             AFRAME.registerComponent("vr-dat-gui", {
                 init: function() {
@@ -73,7 +74,7 @@
                 gui.addFolder(gui2);
 
                 for (var i = 0; i<Node.length; i++){
-                    gui2.add(Node[i], 'forceX', -50, 50).step(5).name(String(Node[i].nodeName).concat('.forceX')).onChange(vizChangeX).listen();
+                    gui2.add(Node[i], 'forceX', -maxForce, maxForce).step(maxForce/10).name(String(Node[i].nodeName).concat('.forceX')).onChange(vizChangeR).listen();
                 }
 
                 gui1 = dat.GUIVR.create("ForceY");
@@ -82,7 +83,7 @@
                 //var InitNodes = document.querySelector("#InitNodes").object3D;
 
                 for (var i = 0; i<Node.length; i++){
-                    gui1.add(Node[i], 'forceY', -50, 50).step(5).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChangeY).listen();
+                    gui1.add(Node[i], 'forceY', -maxForce, maxForce).step(maxForce/10).name(String(Node[i].nodeName).concat('.forceY')).onChange(vizChangeR).listen();
                 }
 
                 /*gui3 = dat.GUIVR.create("ForceZ");

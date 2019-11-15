@@ -126,7 +126,7 @@ var Node =
       xRot: 0,
       yRot: 0,
       zRot: 0,
-      forceX: 0,
+      forceX: 10000,
       forceY: -100000,
       forceZ: 0,
       fdist: 0 },
@@ -238,7 +238,7 @@ var Node =
       xRot: 0,
       yRot: 0,
       zRot: 0,
-      forceX: 0,
+      forceX: 10000,
       forceY: -10000,
       forceZ: 0,
       fdist: 0 },
@@ -280,7 +280,7 @@ var Node =
       xRot: 0,
       yRot: 0,
       zRot: 0,
-      forceX: 0,
+      forceX: 10000,
       forceY: -10000,
       forceZ: 0,
       fdist: 0 },
@@ -424,23 +424,26 @@ function vizChangeY(){
         var idCheck = 'Node'+String(i)+'.fy';
         var arr = document.getElementById(idCheck);
         var forceY = Node[i].forceY;
+        var scaling = math.abs(forceY/maxForce);
+        if(scaling > 1){
+            scaling = 1;
+        };
         var offset = 0.215;
 
         if(forceY==0){
             arr.setAttribute('visible', 'false');
         }
         else if(forceY>0){
-            var rotation = '0 0 0'
+            arr.setAttribute('scale', {x: -scaling, y: -scaling, z: -scaling});
             arr.setAttribute('visible', 'true');
-            arr.setAttribute('rotation', rotation);
+
         }
         else if(forceY<0){
             offset = -offset;
-            var rotation = '0 0 180'
+            arr.setAttribute('scale', {x: scaling, y: scaling, z: scaling});
             arr.setAttribute('visible', 'true');
-            arr.setAttribute('rotation', rotation);
         }
-        var pos = {x: 0, y: offset, z: 0};
+        var pos = {x: 0, y: offset*scaling, z: 0};
         arr.setAttribute('position', pos);
     }
 }
@@ -449,23 +452,25 @@ function vizChangeX(){
         var idCheck = 'Node'+String(i)+'.fx';
         var arr = document.getElementById(idCheck);
         var forceX = Node[i].forceX;
+        var scaling = math.abs(forceX/maxForce);
+        if(scaling > 1){
+            scaling = 1;
+        };
         var offset = 0.215;
 
         if(forceX==0){
             arr.setAttribute('visible', 'false');
         }
         else if(forceX>0){
-            var rotation = '0 0 -90'
+            arr.setAttribute('scale', {x: -scaling, y: -scaling, z: -scaling});
             arr.setAttribute('visible', 'true');
-            arr.setAttribute('rotation', rotation);
         }
         else if(forceX<0){
             offset = -offset;
-            var rotation = '0 0 90'
+            arr.setAttribute('scale', {x: scaling, y: scaling, z: scaling});
             arr.setAttribute('visible', 'true');
-            arr.setAttribute('rotation', rotation);
         }
-        var pos = {x: offset, y: 0, z: 0};
+        var pos = {x: offset*scaling, y: 0, z: 0};
         arr.setAttribute('position', pos);
     };
 }
@@ -498,9 +503,103 @@ function vizChangeZ(){
     }
 }
 
-function addForceArrow (nodeID, force, dir) {
-    var scene = document.querySelector('a-scene');
+function vizChangeR(){
+    for (var i = 0; i < Node.length; i = i+1) {
+        var idCheck = 'Node'+String(i)+'.R';
+        var cyl = document.getElementById(idCheck);
+        var fx = Node[i].forceX;
+        var fy = Node[i].forceY;
+        var fz = Node[i].forceZ;
+        var offset = 0.215;
+
+        if(fz == 0){
+            var R = math.sqrt(math.square(fx)+math.square(fy));
+            var alpha = math.acos(fx/R)*(180/Math.PI);
+            var beta = math.acos(fy/R)*(180/Math.PI);
+
+            if(fx>0){
+                beta = -beta;
+            }
+            var rotation = '0'.concat(' '+0+' '+ beta);
+        } else{
+            var R = math.sqrt(math.square(fx)+math.square(fy)+math.square(fz));
+            var alpha = math.acos(fx/R)*(180/Math.PI);
+            var beta = math.acos(fy/R)*(180/Math.PI);
+            var gamma = math.acos(fz/R)*(180/Math.PI);
+            var rotation = ''.concat(gamma+' '+alpha+' '+beta);
+        }
+
+        var scaling = math.abs(R/maxForce);
+        if(scaling > 1){
+            scaling = 1;
+            if(offset*math.abs(fx/maxForce) > offset){
+                var xOffset = offset;
+            } else {
+                var xOffset = offset*math.abs(fx/maxForce)*math.abs(fx/R);
+            }
+            if(offset*math.abs(fy/maxForce) > offset){
+                var yOffset = offset;
+            } else {
+                var yOffset = offset*math.abs(fy/maxForce)*math.abs(fx/R);
+            }
+            if(offset*math.abs(fz/maxForce) > offset){
+                var zOffset = offset;
+            } else {
+                var zOffset = offset*math.abs(fz/maxForce)*math.abs(fx/R);
+            }
+            console.log(xOffset);
+            console.log(yOffset);
+            console.log(zOffset);
+        } else {
+            var xOffset = offset*math.abs(fx/maxForce);
+            var yOffset = offset*math.abs(fy/maxForce);
+            var zOffset = offset*math.abs(fz/maxForce);
+        }
+
+        if(fx<0){
+            xOffset = -xOffset;
+        }
+        if(fy<0){
+            yOffset = -yOffset;
+        }
+        if(fz<0){
+            zOffset = -zOffset;
+        }
+
+        var pos = {x: xOffset, y: yOffset, z: zOffset};
+        cyl.setAttribute('scale', {x: scaling, y: scaling, z: scaling});
+        cyl.setAttribute('position', pos);
+        cyl.setAttribute('rotation', rotation);
+    }
+}
+
+function resultantForceArrow (nodeID) {
     var nodeUsed = document.getElementById(nodeID);
+    var nodeObj = Node[Number(nodeID.substr(7))];
+    var offset = 0.215;
+
+    var fx = nodeObj.forceX;
+    var fy = nodeObj.forceY;
+    var fz = nodeObj.forceZ;
+
+    if(fz == 0){
+        var R = math.sqrt(math.square(fx)+math.square(fy));
+        var alpha = math.acos(fx/R)*(180/Math.PI);
+        var beta = math.acos(fy/R)*(180/Math.PI);
+
+        if(fx>0){
+            beta = -beta;
+        }
+        var rotation = '0'.concat(' '+0+' '+ beta);
+    } else{
+        var R = math.sqrt(math.square(fx)+math.square(fy)+math.square(fz));
+        var alpha = math.acos(fx/R)*(180/Math.PI);
+        var beta = math.acos(fy/R)*(180/Math.PI);
+        var gamma = math.acos(fz/R)*(180/Math.PI);
+        var rotation = ''.concat(gamma+' '+alpha+' '+beta);
+    }
+
+    //console.log(rotation);
 
     var cyl = document.createElement('a-entity');
     cyl.setAttribute('mixin', 'down Cyl');
@@ -509,6 +608,74 @@ function addForceArrow (nodeID, force, dir) {
     var offset = 0.215;
     cone.setAttribute('mixin', 'Cone');
     cyl.appendChild(cone);
+
+
+    var cylID = String(nodeID.substr(3))+'.R';
+    cyl.setAttribute('id', cylID);
+
+    var scaling = math.abs(R/maxForce);
+    if(scaling > 1){
+        scaling = 1;
+        if(offset*math.abs(fx/maxForce) > offset){
+            var xOffset = offset;
+        } else {
+            var xOffset = offset*math.abs(fx/maxForce)*math.abs(fx/R);
+        }
+        if(offset*math.abs(fy/maxForce) > offset){
+            var yOffset = offset;
+        } else {
+            var yOffset = offset*math.abs(fy/maxForce)*math.abs(fx/R);
+        }
+        if(offset*math.abs(fz/maxForce) > offset){
+            var zOffset = offset;
+        } else {
+            var zOffset = offset*math.abs(fz/maxForce)*math.abs(fx/R);
+        }
+        console.log(xOffset);
+        console.log(yOffset);
+        console.log(zOffset);
+    } else {
+        var xOffset = offset*math.abs(fx/maxForce);
+        var yOffset = offset*math.abs(fy/maxForce);
+        var zOffset = offset*math.abs(fz/maxForce);
+    }
+
+    if(fx<0){
+        xOffset = -xOffset;
+    }
+    if(fy<0){
+        yOffset = -yOffset;
+    }
+    if(fz<0){
+        zOffset = -zOffset;
+    }
+
+    var pos = {x: xOffset, y: yOffset, z: zOffset};
+    cyl.setAttribute('scale', {x: scaling, y: scaling, z: scaling});
+    cyl.setAttribute('position', pos);
+    cyl.setAttribute('rotation', rotation);
+
+}
+
+/*
+function addForceArrow (nodeID, force, dir) {
+    var nodeUsed = document.getElementById(nodeID);
+    var nodeObj = Node[Number(nodeID.substr(7))];
+
+    var cyl = document.createElement('a-entity');
+    cyl.setAttribute('mixin', 'down Cyl');
+    nodeUsed.appendChild(cyl);
+    var cone = document.createElement('a-entity');
+    var offset = 0.215;
+    cone.setAttribute('mixin', 'Cone');
+    cyl.appendChild(cone);
+
+    var scaling = math.abs(force/maxForce);
+    if(scaling > 1){
+        scaling = 1;
+    };
+
+
     if(dir == 'y'){
         var cylID = String(nodeID.substr(3))+'.fy';
         cyl.setAttribute('id', cylID);
@@ -516,37 +683,35 @@ function addForceArrow (nodeID, force, dir) {
             cyl.setAttribute('visible', 'false');
         }
         else if(force>0){
-            var rotation = '0 0 0'
+            cyl.setAttribute('scale', {x: -scaling, y: -scaling, z: -scaling});
             cyl.setAttribute('visible', 'true');
-            cyl.setAttribute('rotation', rotation);
         }
         else if(force<0){
-            var rotation = '0 0 180'
-            cyl.setAttribute('visible', 'true');
-            cyl.setAttribute('rotation', rotation);
             offset = -offset;
+            cyl.setAttribute('visible', 'true');
+            cyl.setAttribute('scale', {x: scaling, y: scaling, z: scaling});
         }
-        var pos = {x: 0, y: offset, z: 0};
+        var pos = {x: 0, y: offset*scaling, z: 0};
         cyl.setAttribute('position', pos);
     }
     else if(dir =='x'){
         var cylID = String(nodeID.substr(3))+'.fx';
         cyl.setAttribute('id', cylID);
+        var rotation = '0 0 90'
+        cyl.setAttribute('rotation', rotation);
         if(force==0){
             cyl.setAttribute('visible', 'false');
         }
         else if(force>0){
-            var rotation = '0 0 -90'
+            cyl.setAttribute('scale', {x: -scaling, y: -scaling, z: -scaling});
             cyl.setAttribute('visible', 'true');
-            cyl.setAttribute('rotation', rotation);
         }
         else if(force<0){
-            var rotation = '0 0 90'
-            cyl.setAttribute('visible', 'true');
-            cyl.setAttribute('rotation', rotation);
             offset = -offset;
+            cyl.setAttribute('scale', {x: scaling, y: scaling, z: scaling});
+            cyl.setAttribute('visible', 'true');
         }
-        var pos = {x: offset, y: 0, z: 0};
+        var pos = {x: offset*scaling, y: 0, z: 0};
         cyl.setAttribute('position', pos);
     }
     else if(dir =='z'){
@@ -572,6 +737,7 @@ function addForceArrow (nodeID, force, dir) {
         }
     }
 }
+*/
 
 function plotDot (scene, position, size, color, id, text) {
     var sphere = document.createElement('a-entity');
@@ -653,8 +819,9 @@ function plotDefDot (scene, position, size, color, id, text) {
     //console.log(sphere);
     parent.appendChild(sphere);
 
-    addForceArrow(id,Node[Number(id.substr(7))].forceY,'y');
-    addForceArrow(id,Node[Number(id.substr(7))].forceX,'x');
+    resultantForceArrow(id);
+    //addForceArrow(id,Node[Number(id.substr(7))].forceY,'y');
+    //addForceArrow(id,Node[Number(id.substr(7))].forceX,'x');
     //addForceArrow(id,Node[Number(id.substr(7))].forceZ,'z');
 };
 
@@ -669,6 +836,7 @@ function TriMaker(nodeA,nodeB,nodeC,color){
     //var geometry = new THREE.ShapeGeometry(shape);
     var material = new THREE.MeshBasicMaterial({
         color: Fcolor
+        //,alphamap: '#000000'
     });
 
     var extrudeSettings = {
@@ -679,7 +847,7 @@ function TriMaker(nodeA,nodeB,nodeC,color){
 
     var geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     var mesh = new THREE.Mesh(geometry, material);
-    
+
     return mesh
 }
 
@@ -1030,9 +1198,9 @@ var DoAnalysis = function(){
 };
 
 function updateLegend(stressDiv, maxAllowableStress){
-    
+
     var legSegs = round(numSegs/6);
-    
+
     var lg0 = document.getElementById('lg0');
     lg0.setAttribute('value','='+ String(round(stressDiv*(legSegs*0)/1E6, 2)) +' MPa');
     var lg1 = document.getElementById('lg1');
