@@ -8,7 +8,7 @@ var content = new Array();
 // Instead of 'utf-8' it can be  
 // other character set also like 'ascii' 
 
-fs.readFile('CST.csv', 'utf-8', (err, data) => { 
+fs.readFile('Job_p25.csv', 'utf-8', (err, data) => { 
     if (err) {throw err; }
 
     // Converting Raw Buffer to text 
@@ -34,35 +34,33 @@ function processFile() {
     var num = 0;
     var Node = [];
     var Tri = [];
-    //console.log(content);
-    for (i = 0; i < content.length; i = i+14, num = num+1) { 
+    console.log(content);
+    for (i = 0; i < content.length; i = i+10, num = num+1) { 
         if (content[i] != '\r\n\r\n*Tri'){
             if( content[i] == '*Node')
             { 
-                i = i+14;
+                i = i+10;
             }
             //Node Objects are created and characterized here
-            Node[num] = { nodeName : 'Node'+ String(Number(content[i])), 
+            Node[num] = { nodeName : 'Node'+ String(Number(content[i])-1), 
                          x : Number(content[i+1]), y : Number(content[i+2]), z : Number(content[i+3]),
                          fixedX : Number(content[i+4]), fixedY : Number(content[i+5]),fixedZ : Number(content[i+6]), 
-                         xRot : Number(content[i+7]), yRot : Number(content[i+8]), zRot : Number(content[i+9]), 
-                         forceX : Number(content[i+10]), forceY : Number(content[i+11]), forceZ : Number(content[i+12]), 
-                         fdist : Number(content[i+13])};
+                         forceX : Number(content[i+7]), forceY : Number(content[i+8]), forceZ : Number(content[i+9])};
 
 
         }
         else if(content[i] == '\r\n\r\n*Tri'){ 
-            for (var i = i + 1, num = 0; i < content.length; i = i+4, num = num+1) { 
+            for (var i = i + 1, num = 0; i < content.length; i = i+10, num = num+1) { 
                 //Element Objects are created and characterized here
                 Tri[num] = { elemName : 'Tri'+ String(Number(content[i])), 
-                             nodeA : Number(content[i+1]), nodeB : Number(content[i+2]), nodeC : Number(content[i+3])}};
+                             nodeA : Number(content[i+1])-1, nodeB : Number(content[i+2])-1, nodeC : Number(content[i+3])-1}};
             //break;
         }
     }
 
 
     console.log('var Node = ');
-    console.log(Node);
+    console.dir(Node, {'maxArrayLength': null});
     console.log('var Tri = ');
-    console.log(Tri);
+    console.dir(Tri, {'maxArrayLength': null});
 }
