@@ -384,6 +384,7 @@ var Tri =
   { elemName: 'Tri39', nodeA: 31, nodeB: 22, nodeC: 9 },
   { elemName: 'Tri40', nodeA: 31, nodeB: 23, nodeC: 30 } ];*/
 
+
 //p25 sheet
 var Node =
 [ { nodeName: 'Node0',
@@ -1642,88 +1643,6 @@ function resultantForceArrow (nodeID) {
 
 }
 
-/*
-function addForceArrow (nodeID, force, dir) {
-    var nodeUsed = document.getElementById(nodeID);
-    var nodeObj = Node[Number(nodeID.substr(7))];
-
-    var cyl = document.createElement('a-entity');
-    cyl.setAttribute('mixin', 'down Cyl');
-    nodeUsed.appendChild(cyl);
-    var cone = document.createElement('a-entity');
-    var offset = 0.215;
-    cone.setAttribute('mixin', 'Cone');
-    cyl.appendChild(cone);
-
-    var scaling = math.abs(force/maxForce);
-    if(scaling > 1){
-        scaling = 1;
-    };
-
-
-    if(dir == 'y'){
-        var cylID = String(nodeID.substr(3))+'.fy';
-        cyl.setAttribute('id', cylID);
-        if(force==0){
-            cyl.setAttribute('visible', 'false');
-        }
-        else if(force>0){
-            cyl.setAttribute('scale', {x: -scaling, y: -scaling, z: -scaling});
-            cyl.setAttribute('visible', 'true');
-        }
-        else if(force<0){
-            offset = -offset;
-            cyl.setAttribute('visible', 'true');
-            cyl.setAttribute('scale', {x: scaling, y: scaling, z: scaling});
-        }
-        var pos = {x: 0, y: offset*scaling, z: 0};
-        cyl.setAttribute('position', pos);
-    }
-    else if(dir =='x'){
-        var cylID = String(nodeID.substr(3))+'.fx';
-        cyl.setAttribute('id', cylID);
-        var rotation = '0 0 90'
-        cyl.setAttribute('rotation', rotation);
-        if(force==0){
-            cyl.setAttribute('visible', 'false');
-        }
-        else if(force>0){
-            cyl.setAttribute('scale', {x: -scaling, y: -scaling, z: -scaling});
-            cyl.setAttribute('visible', 'true');
-        }
-        else if(force<0){
-            offset = -offset;
-            cyl.setAttribute('scale', {x: scaling, y: scaling, z: scaling});
-            cyl.setAttribute('visible', 'true');
-        }
-        var pos = {x: offset*scaling, y: 0, z: 0};
-        cyl.setAttribute('position', pos);
-    }
-    else if(dir =='z'){
-        var cylID = String(nodeID.substr(3))+'.fz';
-        cyl.setAttribute('id', cylID);
-        if(force==0){
-            cyl.setAttribute('visible', 'false');
-        }
-        else if(force>0){
-            var rotation = '0 270 -90'
-            cyl.setAttribute('visible', 'true');
-            cyl.setAttribute('rotation', rotation);
-            var pos = {x: 0, y: 0, z: offset};
-            cyl.setAttribute('position', pos);
-        }
-        else if(force<0){
-            offset = -offset;
-            var rotation = '0 270 90'
-            cyl.setAttribute('visible', 'true');
-            cyl.setAttribute('rotation', rotation);
-            var pos = {x: 0, y: 0, z: offset};
-            cyl.setAttribute('position', pos);
-        }
-    }
-}
-*/
-
 function plotDot (scene, position, size, color, id, text) {
     var sphere = document.createElement('a-entity');
     var parent = document.getElementById('undefModel');
@@ -2158,7 +2077,7 @@ var DoAnalysis = function(){
             newNode.setAttribute('position', {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z});
         }
         else{
-            plotDefDot(scene, {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z}, 0.1, "#000000", 'Def'+Node[i].nodeName, detailText);
+            plotDefDot(scene, {x: DefNode[i].x, y: DefNode[i].y, z: DefNode[i].z}, 0.05, "#000000", 'Def'+Node[i].nodeName, detailText);
         }
         i = i+1;
     };
@@ -2233,7 +2152,7 @@ AFRAME.registerComponent('web-cst', {
             //Node[i].x = Node[i].x*scaleFactor;
             //Node[i].y = Node[i].y*scaleFactor;
             //Node[i].z = Node[i].z*scaleFactor;
-            plotDot(scene, {x: Node[i].x, y: Node[i].y, z: Node[i].z}, 0.1, "#ffffff", Node[i].nodeName, detailText);
+            plotDot(scene, {x: Node[i].x, y: Node[i].y, z: Node[i].z}, 0.01, "#ffffff", Node[i].nodeName, detailText);
             i = i+1;
         };
         for (var j = 0; j < Tri.length; j = j+1) {
