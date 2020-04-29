@@ -1,5 +1,5 @@
 # WebTruss
- Realtime 2D Frame FEA in WebVR
+ Realtime 3D Frame FEA Solver in WebVR
 
 Michayal Mathew,
 MAESTRO VR Research Lab,
