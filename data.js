@@ -1060,9 +1060,18 @@ var DoAnalysis = function(){
         }
     }
 
+<<<<<<< Updated upstream
     var Kinv = math.inv(Kglobal)
     var qGlobal = math.multiply(Kinv,Qglobal);
 
+=======
+    const t0 = performance.now();
+    //var Kinv = math.inv(Kglobal)
+    //var qGlobal = math.multiply(Kinv,Qglobal);
+    var qGlobal = math.lusolve(Kglobal,Qglobal);
+    const t1 = performance.now();
+    console.log(`Call to solve matrix took ${t1 - t0} milliseconds.`);
+>>>>>>> Stashed changes
     /*
     for (var i = 0; i < qGlobal._size[0]; i = i+1) {
         if(Math.abs(qGlobal.subset(math.index(i,0)))< 1E-16){
